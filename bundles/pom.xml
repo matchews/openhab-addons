@@ -126,6 +126,7 @@
     <module>org.openhab.binding.ekey</module>
     <module>org.openhab.binding.electroluxair</module>
     <module>org.openhab.binding.elerotransmitterstick</module>
+    <module>org.openhab.binding.elkm1</module>
     <module>org.openhab.binding.elroconnects</module>
     <module>org.openhab.binding.energenie</module>
     <module>org.openhab.binding.energidataservice</module>
