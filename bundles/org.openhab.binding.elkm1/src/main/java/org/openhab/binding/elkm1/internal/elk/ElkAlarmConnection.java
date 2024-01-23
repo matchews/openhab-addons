@@ -18,6 +18,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
@@ -94,7 +95,7 @@ public class ElkAlarmConnection {
 
             SSLContext sc;
             try {
-                sc = SSLContext.getInstance("SSL");
+                sc = SSLContext.getInstance("TLSv1.2");
                 sc.init(null, trustAllCerts, new java.security.SecureRandom());
                 sFactory = sc.getSocketFactory();
             } catch (KeyManagementException | NoSuchAlgorithmException e) {
@@ -107,6 +108,8 @@ public class ElkAlarmConnection {
 
         try {
             socket = sFactory.createSocket(config.ipAddress, config.port);
+        } catch (ConnectException e) {
+            logger.error("Unable to open connection to Elk alarm: {}:{}", config.ipAddress, config.port, e);
         } catch (IOException e) {
             logger.error("Unable to open connection to Elk alarm: {}:{}", config.ipAddress, config.port, e);
         }
@@ -130,7 +133,7 @@ public class ElkAlarmConnection {
      * @return True if connection is established, false if it is not.
      */
     public boolean sslLogin() {
-        ((SSLSocket) socket).setEnabledProtocols(new String[] { "TLSv1" }); // "TLSv1,TLSv1.1,TLSv1.2"
+        ((SSLSocket) socket).setEnabledProtocols(new String[] { "TLSv1.2" }); // "TLSv1,TLSv1.1,TLSv1.2"
         try {
             try (BufferedWriter out = new BufferedWriter(
                     new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
