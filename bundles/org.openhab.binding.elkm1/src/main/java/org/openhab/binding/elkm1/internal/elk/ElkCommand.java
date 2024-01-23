@@ -97,6 +97,6 @@ public enum ElkCommand {
     }
 
     public String toSendString() {
-        return null;
+        return "";
     }
 }

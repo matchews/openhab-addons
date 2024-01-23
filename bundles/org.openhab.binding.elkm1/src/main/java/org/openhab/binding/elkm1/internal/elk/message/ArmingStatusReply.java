@@ -13,6 +13,7 @@
 
 package org.openhab.binding.elkm1.internal.elk.message;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.elkm1.internal.elk.ElkAlarmAreaState;
 import org.openhab.binding.elkm1.internal.elk.ElkAlarmArmUpState;
 import org.openhab.binding.elkm1.internal.elk.ElkAlarmArmedState;
@@ -26,6 +27,7 @@ import org.openhab.binding.elkm1.internal.elk.ElkMessageFactory;
  * @author David Bennett - Initial Contribution
  *
  */
+@NonNullByDefault
 public class ArmingStatusReply extends ElkMessage {
     private ElkAlarmArmUpState[] armedUp;
     private ElkAlarmAreaState[] state;
@@ -59,6 +61,6 @@ public class ArmingStatusReply extends ElkMessage {
 
     @Override
     protected String getData() {
-        return null;
+        return "";
     }
 }

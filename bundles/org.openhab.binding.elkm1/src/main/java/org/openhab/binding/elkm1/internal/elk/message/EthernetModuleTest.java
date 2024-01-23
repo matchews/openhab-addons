@@ -16,6 +16,7 @@ package org.openhab.binding.elkm1.internal.elk.message;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.elkm1.internal.elk.ElkCommand;
 import org.openhab.binding.elkm1.internal.elk.ElkMessage;
 
@@ -24,6 +25,7 @@ import org.openhab.binding.elkm1.internal.elk.ElkMessage;
  *
  * @author David Bennett - Initial Contribution
  */
+@NonNullByDefault
 public class EthernetModuleTest extends ElkMessage {
     private Date dateFromElk;
     private boolean daylightSavings;
@@ -69,6 +71,6 @@ public class EthernetModuleTest extends ElkMessage {
 
     @Override
     protected String getData() {
-        return null;
+        return "";
     }
 }

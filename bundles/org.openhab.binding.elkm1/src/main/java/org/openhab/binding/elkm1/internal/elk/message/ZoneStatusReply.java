@@ -91,6 +91,6 @@ public class ZoneStatusReply extends ElkMessage {
 
     @Override
     protected String getData() {
-        return null;
+        return "";
     }
 }

@@ -13,6 +13,7 @@
 
 package org.openhab.binding.elkm1.internal.elk.message;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.elkm1.internal.elk.ElkCommand;
 import org.openhab.binding.elkm1.internal.elk.ElkMessage;
 
@@ -22,6 +23,7 @@ import org.openhab.binding.elkm1.internal.elk.ElkMessage;
  * @author David Bennett - Initial Contribution
  *
  */
+@NonNullByDefault
 public class KeypadKeyChangeUpdate extends ElkMessage {
     public KeypadKeyChangeUpdate(String input) {
         super(ElkCommand.KeypadKeyChangeUpdate);
@@ -29,6 +31,6 @@ public class KeypadKeyChangeUpdate extends ElkMessage {
 
     @Override
     protected String getData() {
-        return null;
+        return "";
     }
 }
