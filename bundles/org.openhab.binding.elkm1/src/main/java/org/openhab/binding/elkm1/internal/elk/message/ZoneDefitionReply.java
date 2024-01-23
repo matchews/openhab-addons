@@ -48,6 +48,6 @@ public class ZoneDefitionReply extends ElkMessage {
 
     @Override
     protected String getData() {
-        return null;
+        return "";
     }
 }

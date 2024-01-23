@@ -12,6 +12,7 @@
  */
 package org.openhab.binding.elkm1.internal.elk.message;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.elkm1.internal.elk.ElkCommand;
 import org.openhab.binding.elkm1.internal.elk.ElkMessage;
 
@@ -21,6 +22,7 @@ import org.openhab.binding.elkm1.internal.elk.ElkMessage;
  * @author Matt Myers - Initial Contribution
  *
  */
+@NonNullByDefault
 public class SendEmailTrigger extends ElkMessage {
     public SendEmailTrigger(String command) {
         super(ElkCommand.SendEmailTrigger);
@@ -28,6 +30,6 @@ public class SendEmailTrigger extends ElkMessage {
 
     @Override
     protected String getData() {
-        return null;
+        return "";
     }
 }
