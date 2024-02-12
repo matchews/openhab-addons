@@ -24,11 +24,14 @@ import org.openhab.binding.elkm1.internal.ElkM1HandlerListener;
 import org.openhab.binding.elkm1.internal.config.ElkAlarmConfig;
 import org.openhab.binding.elkm1.internal.elk.ElkAlarmArmedState;
 import org.openhab.binding.elkm1.internal.elk.ElkAlarmConnection;
+import org.openhab.binding.elkm1.internal.elk.ElkCommand;
 import org.openhab.binding.elkm1.internal.elk.ElkDefinition;
 import org.openhab.binding.elkm1.internal.elk.ElkListener;
 import org.openhab.binding.elkm1.internal.elk.ElkMessage;
 import org.openhab.binding.elkm1.internal.elk.ElkMessageFactory;
 import org.openhab.binding.elkm1.internal.elk.ElkTypeToRequest;
+import org.openhab.binding.elkm1.internal.elk.ElkVoicePhrases;
+import org.openhab.binding.elkm1.internal.elk.ElkVoiceWords;
 import org.openhab.binding.elkm1.internal.elk.message.ArmAway;
 import org.openhab.binding.elkm1.internal.elk.message.ArmToNight;
 import org.openhab.binding.elkm1.internal.elk.message.ArmToNightInstant;
@@ -41,6 +44,8 @@ import org.openhab.binding.elkm1.internal.elk.message.Disarm;
 import org.openhab.binding.elkm1.internal.elk.message.EthernetModuleTest;
 import org.openhab.binding.elkm1.internal.elk.message.EthernetModuleTestReply;
 import org.openhab.binding.elkm1.internal.elk.message.OutputOn;
+import org.openhab.binding.elkm1.internal.elk.message.SpeakPhraseAtVoiceOutput;
+import org.openhab.binding.elkm1.internal.elk.message.SpeakWordAtVoiceOutput;
 import org.openhab.binding.elkm1.internal.elk.message.StringTextDescription;
 import org.openhab.binding.elkm1.internal.elk.message.StringTextDescriptionReply;
 import org.openhab.binding.elkm1.internal.elk.message.ValidOrInvalidUserCode;
@@ -69,7 +74,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author David Bennett - Initial contribution
  */
-
 public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener {
     private final Logger logger = LoggerFactory.getLogger(ElkM1BridgeHandler.class);
     private ScheduledFuture<?> initializeFuture;
@@ -401,11 +405,19 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         }
     }
 
-    public void sendELKCommand(String command) {
-        String messageType = command.substring(0, 2);
+    public void sendELKCommand(String commandString) {
+        ElkCommand messageType = ElkCommand.fromValue(commandString.substring(0, 2));
         switch (messageType) {
-            case "cn":
-                connection.sendCommand(new OutputOn(command));
+            case ControlOutputOn:
+                connection.sendCommand(new OutputOn(commandString));
+                break;
+            case SpeakPhraseAtVoiceOutput:
+                connection.sendCommand(new SpeakPhraseAtVoiceOutput(
+                        ElkVoicePhrases.fromValue(Integer.parseInt(commandString.substring(2)))));
+                break;
+            case SpeakWordAtVoiceOutput:
+                connection.sendCommand(new SpeakWordAtVoiceOutput(
+                        ElkVoiceWords.fromValue(Integer.parseInt(commandString.substring(2)))));
                 break;
         }
     }
