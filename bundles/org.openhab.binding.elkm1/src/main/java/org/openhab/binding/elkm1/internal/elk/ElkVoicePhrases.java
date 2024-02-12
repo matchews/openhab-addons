@@ -13,14 +13,11 @@
 
 package org.openhab.binding.elkm1.internal.elk;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
-
 /**
  * The phrases the elk can speak.
  *
  * @author David Bennett - Initial Contribution
  */
-@NonNullByDefault
 public enum ElkVoicePhrases {
     SilenceDelay(0),
     Zone1(1),
@@ -354,5 +351,17 @@ public enum ElkVoicePhrases {
      */
     public int getValue() {
         return value;
+    }
+
+    /**
+     * Get an elk voice phrase from the integer value.
+     */
+    public static ElkVoicePhrases fromValue(Integer val) {
+        for (ElkVoicePhrases cmd : ElkVoicePhrases.values()) {
+            if (cmd.getValue() == val) {
+                return cmd;
+            }
+        }
+        return null;
     }
 }

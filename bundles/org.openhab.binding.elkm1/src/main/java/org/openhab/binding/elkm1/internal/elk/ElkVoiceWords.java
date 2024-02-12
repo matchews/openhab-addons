@@ -13,14 +13,11 @@
 
 package org.openhab.binding.elkm1.internal.elk;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
-
 /**
  * The set of words the elk can speak.
  *
  * @author David Bennett - Initial Contribution
  */
-@NonNullByDefault
 public enum ElkVoiceWords {
     _Custom1(1),
     _Custom2(2),
@@ -497,5 +494,17 @@ public enum ElkVoiceWords {
      */
     public int getValue() {
         return value;
+    }
+
+    /**
+     * Get an elk voice word from the integer value.
+     */
+    public static ElkVoiceWords fromValue(int val) {
+        for (ElkVoiceWords cmd : ElkVoiceWords.values()) {
+            if (cmd.getValue() == val) {
+                return cmd;
+            }
+        }
+        return null;
     }
 }
