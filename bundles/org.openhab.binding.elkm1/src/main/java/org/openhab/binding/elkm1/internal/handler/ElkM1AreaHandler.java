@@ -55,28 +55,28 @@ public class ElkM1AreaHandler extends BaseThingHandler {
      */
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        if (ElkM1BindingConstants.CHANNEL_AREA_ARMED.equals(channelUID.getId())) {
-            if (command instanceof StringType) {
-                StringType str = (StringType) command;
-                ElkAlarmArmedState armed = ElkAlarmArmedState.valueOf(str.toString());
-                @SuppressWarnings("null")
-                ElkM1BridgeHandler bridgeHandler = (ElkM1BridgeHandler) getBridge().getHandler();
-
-                String zoneNo = getThing().getProperties().get(ElkM1BindingConstants.PROPERTY_ZONE_NUM);
-                if (zoneNo != null) {
-                    int zone = Integer.valueOf(zoneNo);
-                    if (bridgeHandler != null) {
-                        bridgeHandler.updateArmedState(zone, armed);
+        try {
+            if (ElkM1BindingConstants.CHANNEL_AREA_ARMED.equals(channelUID.getId())) {
+                if (command instanceof StringType) {
+                    StringType str = (StringType) command;
+                    ElkAlarmArmedState armed = ElkAlarmArmedState.valueOf(str.toString());
+                    @SuppressWarnings("null")
+                    ElkM1BridgeHandler bridgeHandler = (ElkM1BridgeHandler) getBridge().getHandler();
+                    String zoneNo = getThing().getProperties().get(ElkM1BindingConstants.PROPERTY_ZONE_NUM);
+                    if (zoneNo != null) {
+                        int zone = Integer.valueOf(zoneNo);
+                        if (bridgeHandler != null) {
+                            bridgeHandler.updateArmedState(zone, armed);
+                        }
                     }
                 }
             }
-        }
 
-        else if (ElkM1BindingConstants.CHANNEL_AREA_COMMAND.equals(channelUID.getId())) {
-            if (command instanceof StringType) {
-                StringType str = (StringType) command;
-                // Execute the command
-                try {
+            else if (ElkM1BindingConstants.CHANNEL_AREA_COMMAND.equals(channelUID.getId())) {
+                if (command instanceof StringType) {
+                    StringType str = (StringType) command;
+                    // Execute the command
+                    // try {
                     Bridge bridge = getBridge();
                     if (bridge != null) {
                         ElkM1BridgeHandler bridgeHandler = (ElkM1BridgeHandler) bridge.getHandler();
@@ -84,13 +84,17 @@ public class ElkM1AreaHandler extends BaseThingHandler {
                             bridgeHandler.sendELKCommand(str.toString());
                         }
                     }
-                } catch (Exception e) {
+                    // } catch (Exception e) {
+                    // logger.error("Error handling command: ", e);
+                    // }
                 }
             }
-        }
 
-        if (command instanceof RefreshType) {
-            getElkM1BridgeHandler().refreshArea();
+            if (command instanceof RefreshType) {
+                getElkM1BridgeHandler().refreshArea();
+            }
+        } catch (Exception e) {
+            logger.error("Error handling command: ", e);
         }
     }
 
