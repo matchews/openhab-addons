@@ -41,6 +41,7 @@ import org.openhab.binding.elkm1.internal.elk.message.ArmToVacation;
 import org.openhab.binding.elkm1.internal.elk.message.ArmingStatus;
 import org.openhab.binding.elkm1.internal.elk.message.ArmingStatusReply;
 import org.openhab.binding.elkm1.internal.elk.message.Disarm;
+import org.openhab.binding.elkm1.internal.elk.message.DisplayTextOnLedScreen;
 import org.openhab.binding.elkm1.internal.elk.message.EthernetModuleTest;
 import org.openhab.binding.elkm1.internal.elk.message.EthernetModuleTestReply;
 import org.openhab.binding.elkm1.internal.elk.message.OutputOn;
@@ -352,7 +353,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     }
 
     /**
-     * Called when an area is added to ask for the defintion and details of it.
+     * Called when an area is added to ask for the definition and details of it.
      *
      * @param elkM1AreaHandler The handler for the area that is added.
      */
@@ -377,7 +378,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
      * @param area The area to alarm
      * @param armed The state to set it to
      */
-    public void updateArmedState(int area, ElkAlarmArmedState armed) {
+    public void updateArmedState(int area, ElkAlarmArmedState armed) throws Exception {
         ElkAlarmConfig config = getConfigAs(ElkAlarmConfig.class);
         String pincode = String.format("%06d", config.userCode);
         switch (armed) {
@@ -405,11 +406,14 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         }
     }
 
-    public void sendELKCommand(String commandString) {
+    public void sendELKCommand(String commandString) throws Exception {
         ElkCommand messageType = ElkCommand.fromValue(commandString.substring(0, 2));
         switch (messageType) {
             case ControlOutputOn:
                 connection.sendCommand(new OutputOn(commandString));
+                break;
+            case DisplayTextOnLedScreen:
+                connection.sendCommand(new DisplayTextOnLedScreen(commandString));
                 break;
             case SpeakPhraseAtVoiceOutput:
                 connection.sendCommand(new SpeakPhraseAtVoiceOutput(

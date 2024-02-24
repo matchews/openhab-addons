@@ -184,7 +184,11 @@ public class ElkAlarmConnection {
      */
     public void sendCommand(ElkMessage message) {
         synchronized (toSend) {
-            this.toSend.add(message);
+            if (message.validElkCommand) {
+                this.toSend.add(message);
+            } else {
+                logger.error("Invalid Command not sent");
+            }
         }
 
         if (!sentSomething) {

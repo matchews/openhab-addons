@@ -22,6 +22,7 @@ import org.openhab.binding.elkm1.internal.elk.message.OutputChangeUpdate;
 import org.openhab.binding.elkm1.internal.elk.message.ReplyRealTimeClock;
 import org.openhab.binding.elkm1.internal.elk.message.SendEmailTrigger;
 import org.openhab.binding.elkm1.internal.elk.message.StringTextDescriptionReply;
+import org.openhab.binding.elkm1.internal.elk.message.SystemTroubleStatusReply;
 import org.openhab.binding.elkm1.internal.elk.message.ValidOrInvalidUserCode;
 import org.openhab.binding.elkm1.internal.elk.message.VersionReply;
 import org.openhab.binding.elkm1.internal.elk.message.ZoneChangeUpdate;
@@ -51,12 +52,28 @@ public class ElkMessageFactory {
         }
         // Figure out the elk message to create.
         switch (input.substring(2, 4)) {
+            case "AM":
+                return new AlarmMemory(data.data);
             case "AS":
                 return new ArmingStatusReply(data.getData());
             case "AZ":
                 return new AlarmZoneReply(data.data);
+            case "CC":
+                return new OutputChangeUpdate(data.data);
+            case "EE":
+                return new EntryExitData(data.data);
+            case "EM":
+                return new SendEmailTrigger(data.data);
+            case "IC":
+                return new ValidOrInvalidUserCode(data.data);
+            case "KC":
+                return new KeypadKeyChangeUpdate(data.data);
+            case "RR":
+                return new ReplyRealTimeClock(data.data);
             case "SD":
                 return new StringTextDescriptionReply(data.data);
+            case "SS":
+                return new SystemTroubleStatusReply(data.data);
             case "VN":
                 return new VersionReply(data.data);
             case "XK":
@@ -69,20 +86,6 @@ public class ElkMessageFactory {
                 return new ZonePartitionReply(data.data);
             case "ZS":
                 return new ZoneStatusReply(data.data);
-            case "KC":
-                return new KeypadKeyChangeUpdate(data.data);
-            case "AM":
-                return new AlarmMemory(data.data);
-            case "CC":
-                return new OutputChangeUpdate(data.data);
-            case "EM":
-                return new SendEmailTrigger(data.data);
-            case "IC":
-                return new ValidOrInvalidUserCode(data.data);
-            case "EE":
-                return new EntryExitData(data.data);
-            case "RR":
-                return new ReplyRealTimeClock(data.data);
         }
         return null;
     }
