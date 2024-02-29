@@ -27,9 +27,4 @@ public class AlarmZone extends ElkMessage {
     public AlarmZone() {
         super(ElkCommand.AlarmZoneRequest);
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

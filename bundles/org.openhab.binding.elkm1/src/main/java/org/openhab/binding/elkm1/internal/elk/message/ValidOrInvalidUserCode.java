@@ -34,9 +34,4 @@ public class ValidOrInvalidUserCode extends ElkMessage {
     public String getUserCode() {
         return userNumber;
     }
-
-    @Override
-    public String getData() {
-        return "";
-    }
 }

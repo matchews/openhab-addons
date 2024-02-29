@@ -41,9 +41,4 @@ public class ZonePartitionReply extends ElkMessage {
     public int[] getAreas() {
         return areas;
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

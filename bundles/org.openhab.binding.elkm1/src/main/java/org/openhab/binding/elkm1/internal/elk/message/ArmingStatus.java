@@ -28,9 +28,4 @@ public class ArmingStatus extends ElkMessage {
     public ArmingStatus() {
         super(ElkCommand.ArmingStatusRequest);
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

@@ -28,9 +28,4 @@ public class AlarmMemory extends ElkMessage {
     public AlarmMemory(String input) {
         super(ElkCommand.AlarmMemory);
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

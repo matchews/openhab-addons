@@ -83,9 +83,4 @@ public class ZoneChangeUpdate extends ElkMessage {
     public ElkZoneStatus getStatus() {
         return status;
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

@@ -56,7 +56,6 @@ public class ElkAlarmConnection {
     private Thread elkAlarmThread;
     private List<ElkListener> listeners = new ArrayList<ElkListener>();
     private Queue<ElkMessage> toSend = new ArrayBlockingQueue<>(100);
-
     private SocketFactory sFactory;
 
     /**
@@ -191,7 +190,7 @@ public class ElkAlarmConnection {
             }
         }
 
-        // Not sure what the purpose of this is
+        // ToDo
         // if (!sentSomething) {
         sendActualMessage();
         // }
@@ -270,7 +269,7 @@ public class ElkAlarmConnection {
             }
             while (running) {
                 try {
-                    // ReadingDataThread sit here waiting to receive something
+                    // Wait to receive something
                     String line = buff.readLine();
                     logger.debug("Received from Elk alarm: {}", line);
                     ElkMessage message = factory.createMessage(line);
@@ -284,7 +283,7 @@ public class ElkAlarmConnection {
                     } else {
                         logger.info("Unknown Elk message: {}", line);
                     }
-                    // See if we need to send a message too.
+                    // Send any messages in the ArrayBlockingQueue
                     sendActualMessage();
                 } catch (IOException e) {
                     logger.error("Error reading from Elk alarm: {}:{}", config.ipAddress, config.port, e);

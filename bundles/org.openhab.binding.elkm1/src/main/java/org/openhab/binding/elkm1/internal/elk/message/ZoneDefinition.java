@@ -27,9 +27,4 @@ public class ZoneDefinition extends ElkMessage {
     public ZoneDefinition() {
         super(ElkCommand.ZoneDefintionRequest);
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

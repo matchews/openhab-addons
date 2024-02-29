@@ -28,9 +28,4 @@ public class OutputChangeUpdate extends ElkMessage {
     public OutputChangeUpdate(String input) {
         super(ElkCommand.OutputChangeUpdate);
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

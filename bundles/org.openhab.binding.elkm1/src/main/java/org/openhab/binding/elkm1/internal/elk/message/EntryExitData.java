@@ -27,9 +27,4 @@ public class EntryExitData extends ElkMessage {
     public EntryExitData(String command) {
         super(ElkCommand.EntryExitData);
     }
-
-    @Override
-    public String getData() {
-        return "";
-    }
 }

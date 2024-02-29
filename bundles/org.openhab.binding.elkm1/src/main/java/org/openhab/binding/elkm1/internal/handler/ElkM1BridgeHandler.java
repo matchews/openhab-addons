@@ -92,11 +92,10 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        // Needed to instantiate class
     }
 
     /**
-     * Initialize the bridge to do stuff.
+     * Initialize the bridge
      */
     @Override
     public void initialize() {
@@ -127,7 +126,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     }
 
     /**
-     * Called when the configuration is updated. We will reconnect to the elk at this point.
+     * Called when the configuration is updated. Reconnect to the elk.
      */
     @Override
     public void handleConfigurationUpdate(Map<String, Object> configurationParameters) {
@@ -149,7 +148,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     }
 
     /**
-     * Shutdown the bridge.
+     * Shutdown the bridge
      */
     @Override
     public void dispose() {
@@ -162,7 +161,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     }
 
     /**
-     * Handlers an incoming message from the elk system.
+     * Handlers an incoming message from the elk system
      *
      * @param message The message from the elk to handle
      */
@@ -191,7 +190,6 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
             ZonePartitionReply reply = (ZonePartitionReply) message;
             for (int i = 0; i < ElkMessageFactory.MAX_ZONES; i++) {
                 Thing thing = getThingForType(ElkTypeToRequest.Area, reply.getAreas()[i]);
-                // Check that area is 0-8 (ELKM1 Gold returned a 9 on zone 208?)
                 if (reply.getAreas()[i] >= 0 && reply.getAreas()[i] <= 8) {
                     if (thing == null && reply.getAreas()[i] != 0 && !areas[reply.getAreas()[i] - 1]) {
                         // Request the area.
@@ -240,7 +238,6 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         }
         if (message instanceof ArmingStatusReply) {
             ArmingStatusReply reply = (ArmingStatusReply) message;
-            // Do stuff.
             for (int i = 0; i < ElkMessageFactory.MAX_AREAS; i++) {
                 Thing thing = getThingForType(ElkTypeToRequest.Area, i + 1);
                 if (thing != null) {
@@ -253,7 +250,6 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         }
         if (message instanceof ValidOrInvalidUserCode) {
             ValidOrInvalidUserCode reply = (ValidOrInvalidUserCode) message;
-            // Do stuff.
             for (int i = 0; i < ElkMessageFactory.MAX_AREAS; i++) {
                 Thing thing = getThingForType(ElkTypeToRequest.Area, i + 1);
                 if (thing != null) {

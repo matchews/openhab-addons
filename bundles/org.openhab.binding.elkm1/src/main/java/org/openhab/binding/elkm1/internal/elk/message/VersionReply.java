@@ -41,9 +41,4 @@ public class VersionReply extends ElkMessage {
     public String getElkVersion() {
         return versionMax + "." + versionMiddle + "." + versionLow;
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

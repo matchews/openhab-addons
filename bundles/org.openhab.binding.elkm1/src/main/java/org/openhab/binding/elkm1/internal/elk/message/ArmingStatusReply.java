@@ -58,9 +58,4 @@ public class ArmingStatusReply extends ElkMessage {
     public ElkAlarmArmedState[] getArmed() {
         return armed;
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

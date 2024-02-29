@@ -29,9 +29,4 @@ public class ZonePartition extends ElkMessage {
     public ZonePartition() {
         super(ElkCommand.ZonePartition);
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

@@ -32,7 +32,9 @@ public abstract class ElkMessage {
         return command;
     }
 
-    protected abstract String getData();
+    protected String getData() {
+        return null;
+    }
 
     // Format of the packet is:
     // 2 chars length (in hex)

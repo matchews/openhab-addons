@@ -45,9 +45,4 @@ public class ZoneDefitionReply extends ElkMessage {
     public ElkDefinition[] getDefinition() {
         return definition;
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

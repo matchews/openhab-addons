@@ -27,9 +27,4 @@ public class Version extends ElkMessage {
     public Version() {
         super(ElkCommand.RequestVersionNumber);
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

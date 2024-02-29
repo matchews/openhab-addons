@@ -27,9 +27,4 @@ public class SendEmailTrigger extends ElkMessage {
     public SendEmailTrigger(String command) {
         super(ElkCommand.SendEmailTrigger);
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

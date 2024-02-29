@@ -28,9 +28,4 @@ public class SystemTroubleStatusReply extends ElkMessage {
     public SystemTroubleStatusReply(String incomingData) {
         super(ElkCommand.SystemTroubleStatusReply);
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

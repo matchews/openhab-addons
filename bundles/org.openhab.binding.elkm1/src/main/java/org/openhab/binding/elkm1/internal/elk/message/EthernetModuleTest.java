@@ -68,9 +68,4 @@ public class EthernetModuleTest extends ElkMessage {
     public boolean isEuropeanDateFormat() {
         return europeanDateFormat;
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

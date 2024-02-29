@@ -27,9 +27,4 @@ public class ZoneStatus extends ElkMessage {
     public ZoneStatus() {
         super(ElkCommand.ZoneStatusRequest);
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

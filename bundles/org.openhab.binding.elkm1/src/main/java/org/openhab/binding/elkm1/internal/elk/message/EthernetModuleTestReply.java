@@ -27,9 +27,4 @@ public class EthernetModuleTestReply extends ElkMessage {
     public EthernetModuleTestReply() {
         super(ElkCommand.EthernetModuleTestAcknowledge);
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

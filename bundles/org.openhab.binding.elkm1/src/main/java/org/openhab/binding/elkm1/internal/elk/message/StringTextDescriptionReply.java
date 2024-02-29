@@ -47,9 +47,4 @@ public class StringTextDescriptionReply extends ElkMessage {
     public String getText() {
         return text;
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }

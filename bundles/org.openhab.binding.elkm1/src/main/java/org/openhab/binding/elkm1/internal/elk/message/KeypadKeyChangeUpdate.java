@@ -28,9 +28,4 @@ public class KeypadKeyChangeUpdate extends ElkMessage {
     public KeypadKeyChangeUpdate(String input) {
         super(ElkCommand.KeypadKeyChangeUpdate);
     }
-
-    @Override
-    protected String getData() {
-        return "";
-    }
 }
