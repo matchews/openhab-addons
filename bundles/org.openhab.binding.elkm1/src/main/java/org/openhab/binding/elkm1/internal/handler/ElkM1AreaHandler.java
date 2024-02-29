@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2023 Contributors to the openHAB project
+ * Copyright (c) 2010-2024 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -75,8 +75,6 @@ public class ElkM1AreaHandler extends BaseThingHandler {
             else if (ElkM1BindingConstants.CHANNEL_AREA_COMMAND.equals(channelUID.getId())) {
                 if (command instanceof StringType) {
                     StringType str = (StringType) command;
-                    // Execute the command
-                    // try {
                     Bridge bridge = getBridge();
                     if (bridge != null) {
                         ElkM1BridgeHandler bridgeHandler = (ElkM1BridgeHandler) bridge.getHandler();
@@ -84,9 +82,6 @@ public class ElkM1AreaHandler extends BaseThingHandler {
                             bridgeHandler.sendELKCommand(str.toString());
                         }
                     }
-                    // } catch (Exception e) {
-                    // logger.error("Error handling command: ", e);
-                    // }
                 }
             }
 

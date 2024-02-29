@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2023 Contributors to the openHAB project
+ * Copyright (c) 2010-2024 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -191,9 +191,10 @@ public class ElkAlarmConnection {
             }
         }
 
-        if (!sentSomething) {
-            sendActualMessage();
-        }
+        // Not sure what the purpose of this is
+        // if (!sentSomething) {
+        sendActualMessage();
+        // }
     }
 
     private void sendActualMessage() {
@@ -269,9 +270,9 @@ public class ElkAlarmConnection {
             }
             while (running) {
                 try {
+                    // ReadingDataThread sit here waiting to receive something
                     String line = buff.readLine();
                     logger.debug("Received from Elk alarm: {}", line);
-                    // Got our line. Yay.
                     ElkMessage message = factory.createMessage(line);
                     if (message != null) {
                         synchronized (listeners) {
