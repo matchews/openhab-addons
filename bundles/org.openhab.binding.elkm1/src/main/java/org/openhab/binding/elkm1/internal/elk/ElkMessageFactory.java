@@ -12,6 +12,8 @@
  */
 package org.openhab.binding.elkm1.internal.elk;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.elkm1.internal.elk.message.AlarmMemory;
 import org.openhab.binding.elkm1.internal.elk.message.AlarmZoneReply;
 import org.openhab.binding.elkm1.internal.elk.message.ArmingStatusReply;
@@ -38,12 +40,13 @@ import org.slf4j.LoggerFactory;
  * @author David Bennett - Initial COntribution
  *
  */
+@NonNullByDefault
 public class ElkMessageFactory {
     private final Logger logger = LoggerFactory.getLogger(ElkMessageFactory.class);
     public static final int MAX_ZONES = 208;
     public static final int MAX_AREAS = 8;
 
-    public ElkMessage createMessage(String input) {
+    public @Nullable ElkMessage createMessage(String input) {
         ElkData data = new ElkData(input);
         if (!verifyCrc(data)) {
             logger.error("Elk Message Checksum Invalid: Is: {}, Should Be: {}", data.getChecksum(),

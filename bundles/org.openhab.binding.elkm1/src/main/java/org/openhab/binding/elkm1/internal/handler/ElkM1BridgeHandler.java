@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.elkm1.internal.ElkM1BindingConstants;
 import org.openhab.binding.elkm1.internal.ElkM1HandlerListener;
 import org.openhab.binding.elkm1.internal.config.ElkAlarmConfig;
@@ -75,11 +77,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author David Bennett - Initial contribution
  */
+@NonNullByDefault
 public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener {
     private final Logger logger = LoggerFactory.getLogger(ElkM1BridgeHandler.class);
-    private ScheduledFuture<?> initializeFuture;
-    private ElkAlarmConnection connection;
-    private ElkMessageFactory messageFactory;
+    private @Nullable ScheduledFuture<?> initializeFuture;
+    private @Nullable ElkAlarmConnection connection;
+    private ElkMessageFactory messageFactory = new ElkMessageFactory(); // ToDo is this ok???****************
     private boolean[] areas = new boolean[ElkMessageFactory.MAX_AREAS];
     private List<ElkM1HandlerListener> listeners = new ArrayList<ElkM1HandlerListener>();
 
@@ -153,9 +156,8 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     @Override
     public void dispose() {
         connection.shutdown();
-        areas = null;
+        areas = new boolean[0];
         connection = null;
-        messageFactory = null;
         assert (listeners.isEmpty());
         super.dispose();
     }
@@ -311,6 +313,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
      * @param num the number of the type to look for
      * @return the thing, null if not found
      */
+    @Nullable
     Thing getThingForType(ElkTypeToRequest type, int num) {
         for (Thing thing : getThing().getThings()) {
             Map<String, String> properties = thing.getProperties();

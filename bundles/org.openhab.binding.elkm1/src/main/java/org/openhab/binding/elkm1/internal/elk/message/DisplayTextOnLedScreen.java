@@ -12,6 +12,8 @@
  */
 package org.openhab.binding.elkm1.internal.elk.message;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.elkm1.internal.elk.ElkCommand;
 import org.openhab.binding.elkm1.internal.elk.ElkMessage;
 import org.slf4j.Logger;
@@ -23,14 +25,15 @@ import org.slf4j.LoggerFactory;
  * @author Matt Myers - Initial Contribution
  *
  */
+@NonNullByDefault
 public class DisplayTextOnLedScreen extends ElkMessage {
     private final Logger logger = LoggerFactory.getLogger(DisplayTextOnLedScreen.class);
     private int keypadArea;
     private int messageClear;
     private int beep;
     private int timeToDisplay;
-    private String line1;
-    private String line2;
+    private String line1 = "";
+    private String line2 = "";
 
     public DisplayTextOnLedScreen(String command) throws Exception {
         super(ElkCommand.DisplayTextOnLedScreen);
@@ -77,7 +80,7 @@ public class DisplayTextOnLedScreen extends ElkMessage {
     }
 
     @Override
-    public String getData() {
+    public @Nullable String getData() {
         return String.format("%01d", keypadArea) + String.format("%01d", messageClear) + String.format("%01d", beep)
                 + String.format("%05d", timeToDisplay) + line1 + line2;
     }

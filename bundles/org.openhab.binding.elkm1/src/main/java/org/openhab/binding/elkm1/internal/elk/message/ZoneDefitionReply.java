@@ -13,6 +13,7 @@
 
 package org.openhab.binding.elkm1.internal.elk.message;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.elkm1.internal.elk.ElkCommand;
 import org.openhab.binding.elkm1.internal.elk.ElkDefinition;
 import org.openhab.binding.elkm1.internal.elk.ElkMessage;
@@ -23,11 +24,13 @@ import org.openhab.binding.elkm1.internal.elk.ElkMessageFactory;
  *
  * @author David Bennett - Initial COntribution
  */
+@NonNullByDefault
 public class ZoneDefitionReply extends ElkMessage {
     private ElkDefinition[] definition;
 
     public ZoneDefitionReply(String data) {
         super(ElkCommand.ZoneDefinitionReply);
+        definition = new ElkDefinition[0];
         if (data.length() >= ElkMessageFactory.MAX_ZONES) {
             byte[] dataBytes = data.getBytes();
             definition = new ElkDefinition[ElkMessageFactory.MAX_ZONES];

@@ -12,12 +12,15 @@
  */
 package org.openhab.binding.elkm1.internal.elk;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * The basic default elk message that everything else will use as a base.
  *
  * @author David Bennett - Initial Contribution
  */
-// @NonNullByDefault
+@NonNullByDefault
 public abstract class ElkMessage {
     // Has the two char message type in it.
     private final ElkCommand command;
@@ -32,7 +35,7 @@ public abstract class ElkMessage {
         return command;
     }
 
-    protected String getData() {
+    protected @Nullable String getData() {
         return null;
     }
 

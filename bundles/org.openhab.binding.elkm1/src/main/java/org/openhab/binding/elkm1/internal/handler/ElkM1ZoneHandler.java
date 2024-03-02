@@ -13,6 +13,8 @@
 
 package org.openhab.binding.elkm1.internal.handler;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.elkm1.internal.ElkM1BindingConstants;
 import org.openhab.binding.elkm1.internal.elk.ElkDefinition;
 import org.openhab.binding.elkm1.internal.elk.ElkZoneConfig;
@@ -34,6 +36,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author David Bennett - Initial Contribution
  */
+@NonNullByDefault
 public class ElkM1ZoneHandler extends BaseThingHandler {
     private final Logger logger = LoggerFactory.getLogger(ElkM1ZoneHandler.class);
 
@@ -97,8 +100,7 @@ public class ElkM1ZoneHandler extends BaseThingHandler {
         }
     }
 
-    @SuppressWarnings("null")
-    private ElkM1BridgeHandler getElkM1BridgeHandler() {
+    private @Nullable ElkM1BridgeHandler getElkM1BridgeHandler() {
         return (ElkM1BridgeHandler) getBridge().getHandler();
     }
 }

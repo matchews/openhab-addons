@@ -13,11 +13,15 @@
 
 package org.openhab.binding.elkm1.internal.elk;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * The elk command to the codes used.
  *
  * @author David Bennett - Initial Contribution
  */
+@NonNullByDefault
 public enum ElkCommand {
     Disarm("a0"),
     ArmAway("a1"),
@@ -90,7 +94,7 @@ public enum ElkCommand {
     /**
      * Get an elk command from the string value.
      */
-    public static ElkCommand fromValue(String val) {
+    public static @Nullable ElkCommand fromValue(String val) {
         for (ElkCommand cmd : ElkCommand.values()) {
             if (cmd.getValue().equals(val)) {
                 return cmd;

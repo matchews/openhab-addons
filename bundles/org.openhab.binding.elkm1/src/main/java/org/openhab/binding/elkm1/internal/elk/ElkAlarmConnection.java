@@ -35,6 +35,8 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.elkm1.internal.config.ElkAlarmConfig;
 import org.openhab.binding.elkm1.internal.elk.message.EthernetModuleTestReply;
 import org.slf4j.Logger;
@@ -46,17 +48,17 @@ import org.slf4j.LoggerFactory;
  * @author David Bennett - Initial Contribution
  * @author Noah Jacobson - Added Secure Socket Connection
  */
+@NonNullByDefault
 public class ElkAlarmConnection {
     private final Logger logger = LoggerFactory.getLogger(ElkAlarmConnection.class);
     private final ElkAlarmConfig config;
     private final ElkMessageFactory factory;
-    private Socket socket;
     private boolean running = false;
-    private boolean sentSomething = false;
-    private Thread elkAlarmThread;
+    private @Nullable Thread elkAlarmThread;
     private List<ElkListener> listeners = new ArrayList<ElkListener>();
     private Queue<ElkMessage> toSend = new ArrayBlockingQueue<>(100);
-    private SocketFactory sFactory;
+    private @Nullable SocketFactory sFactory;
+    private @Nullable Socket socket;
 
     /**
      * Create the connection to the alarm.
@@ -189,11 +191,7 @@ public class ElkAlarmConnection {
                 logger.error("Invalid Command not sent");
             }
         }
-
-        // ToDo
-        // if (!sentSomething) {
         sendActualMessage();
-        // }
     }
 
     private void sendActualMessage() {
@@ -201,7 +199,6 @@ public class ElkAlarmConnection {
         ElkMessage message;
         synchronized (toSend) {
             if (toSend.isEmpty()) {
-                sentSomething = false;
                 return;
             }
             message = toSend.remove();
@@ -218,7 +215,6 @@ public class ElkAlarmConnection {
             socket.getOutputStream().write(sendStr.getBytes(StandardCharsets.US_ASCII));
             socket.getOutputStream().flush();
             logger.debug("Sending to Elk Alarm: {}", sendStr);
-            sentSomething = true;
             if (message instanceof EthernetModuleTestReply) {
                 sendActualMessage();
             }

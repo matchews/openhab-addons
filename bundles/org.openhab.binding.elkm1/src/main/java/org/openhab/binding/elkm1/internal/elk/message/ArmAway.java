@@ -14,6 +14,7 @@
 package org.openhab.binding.elkm1.internal.elk.message;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.elkm1.internal.elk.ElkCommand;
 import org.openhab.binding.elkm1.internal.elk.ElkMessage;
 import org.openhab.binding.elkm1.internal.elk.ElkMessageFactory;
@@ -45,7 +46,7 @@ public class ArmAway extends ElkMessage {
     }
 
     @Override
-    public String getData() {
+    public @Nullable String getData() {
         return this.area + this.pincode;
     }
 }

@@ -13,6 +13,7 @@
 package org.openhab.binding.elkm1.internal.elk.message;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.elkm1.internal.elk.ElkCommand;
 import org.openhab.binding.elkm1.internal.elk.ElkMessage;
 
@@ -53,7 +54,7 @@ public class OutputOn extends ElkMessage {
     }
 
     @Override
-    public String getData() {
+    public @Nullable String getData() {
         return String.format("%03d", outputno) + String.format("%05d", time);
     }
 }
