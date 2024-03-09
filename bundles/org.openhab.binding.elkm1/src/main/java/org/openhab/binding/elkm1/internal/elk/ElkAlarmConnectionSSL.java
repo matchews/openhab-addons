@@ -65,14 +65,15 @@ public class ElkAlarmConnectionSSL implements HandshakeCompletedListener {
         logger.debug("Checking for jssecacerts keystore at {}{}", certFilePath, certFileName);
         File file = new File(certFilePath + certFileName);
 
-        if (!file.isFile()) {
+        // ToDo force keystore jssecacerts
+        if (!file.isFile() || file.isFile()) {
             logger.info("Cannot access jssecacerts keystore at {}{}", certFilePath, certFileName);
             try {
                 if (!createTrustStore(certFilePath, certFileName)) {
                     return false;
                 }
             } catch (Exception e) {
-                logger.info("createTrustStore error", e);
+                logger.info("createTrustStore error");
                 return false;
             }
         } else {
@@ -94,6 +95,7 @@ public class ElkAlarmConnectionSSL implements HandshakeCompletedListener {
         char SEP = File.separatorChar;
         File dir = new File(System.getProperty("java.home") + SEP + "lib" + SEP + "security" + SEP);
         File file = new File(dir, "cacerts");
+
         logger.info("Checking for default keystore at {}", file);
         if (!file.isFile()) {
             logger.warn("Default Java Keystore not found at: {}", dir);
@@ -110,18 +112,14 @@ public class ElkAlarmConnectionSSL implements HandshakeCompletedListener {
 
         // Setup trustmanager
         SSLContext context = SSLContext.getInstance("TLS");
+
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(ks);
         X509TrustManager defaultTrustManager = (X509TrustManager) tmf.getTrustManagers()[0];
         SavingTrustManager tm = new SavingTrustManager(defaultTrustManager);
+
         context.init(null, new TrustManager[] { tm }, null);
         SSLSocketFactory factory = context.getSocketFactory();
-
-        // Let java know where to find the cacerts keystore
-        // System.setProperty("javax.net.ssl.trustStore", dir + "/cacerts");
-        // System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
-        logger.debug("Java truststore location: {}", System.getProperty("javax.net.ssl.trustStore"));
-        logger.debug("Java truststore password: {}", System.getProperty("javax.net.ssl.trustStorePassword"));
 
         // Determine if server is trusted
         try {
@@ -193,6 +191,7 @@ public class ElkAlarmConnectionSSL implements HandshakeCompletedListener {
             logger.trace("{}", cert.toString());
             logger.info("Added certificate to keystore {}{} using alias {}", certFilePath, certFileName, alias);
         }
+
         return true;
     }
 

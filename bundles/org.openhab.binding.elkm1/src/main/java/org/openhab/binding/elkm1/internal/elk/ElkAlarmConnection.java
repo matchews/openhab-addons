@@ -83,6 +83,8 @@ public class ElkAlarmConnection {
                 logger.error("connectionSSL.setupSSL failed");
                 return false;
             }
+            logger.debug("Java truststore location: {}", System.getProperty("javax.net.ssl.trustStore"));
+            logger.debug("Java truststore password: {}", System.getProperty("javax.net.ssl.trustStorePassword"));
             sFactory = SSLSocketFactory.getDefault();
 
         } else {
@@ -124,6 +126,9 @@ public class ElkAlarmConnection {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF8"));
 
             ((SSLSocket) socket).addHandshakeCompletedListener(connectionSSL);
+
+            logger.debug("Java truststore location: {}", System.getProperty("javax.net.ssl.trustStore"));
+            logger.debug("Java truststore password: {}", System.getProperty("javax.net.ssl.trustStorePassword"));
 
             logger.debug("Elk Login Sending Username: {} and Password: *****", config.username);
             out.write(config.username + "\r\n");
