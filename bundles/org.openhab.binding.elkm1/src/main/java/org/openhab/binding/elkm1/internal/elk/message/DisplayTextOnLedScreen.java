@@ -53,21 +53,25 @@ public class DisplayTextOnLedScreen extends ElkMessage {
 
         this.keypadArea = Integer.valueOf(keypadArea);
         if (this.keypadArea < 1 || this.keypadArea > 8) {
+            logger.error("Keypad area {} must be between 1-8", this.keypadArea);
             this.validElkCommand = false;
         }
 
         this.messageClear = Integer.valueOf(messageClear);
         if (this.messageClear < 0 || this.messageClear > 2) {
+            logger.error("Message clear {} must be between 0-2", this.messageClear);
             this.validElkCommand = false;
         }
 
         this.beep = Integer.valueOf(beep);
         if (this.beep < 0 || this.beep > 1) {
+            logger.error("Beep{} must be between 0-1", this.beep);
             this.validElkCommand = false;
         }
 
         this.timeToDisplay = Integer.valueOf(timeToDisplay);
         if (this.timeToDisplay < 0 || this.timeToDisplay > 65535) {
+            logger.error("Time to display {} must be between 0-65535", this.keypadArea);
             this.validElkCommand = false;
         }
 

@@ -10,9 +10,9 @@
 		<description>Connection to the elk alarm</description>
 
 		<config-description>
-			<parameter name="ipAddress" type="text" required="true">
-				<label>IP Address</label>
-				<description>The IP address of the elk alarm system.</description>
+			<parameter name="host" type="text" required="true">
+				<label>Host</label>
+				<description>The host name or IP address of the elk alarm system.</description>
 				<context>network-address</context>
 			</parameter>
 			<parameter name="port" type="integer" min="0" max="65335" required="true">

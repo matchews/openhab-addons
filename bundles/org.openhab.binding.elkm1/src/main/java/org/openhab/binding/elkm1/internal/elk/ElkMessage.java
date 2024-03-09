@@ -36,7 +36,7 @@ public abstract class ElkMessage {
     }
 
     protected @Nullable String getData() {
-        return null;
+        return "";
     }
 
     // Format of the packet is:

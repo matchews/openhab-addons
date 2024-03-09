@@ -95,7 +95,7 @@ public class ElkMessageFactory {
 
     private boolean verifyCrc(ElkData data) {
         // First two chars is length.
-        logger.debug("Elk Message Checksum Value: Is: {}, Should Be: {}", data.getChecksum(),
+        logger.trace("Elk Message Checksum Value: Is: {}, Should Be: {}", data.getChecksum(),
                 data.getCalculatedChecksum());
         return data.getChecksum() == data.getCalculatedChecksum();
     }
@@ -130,7 +130,7 @@ public class ElkMessageFactory {
                 // Last two bits should just be 00
                 data = input.substring(4, length - 2);
             }
-            logger.debug("Elk Message Data: Length: {}, Checksum: {}, Command: {}, Data: {}", length, checksum, command,
+            logger.trace("Elk Message Data: Length: {}, Checksum: {}, Command: {}, Data: {}", length, checksum, command,
                     data);
         }
 
@@ -160,7 +160,7 @@ public class ElkMessageFactory {
             for (char ch : input.substring(0, len).toCharArray()) {
                 checksum += ch;
             }
-            logger.debug("checksum cal: {}", (~checksum + 1) & 0xff);
+            logger.trace("checksum cal: {}", (~checksum + 1) & 0xff);
             return (~checksum + 1) & 0xff;
         }
     }

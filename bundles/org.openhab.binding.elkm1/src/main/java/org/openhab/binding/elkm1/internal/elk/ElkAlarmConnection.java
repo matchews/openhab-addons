@@ -20,22 +20,17 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import javax.net.SocketFactory;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.SSLSocketFactory;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.elkm1.internal.config.ElkAlarmConfig;
 import org.openhab.binding.elkm1.internal.elk.message.EthernetModuleTestReply;
@@ -46,19 +41,21 @@ import org.slf4j.LoggerFactory;
  * The connection to the elk, handles the socket and other pieces.
  *
  * @author David Bennett - Initial Contribution
- * @author Noah Jacobson - Added Secure Socket Connection
+ * @author Matt Myers - Added Secure Socket Connection
  */
-@NonNullByDefault
+// @NonNullByDefault
 public class ElkAlarmConnection {
     private final Logger logger = LoggerFactory.getLogger(ElkAlarmConnection.class);
     private final ElkAlarmConfig config;
     private final ElkMessageFactory factory;
-    private boolean running = false;
+    private @Nullable ElkAlarmConnectionSSL connectionSSL;
     private @Nullable Thread elkAlarmThread;
-    private List<ElkListener> listeners = new ArrayList<ElkListener>();
-    private Queue<ElkMessage> toSend = new ArrayBlockingQueue<>(100);
     private @Nullable SocketFactory sFactory;
     private @Nullable Socket socket;
+    private List<ElkListener> listeners = new ArrayList<ElkListener>();
+    private Queue<ElkMessage> toSend = new ArrayBlockingQueue<>(100);
+    private boolean running = false;
+    private boolean sentSomething = false;
 
     /**
      * Create the connection to the alarm.
@@ -78,41 +75,26 @@ public class ElkAlarmConnection {
      * @return true if successfully initialized.
      */
     public boolean initialize() {
+        connectionSSL = new ElkAlarmConnectionSSL(config);
+        SocketFactory sFactory;
+
         if (config.useSSL) {
-            TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-                @Override
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[0];
-                }
-
-                @Override
-                public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-                }
-
-                @Override
-                public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-                }
-            } };
-
-            SSLContext sc;
-            try {
-                sc = SSLContext.getInstance("TLSv1.2");
-                sc.init(null, trustAllCerts, new java.security.SecureRandom());
-                sFactory = sc.getSocketFactory();
-            } catch (KeyManagementException | NoSuchAlgorithmException e) {
-                logger.error("An error has occured while creating the trust manager to connect to Elk alarm: {}:{}",
-                        config.ipAddress, config.port, e);
+            if (!connectionSSL.setupSSL()) {
+                logger.error("connectionSSL.setupSSL failed");
+                return false;
             }
+            sFactory = SSLSocketFactory.getDefault();
+
         } else {
             sFactory = SocketFactory.getDefault();
         }
 
         try {
-            socket = sFactory.createSocket(config.ipAddress, config.port);
+            socket = sFactory.createSocket(config.host, config.port);
         } catch (ConnectException e) {
-            logger.error("Unable to open connection to Elk alarm: {}:{}", config.ipAddress, config.port, e);
+            logger.error("Unable to open connection to Elk alarm: {}:{}", config.host, config.port, e);
         } catch (IOException e) {
-            logger.error("Unable to open connection to Elk alarm: {}:{}", config.ipAddress, config.port, e);
+            logger.error("Unable to open connection to Elk alarm: {}:{}", config.host, config.port, e);
         }
 
         if (config.useSSL) {
@@ -134,25 +116,32 @@ public class ElkAlarmConnection {
      * @return True if connection is established, false if it is not.
      */
     public boolean sslLogin() {
-        ((SSLSocket) socket).setEnabledProtocols(new String[] { "TLSv1.2" }); // "TLSv1,TLSv1.1,TLSv1.2"
-        try {
-            try (BufferedWriter out = new BufferedWriter(
-                    new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
-                out.write(config.username + "\r\n");
-                out.write(config.password + "\r\n");
-                out.flush();
-            }
+        BufferedReader in;
+        BufferedWriter out;
 
-            try (BufferedReader in = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8))) {
-                // Read back username and password
-                logger.debug("Elk Login Readback: {}", in.readLine());
-                logger.debug("Elk Login Readback: {}", in.readLine());
-                logger.debug("Elk Login Readback: {}", in.readLine());
-                logger.debug("Elk Login Readback: {}", in.readLine());
+        try {
+            out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF8"));
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF8"));
+
+            ((SSLSocket) socket).addHandshakeCompletedListener(connectionSSL);
+
+            logger.debug("Elk Login Sending Username: {} and Password: *****", config.username);
+            out.write(config.username + "\r\n");
+            out.write(config.password + "\r\n");
+            out.flush();
+
+            // Read back username and password
+            for (int i = 1; i <= 4; i++) {
+                String line = in.readLine();
+                if (line.length() > 0) {
+                    logger.debug("Elk Response: {}", line);
+                }
             }
+        } catch (UnknownHostException e) {
+            logger.error("Unable to open connection to Elk alarm: {}:{}", config.host, config.port, e);
+            return false;
         } catch (IOException e) {
-            logger.error("Unable to open connection to Elk alarm: {}:{}", config.ipAddress, config.port, e);
+            logger.error("Unable to open connection to Elk alarm: {}:{}", config.host, config.port, e);
             return false;
         }
         return true;
@@ -172,8 +161,7 @@ public class ElkAlarmConnection {
                 socket.close();
                 socket = null;
             } catch (IOException e) {
-                logger.error("Unable to properly close connection to Elk alarm: {}:{}", config.ipAddress, config.port,
-                        e);
+                logger.error("Unable to properly close connection to Elk alarm: {}:{}", config.host, config.port, e);
             }
         }
     }
@@ -191,13 +179,20 @@ public class ElkAlarmConnection {
                 logger.error("Invalid Command not sent");
             }
         }
-        sendActualMessage();
+
+        if (!sentSomething) {
+            sendActualMessage();
+        }
     }
 
     private void sendActualMessage() {
         String sendStr;
         ElkMessage message;
         synchronized (toSend) {
+            if (toSend.isEmpty()) {
+                sentSomething = false;
+                return;
+            }
             if (toSend.isEmpty()) {
                 return;
             }
@@ -207,25 +202,25 @@ public class ElkAlarmConnection {
         try {
             // Try and reopen it.
             if (socket == null || socket.isClosed()) {
-                socket = sFactory.createSocket(config.ipAddress, config.port);
+                socket = sFactory.createSocket(config.host, config.port);
                 if (config.useSSL) {
                     sslLogin();
                 }
             }
             socket.getOutputStream().write(sendStr.getBytes(StandardCharsets.US_ASCII));
             socket.getOutputStream().flush();
+            sentSomething = true;
             logger.debug("Sending to Elk Alarm: {}", sendStr);
             if (message instanceof EthernetModuleTestReply) {
                 sendActualMessage();
             }
         } catch (IOException e) {
-            logger.error("Error sending to Elk alarm: {}:{}", config.ipAddress, config.port, e);
+            logger.error("Error sending to Elk alarm: {}:{}", config.host, config.port, e);
             running = false;
             try {
                 socket.close();
             } catch (IOException e1) {
-                logger.error("Unable to properly close connection to Elk alarm: {}:{}", config.ipAddress, config.port,
-                        e);
+                logger.error("Unable to properly close connection to Elk alarm: {}:{}", config.host, config.port, e);
             }
             socket = null;
         }
@@ -259,7 +254,7 @@ public class ElkAlarmConnection {
             try {
                 buff = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII));
             } catch (IOException e1) {
-                logger.error("Unable to setup the reader for Elk alarm: {}:{}", config.ipAddress, config.port, e1);
+                logger.error("Unable to setup the reader for Elk alarm: {}:{}", config.host, config.port, e1);
                 running = false;
                 return;
             }
@@ -267,7 +262,7 @@ public class ElkAlarmConnection {
                 try {
                     // Wait to receive something
                     String line = buff.readLine();
-                    logger.debug("Received from Elk alarm: {}", line);
+                    logger.trace("Received from Elk alarm: {}", line);
                     ElkMessage message = factory.createMessage(line);
                     if (message != null) {
                         synchronized (listeners) {
@@ -275,14 +270,18 @@ public class ElkAlarmConnection {
                                 listen.handleElkMessage(message);
                             }
                         }
-                        logger.debug("Processed Elk message: {} as {}", line, message);
+                        logger.trace("Processed Elk message: {} as {}", line, message);
                     } else {
                         logger.info("Unknown Elk message: {}", line);
                     }
                     // Send any messages in the ArrayBlockingQueue
                     sendActualMessage();
                 } catch (IOException e) {
-                    logger.error("Error reading from Elk alarm: {}:{}", config.ipAddress, config.port, e);
+                    if (e.getMessage().equals("Socket closed")) {
+                        logger.error("Error reading from Elk alarm.  Socket Closed. {}:{}", config.host, config.port);
+                    } else {
+                        logger.error("Error reading from Elk alarm: {}:{}", config.host, config.port, e);
+                    }
                 }
             }
         }

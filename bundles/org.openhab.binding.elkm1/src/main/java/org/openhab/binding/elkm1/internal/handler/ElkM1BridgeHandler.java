@@ -26,6 +26,7 @@ import org.openhab.binding.elkm1.internal.ElkM1HandlerListener;
 import org.openhab.binding.elkm1.internal.config.ElkAlarmConfig;
 import org.openhab.binding.elkm1.internal.elk.ElkAlarmArmedState;
 import org.openhab.binding.elkm1.internal.elk.ElkAlarmConnection;
+import org.openhab.binding.elkm1.internal.elk.ElkAlarmConnectionSSL;
 import org.openhab.binding.elkm1.internal.elk.ElkCommand;
 import org.openhab.binding.elkm1.internal.elk.ElkDefinition;
 import org.openhab.binding.elkm1.internal.elk.ElkListener;
@@ -82,6 +83,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     private final Logger logger = LoggerFactory.getLogger(ElkM1BridgeHandler.class);
     private @Nullable ScheduledFuture<?> initializeFuture;
     private @Nullable ElkAlarmConnection connection;
+    private @Nullable ElkAlarmConnectionSSL connectionSSL;
     private ElkMessageFactory messageFactory = new ElkMessageFactory(); // ToDo is this ok???****************
     private boolean[] areas = new boolean[ElkMessageFactory.MAX_AREAS];
     private List<ElkM1HandlerListener> listeners = new ArrayList<ElkM1HandlerListener>();
@@ -116,6 +118,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         ElkAlarmConfig config = getConfigAs(ElkAlarmConfig.class);
         connection = new ElkAlarmConnection(config, messageFactory);
         connection.addElkListener(this);
+
         if (connection.initialize()) {
             connection.sendCommand(new Version());
             connection.sendCommand(new ZoneDefinition());

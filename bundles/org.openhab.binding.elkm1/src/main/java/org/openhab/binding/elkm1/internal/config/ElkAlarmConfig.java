@@ -23,7 +23,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 
 @NonNullByDefault
 public class ElkAlarmConfig {
-    public String ipAddress = "";
+    public String host = "";
     public int port;
     public int userCode;
     public boolean useSSL;
