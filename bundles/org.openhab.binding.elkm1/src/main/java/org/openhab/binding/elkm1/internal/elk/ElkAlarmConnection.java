@@ -22,14 +22,22 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import javax.net.SocketFactory;
+import javax.net.ssl.HandshakeCompletedEvent;
+import javax.net.ssl.HandshakeCompletedListener;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.elkm1.internal.config.ElkAlarmConfig;
@@ -41,10 +49,9 @@ import org.slf4j.LoggerFactory;
  * The connection to the elk, handles the socket and other pieces.
  *
  * @author David Bennett - Initial Contribution
- * @author Matt Myers - Added Secure Socket Connection
  */
 // @NonNullByDefault
-public class ElkAlarmConnection {
+public class ElkAlarmConnection implements HandshakeCompletedListener {
     private final Logger logger = LoggerFactory.getLogger(ElkAlarmConnection.class);
     private final ElkAlarmConfig config;
     private final ElkMessageFactory factory;
@@ -75,18 +82,31 @@ public class ElkAlarmConnection {
      * @return true if successfully initialized.
      */
     public boolean initialize() {
-        connectionSSL = new ElkAlarmConnectionSSL(config);
-        SocketFactory sFactory;
-
         if (config.useSSL) {
-            if (!connectionSSL.setupSSL()) {
-                logger.error("connectionSSL.setupSSL failed");
-                return false;
-            }
-            logger.debug("Java truststore location: {}", System.getProperty("javax.net.ssl.trustStore"));
-            logger.debug("Java truststore password: {}", System.getProperty("javax.net.ssl.trustStorePassword"));
-            sFactory = SSLSocketFactory.getDefault();
+            TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+                @Override
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }
 
+                @Override
+                public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                }
+
+                @Override
+                public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                }
+            } };
+
+            SSLContext sc;
+            try {
+                sc = SSLContext.getInstance("TLS");
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                sFactory = sc.getSocketFactory();
+            } catch (KeyManagementException | NoSuchAlgorithmException e) {
+                logger.error("An error has occured while creating the trust manager to connect to Elk alarm: {}:{}",
+                        config.host, config.port, e);
+            }
         } else {
             sFactory = SocketFactory.getDefault();
         }
@@ -110,6 +130,44 @@ public class ElkAlarmConnection {
         elkAlarmThread.start();
 
         return socket != null && !socket.isClosed();
+
+        /*
+         * connectionSSL = new ElkAlarmConnectionSSL(config);
+         * SocketFactory sFactory;
+         *
+         * if (config.useSSL) {
+         * if (!connectionSSL.setupSSL()) {
+         * logger.error("connectionSSL.setupSSL failed");
+         * return false;
+         * }
+         * logger.debug("Java truststore location: {}", System.getProperty("javax.net.ssl.trustStore"));
+         * logger.debug("Java truststore password: {}", System.getProperty("javax.net.ssl.trustStorePassword"));
+         * sFactory = SSLSocketFactory.getDefault();
+         *
+         * } else {
+         * sFactory = SocketFactory.getDefault();
+         * }
+         *
+         * try {
+         * socket = sFactory.createSocket(config.host, config.port);
+         * } catch (ConnectException e) {
+         * logger.error("Unable to open connection to Elk alarm: {}:{}", config.host, config.port, e);
+         * } catch (IOException e) {
+         * logger.error("Unable to open connection to Elk alarm: {}:{}", config.host, config.port, e);
+         * }
+         *
+         * if (config.useSSL) {
+         * if (!sslLogin()) {
+         * return false;
+         * }
+         * }
+         *
+         * running = true;
+         * elkAlarmThread = new Thread(new ReadingDataThread());
+         * elkAlarmThread.start();
+         *
+         * return socket != null && !socket.isClosed();
+         */
     }
 
     /**
@@ -125,10 +183,14 @@ public class ElkAlarmConnection {
             out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF8"));
             in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF8"));
 
-            ((SSLSocket) socket).addHandshakeCompletedListener(connectionSSL);
+            ((SSLSocket) socket).addHandshakeCompletedListener(this);
 
-            logger.debug("Java truststore location: {}", System.getProperty("javax.net.ssl.trustStore"));
-            logger.debug("Java truststore password: {}", System.getProperty("javax.net.ssl.trustStorePassword"));
+            // Elk M1XEP Firmware <2.046 uses TLS1.0
+            // Elk M1XEP Firmware >=2.046 uses TLS1.2 AES-128
+            ((SSLSocket) socket).setEnabledProtocols(new String[] { "TLSv1", "TLSv1.2" });
+            socket.setSoTimeout(10000);
+            logger.debug("Starting SSL handshake");
+            ((SSLSocket) socket).startHandshake();
 
             logger.debug("Elk Login Sending Username: {} and Password: *****", config.username);
             out.write(config.username + "\r\n");
@@ -306,6 +368,29 @@ public class ElkAlarmConnection {
                 }
             }
             return false;
+        }
+    }
+
+    @Override
+    public void handshakeCompleted(HandshakeCompletedEvent event) {
+        logger.debug("SSL handshake completed");
+
+        try {
+            SSLSession session = event.getSession();
+            logger.debug("Cipher Suite: {}", event.getCipherSuite());
+            logger.debug("Protocol: {}", session.getProtocol());
+            logger.debug("Peer host: {}", session.getPeerHost());
+
+            java.security.cert.Certificate[] certs = event.getPeerCertificates();
+            for (int i = 0; i < certs.length; i++) {
+                if (!(certs[i] instanceof java.security.cert.X509Certificate)) {
+                    continue;
+                }
+                java.security.cert.X509Certificate cert = (java.security.cert.X509Certificate) certs[i];
+                logger.debug("Cert #: {}", cert.getSubjectX500Principal().getName());
+            }
+        } catch (Exception e) {
+            logger.error("HandshakeCompletedError", e);
         }
     }
 }

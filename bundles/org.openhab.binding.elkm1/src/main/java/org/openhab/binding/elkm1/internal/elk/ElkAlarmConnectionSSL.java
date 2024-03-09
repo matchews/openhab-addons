@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 public class ElkAlarmConnectionSSL implements HandshakeCompletedListener {
     private final Logger logger = LoggerFactory.getLogger(ElkAlarmConnectionSSL.class);
     private final ElkAlarmConfig config;
-    private final char SEP = File.separatorChar;
+    private final char sep = File.separatorChar;
 
     public ElkAlarmConnectionSSL(ElkAlarmConfig config) {
         this.config = config;
@@ -59,7 +59,7 @@ public class ElkAlarmConnectionSSL implements HandshakeCompletedListener {
     public boolean setupSSL() {
         // Check to see if jssecacerts keystore exists
         // Can't use default java security folder. No write access
-        // String certFilePath = System.getProperty("java.home") + SEP + "lib" + SEP + "security" + SEP;
+        // String certFilePath = System.getProperty("java.home") + sep + "lib" + sep + "security" + sep;
         String certFilePath = OpenHAB.getUserDataFolder() + "/elkm1/";
         String certFileName = "jssecacerts";
         logger.debug("Checking for jssecacerts keystore at {}{}", certFilePath, certFileName);
@@ -77,7 +77,6 @@ public class ElkAlarmConnectionSSL implements HandshakeCompletedListener {
                 return false;
             }
         } else {
-
             logger.info("Succesfully accessed jssecacerts keystore at {}{}", certFilePath, certFileName);
         }
 
@@ -92,8 +91,7 @@ public class ElkAlarmConnectionSSL implements HandshakeCompletedListener {
 
     public boolean createTrustStore(String certFilePath, String certFileName) throws Exception {
         // Check if default Java cacerts exists
-        char SEP = File.separatorChar;
-        File dir = new File(System.getProperty("java.home") + SEP + "lib" + SEP + "security" + SEP);
+        File dir = new File(System.getProperty("java.home") + sep + "lib" + sep + "security" + sep);
         File file = new File(dir, "cacerts");
 
         logger.info("Checking for default keystore at {}", file);
@@ -123,7 +121,6 @@ public class ElkAlarmConnectionSSL implements HandshakeCompletedListener {
 
         // Determine if server is trusted
         try {
-            System.setProperty("javax.net.debug", "ssl:handshake");// TODO
             logger.debug("Opening connection to {}:{}", config.host, config.port);
             SSLSocket socket = (SSLSocket) factory.createSocket(config.host, config.port);
             socket.setSoTimeout(10000);
