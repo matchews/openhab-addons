@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -55,7 +56,6 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
     private final Logger logger = LoggerFactory.getLogger(ElkAlarmConnection.class);
     private final ElkAlarmConfig config;
     private final ElkMessageFactory factory;
-    private @Nullable ElkAlarmConnectionSSL connectionSSL;
     private @Nullable Thread elkAlarmThread;
     private @Nullable SocketFactory sFactory;
     private @Nullable Socket socket;
@@ -63,6 +63,8 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
     private Queue<ElkMessage> toSend = new ArrayBlockingQueue<>(100);
     private boolean running = false;
     private boolean sentSomething = false;
+
+    public LocalDateTime lastCommTime;
 
     /**
      * Create the connection to the alarm.
@@ -130,44 +132,6 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
         elkAlarmThread.start();
 
         return socket != null && !socket.isClosed();
-
-        /*
-         * connectionSSL = new ElkAlarmConnectionSSL(config);
-         * SocketFactory sFactory;
-         *
-         * if (config.useSSL) {
-         * if (!connectionSSL.setupSSL()) {
-         * logger.error("connectionSSL.setupSSL failed");
-         * return false;
-         * }
-         * logger.debug("Java truststore location: {}", System.getProperty("javax.net.ssl.trustStore"));
-         * logger.debug("Java truststore password: {}", System.getProperty("javax.net.ssl.trustStorePassword"));
-         * sFactory = SSLSocketFactory.getDefault();
-         *
-         * } else {
-         * sFactory = SocketFactory.getDefault();
-         * }
-         *
-         * try {
-         * socket = sFactory.createSocket(config.host, config.port);
-         * } catch (ConnectException e) {
-         * logger.error("Unable to open connection to Elk alarm: {}:{}", config.host, config.port, e);
-         * } catch (IOException e) {
-         * logger.error("Unable to open connection to Elk alarm: {}:{}", config.host, config.port, e);
-         * }
-         *
-         * if (config.useSSL) {
-         * if (!sslLogin()) {
-         * return false;
-         * }
-         * }
-         *
-         * running = true;
-         * elkAlarmThread = new Thread(new ReadingDataThread());
-         * elkAlarmThread.start();
-         *
-         * return socket != null && !socket.isClosed();
-         */
     }
 
     /**
@@ -188,7 +152,7 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
             // Elk M1XEP Firmware <2.046 uses TLS1.0
             // Elk M1XEP Firmware >=2.046 uses TLS1.2 AES-128
             ((SSLSocket) socket).setEnabledProtocols(new String[] { "TLSv1", "TLSv1.2" });
-            socket.setSoTimeout(10000);
+            // socket.setSoTimeout(10000);
             logger.debug("Starting SSL handshake");
             ((SSLSocket) socket).startHandshake();
 
@@ -312,8 +276,7 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
     }
 
     class ReadingDataThread implements Runnable {
-
-        /** The reading thread to get data from the elk. */
+        // The reading thread to get data from the elk.
         @Override
         public void run() {
             logger.debug("Starting Elk alarm reading thread");
@@ -346,8 +309,10 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
                 } catch (IOException e) {
                     if (e.getMessage().equals("Socket closed")) {
                         logger.error("Error reading from Elk alarm.  Socket Closed. {}:{}", config.host, config.port);
+                        initialize();
                     } else {
                         logger.error("Error reading from Elk alarm: {}:{}", config.host, config.port, e);
+                        initialize();
                     }
                 }
             }
