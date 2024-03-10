@@ -13,9 +13,12 @@
 
 package org.openhab.binding.elkm1.internal.handler;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -26,7 +29,6 @@ import org.openhab.binding.elkm1.internal.ElkM1HandlerListener;
 import org.openhab.binding.elkm1.internal.config.ElkAlarmConfig;
 import org.openhab.binding.elkm1.internal.elk.ElkAlarmArmedState;
 import org.openhab.binding.elkm1.internal.elk.ElkAlarmConnection;
-import org.openhab.binding.elkm1.internal.elk.ElkAlarmConnectionSSL;
 import org.openhab.binding.elkm1.internal.elk.ElkCommand;
 import org.openhab.binding.elkm1.internal.elk.ElkDefinition;
 import org.openhab.binding.elkm1.internal.elk.ElkListener;
@@ -82,11 +84,12 @@ import org.slf4j.LoggerFactory;
 public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener {
     private final Logger logger = LoggerFactory.getLogger(ElkM1BridgeHandler.class);
     private @Nullable ScheduledFuture<?> initializeFuture;
-    private @Nullable ElkAlarmConnection connection;
-    private @Nullable ElkAlarmConnectionSSL connectionSSL;
-    private ElkMessageFactory messageFactory = new ElkMessageFactory(); // ToDo is this ok???****************
+    public @Nullable ElkAlarmConnection connection;
+    private ElkMessageFactory messageFactory = new ElkMessageFactory();
     private boolean[] areas = new boolean[ElkMessageFactory.MAX_AREAS];
     private List<ElkM1HandlerListener> listeners = new ArrayList<ElkM1HandlerListener>();
+    private LocalDateTime lastEthernetTestTime = LocalDateTime.now();
+    private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     public ElkM1BridgeHandler(Bridge thing) {
         super(thing);
@@ -125,6 +128,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
             connection.sendCommand(new ZonePartition());
             connection.sendCommand(new ZoneStatus());
             connection.sendCommand(new ArmingStatus());
+            executor.scheduleAtFixedRate(commWatchdog, 0, 60, TimeUnit.SECONDS);
             updateStatus(ThingStatus.ONLINE, ThingStatusDetail.CONFIGURATION_PENDING, "Requesting version from alarm");
         } else {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, "Unable to open socket to alarm");
@@ -147,11 +151,25 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
             connection.sendCommand(new ZonePartition());
             connection.sendCommand(new ZoneStatus());
             connection.sendCommand(new ArmingStatus());
+            executor.scheduleAtFixedRate(commWatchdog, 0, 10, TimeUnit.SECONDS);
             updateStatus(ThingStatus.ONLINE, ThingStatusDetail.CONFIGURATION_PENDING, "Requesting version from alarm");
         } else {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, "Unable to open socket to alarm");
         }
     }
+
+    /**
+     * Communications watchdog
+     */
+    Runnable commWatchdog = new Runnable() {
+        @Override
+        public void run() {
+            if (LocalDateTime.now().isAfter(lastEthernetTestTime.plusSeconds(70))) {
+                logger.warn("Elk communications timeout.  Reinitialize comms.");
+                initialize();
+            }
+        }
+    };
 
     /**
      * Shutdown the bridge
@@ -240,6 +258,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         }
         if (message instanceof EthernetModuleTest) {
             connection.sendCommand(new EthernetModuleTestReply());
+            lastEthernetTestTime = LocalDateTime.now();
         }
         if (message instanceof ArmingStatusReply) {
             ArmingStatusReply reply = (ArmingStatusReply) message;
@@ -375,7 +394,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     }
 
     /**
-     * Sends the right command to the elk to change the alarmed state for the m1 gold.
+     * Sends command to the elk to change the alarmed state for the m1 gold.
      *
      * @param area The area to alarm
      * @param armed The state to set it to
