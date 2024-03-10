@@ -75,6 +75,24 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
     }
 
     /**
+     * Adds the elk listener into the list of things listening for messages.
+     */
+    public void addElkListener(ElkListener listener) {
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
+    }
+
+    /**
+     * Removes the elk listener into the list of things listening for messages.
+     */
+    public void removeElkListener(ElkListener listener) {
+        synchronized (listeners) {
+            listeners.remove(listener);
+        }
+    }
+
+    /**
      * Initializes the connection by connecting to the elk and verifying we get
      * basic data back.
      *
@@ -164,25 +182,6 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
     }
 
     /**
-     * Called to shutdown the running threads and close the socket.
-     */
-    public void shutdown() {
-        running = false;
-        if (elkAlarmThread != null) {
-            elkAlarmThread.interrupt();
-            elkAlarmThread = null;
-        }
-        if (socket != null) {
-            try {
-                socket.close();
-                socket = null;
-            } catch (IOException e) {
-                logger.error("Unable to properly close connection to Elk alarm: {}:{}", config.host, config.port, e);
-            }
-        }
-    }
-
-    /**
      * Sends a specific command to the elk.
      *
      * @param message The message to send.
@@ -239,24 +238,6 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
                 logger.error("Unable to properly close connection to Elk alarm: {}:{}", config.host, config.port, e);
             }
             socket = null;
-        }
-    }
-
-    /**
-     * Adds the elk listener into the list of things listening for messages.
-     */
-    public void addElkListener(ElkListener listener) {
-        synchronized (listeners) {
-            listeners.add(listener);
-        }
-    }
-
-    /**
-     * Removes the elk listener into the list of things listening for messages.
-     */
-    public void removeElkListener(ElkListener listener) {
-        synchronized (listeners) {
-            listeners.remove(listener);
         }
     }
 
@@ -367,6 +348,25 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
                 }
                 logger.debug("Certificate issued to Elk: {}", cert.getSubjectX500Principal().getName());
                 logger.debug("Certificate self-signed by Elk: {}", cert.getIssuerX500Principal().getName());
+            }
+        }
+    }
+
+    /**
+     * Called to shutdown the running threads and close the socket.
+     */
+    public void shutdown() {
+        running = false;
+        if (elkAlarmThread != null) {
+            elkAlarmThread.interrupt();
+            elkAlarmThread = null;
+        }
+        if (socket != null) {
+            try {
+                socket.close();
+                socket = null;
+            } catch (IOException e) {
+                logger.error("Unable to properly close connection to Elk alarm: {}:{}", config.host, config.port, e);
             }
         }
     }

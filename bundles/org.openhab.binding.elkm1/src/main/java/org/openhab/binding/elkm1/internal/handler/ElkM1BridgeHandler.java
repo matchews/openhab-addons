@@ -84,6 +84,7 @@ import org.slf4j.LoggerFactory;
 public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener {
     private final Logger logger = LoggerFactory.getLogger(ElkM1BridgeHandler.class);
     private @Nullable ScheduledFuture<?> initializeFuture;
+    private @Nullable ScheduledFuture<?> commWatchdogFuture;
     public @Nullable ElkAlarmConnection connection;
     private ElkMessageFactory messageFactory = new ElkMessageFactory();
     private boolean[] areas = new boolean[ElkMessageFactory.MAX_AREAS];
@@ -98,8 +99,22 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         }
     }
 
-    @Override
-    public void handleCommand(ChannelUID channelUID, Command command) {
+    /**
+     * Adds a listener to this bridge.
+     */
+    public void addListener(ElkM1HandlerListener listener) {
+        synchronized (listeners) {
+            this.listeners.add(listener);
+        }
+    }
+
+    /**
+     * Removes a listener from this bridge.
+     */
+    public void removeListener(ElkM1HandlerListener listener) {
+        synchronized (listeners) {
+            this.listeners.remove(listener);
+        }
     }
 
     /**
@@ -109,7 +124,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     public void initialize() {
         updateStatus(ThingStatus.UNKNOWN);
         initializeFuture = scheduler.schedule(this::scheduledInitialize, 1, TimeUnit.SECONDS);
-        executor.scheduleWithFixedDelay(commWatchdog, 0, 60, TimeUnit.SECONDS);
+        commWatchdogFuture = scheduler.scheduleWithFixedDelay(commWatchdog, 30, 120, TimeUnit.SECONDS);
         return;
     }
 
@@ -136,6 +151,27 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     }
 
     /**
+     * Communications watchdog
+     */
+    Runnable commWatchdog = new Runnable() {
+        @Override
+        public void run() {
+            if (LocalDateTime.now().isAfter(lastEthernetTestTime.plusSeconds(100))) {
+                logger.warn("Elk communications timeout.  Reinitialize comms.");
+                connection.shutdown();
+                scheduledInitialize();
+            }
+        }
+    };
+
+    /**
+     * Starts a scan by asking for the zone status. This is called from the discovery handler.
+     */
+    public void startScan() {
+        connection.sendCommand(new ZoneStatus());
+    }
+
+    /**
      * Called when the configuration is updated. Reconnect to the elk.
      */
     @Override
@@ -159,29 +195,11 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     }
 
     /**
-     * Communications watchdog
-     */
-    Runnable commWatchdog = new Runnable() {
-        @Override
-        public void run() {
-            if (LocalDateTime.now().isAfter(lastEthernetTestTime.plusSeconds(70))) {
-                logger.warn("Elk communications timeout.  Reinitialize comms.");
-                connection.shutdown();
-                scheduledInitialize();
-            }
-        }
-    };
-
-    /**
-     * Shutdown the bridge
+     * Handles an incoming command
+     *
      */
     @Override
-    public void dispose() {
-        connection.shutdown();
-        areas = new boolean[0];
-        connection = null;
-        assert (listeners.isEmpty());
-        super.dispose();
+    public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
     /**
@@ -312,51 +330,6 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     }
 
     /**
-     * Adds a listener to this bridge.
-     */
-    public void addListener(ElkM1HandlerListener listener) {
-        synchronized (listeners) {
-            this.listeners.add(listener);
-        }
-    }
-
-    /**
-     * Removes a listener from this bridge.
-     */
-    public void removeListener(ElkM1HandlerListener listener) {
-        synchronized (listeners) {
-            this.listeners.remove(listener);
-        }
-    }
-
-    /**
-     * Gets the thing associated with the type/number.
-     *
-     * @param type the type to look for
-     * @param num the number of the type to look for
-     * @return the thing, null if not found
-     */
-    @Nullable
-    Thing getThingForType(ElkTypeToRequest type, int num) {
-        for (Thing thing : getThing().getThings()) {
-            Map<String, String> properties = thing.getProperties();
-            if (properties.get(ElkM1BindingConstants.PROPERTY_TYPE_ID).equals(type.toString())) {
-                if (properties.get(ElkM1BindingConstants.PROPERTY_ZONE_NUM).equals(Integer.toString(num))) {
-                    return thing;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Starts a scan by asking for the zone status. This is called from the discovery handler.
-     */
-    public void startScan() {
-        connection.sendCommand(new ZoneStatus());
-    }
-
-    /**
      * Refreshes the zones.
      */
     public void refreshZones() {
@@ -446,5 +419,37 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
                         ElkVoiceWords.fromValue(Integer.parseInt(commandString.substring(2)))));
                 break;
         }
+    }
+
+    /**
+     * Gets the thing associated with the type/number.
+     *
+     * @param type the type to look for
+     * @param num the number of the type to look for
+     * @return the thing, null if not found
+     */
+    @Nullable
+    Thing getThingForType(ElkTypeToRequest type, int num) {
+        for (Thing thing : getThing().getThings()) {
+            Map<String, String> properties = thing.getProperties();
+            if (properties.get(ElkM1BindingConstants.PROPERTY_TYPE_ID).equals(type.toString())) {
+                if (properties.get(ElkM1BindingConstants.PROPERTY_ZONE_NUM).equals(Integer.toString(num))) {
+                    return thing;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Shutdown the bridge
+     */
+    @Override
+    public void dispose() {
+        connection.shutdown();
+        areas = new boolean[0];
+        connection = null;
+        assert (listeners.isEmpty());
+        super.dispose();
     }
 }
