@@ -24,8 +24,8 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -37,7 +37,6 @@ import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -64,8 +63,6 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
     private boolean running = false;
     private boolean sentSomething = false;
 
-    public LocalDateTime lastCommTime;
-
     /**
      * Create the connection to the alarm.
      *
@@ -85,20 +82,7 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
      */
     public boolean initialize() {
         if (config.useSSL) {
-            TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-                @Override
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[0];
-                }
-
-                @Override
-                public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-                }
-
-                @Override
-                public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-                }
-            } };
+            TrustManager[] trustAllCerts = new TrustManager[] { new TrustManager() };
 
             SSLContext sc;
             try {
@@ -117,8 +101,10 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
             socket = sFactory.createSocket(config.host, config.port);
         } catch (ConnectException e) {
             logger.error("Unable to open connection to Elk alarm: {}:{}", config.host, config.port, e);
+            return false;
         } catch (IOException e) {
             logger.error("Unable to open connection to Elk alarm: {}:{}", config.host, config.port, e);
+            return false;
         }
 
         if (config.useSSL) {
@@ -149,10 +135,9 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
 
             ((SSLSocket) socket).addHandshakeCompletedListener(this);
 
-            // Elk M1XEP Firmware <2.046 uses TLS1.0
-            // Elk M1XEP Firmware >=2.046 uses TLS1.2 AES-128
+            // Elk M1XEP Firmware <2.046 uses TLSv1
+            // Elk M1XEP Firmware >=2.046 uses TLSv1.2 AES-128
             ((SSLSocket) socket).setEnabledProtocols(new String[] { "TLSv1", "TLSv1.2" });
-            // socket.setSoTimeout(10000);
             logger.debug("Starting SSL handshake");
             ((SSLSocket) socket).startHandshake();
 
@@ -309,10 +294,8 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
                 } catch (IOException e) {
                     if (e.getMessage().equals("Socket closed")) {
                         logger.error("Error reading from Elk alarm.  Socket Closed. {}:{}", config.host, config.port);
-                        initialize();
                     } else {
                         logger.error("Error reading from Elk alarm: {}:{}", config.host, config.port, e);
-                        initialize();
                     }
                 }
             }
@@ -345,17 +328,46 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
             logger.debug("Cipher Suite: {}", event.getCipherSuite());
             logger.debug("Protocol: {}", session.getProtocol());
             logger.debug("Peer host: {}", session.getPeerHost());
-
-            java.security.cert.Certificate[] certs = event.getPeerCertificates();
-            for (int i = 0; i < certs.length; i++) {
-                if (!(certs[i] instanceof java.security.cert.X509Certificate)) {
-                    continue;
-                }
-                java.security.cert.X509Certificate cert = (java.security.cert.X509Certificate) certs[i];
-                logger.debug("Cert #: {}", cert.getSubjectX500Principal().getName());
-            }
         } catch (Exception e) {
             logger.error("HandshakeCompletedError", e);
+        }
+    }
+
+    /**
+     * Trustmanager that will trust the Elkm1 self-signed certificate
+     *
+     */
+    public class TrustManager implements X509TrustManager {
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return new X509Certificate[0];
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            for (int i = 0; i < chain.length; i++) {
+                if (!(chain[i] instanceof java.security.cert.X509Certificate)) {
+                    continue;
+                }
+                java.security.cert.X509Certificate cert = chain[i];
+
+                // Ensure certificate issued for Elk
+                if (!cert.getSubjectX500Principal().toString().contains("O=Elk")) {
+                    logger.debug("Certificate issued to unknown entity: {}", cert.getSubjectX500Principal());
+                    throw new UnsupportedOperationException();
+                }
+                // Ensure certificate is self-signed
+                if (!cert.getIssuerX500Principal().toString().contains("O=Elk")) {
+                    logger.debug("Certificate signed by unknown entity: {}", cert.getIssuerX500Principal());
+                    throw new UnsupportedOperationException();
+                }
+                logger.debug("Certificate issued to Elk: {}", cert.getSubjectX500Principal().getName());
+                logger.debug("Certificate self-signed by Elk: {}", cert.getIssuerX500Principal().getName());
+            }
         }
     }
 }

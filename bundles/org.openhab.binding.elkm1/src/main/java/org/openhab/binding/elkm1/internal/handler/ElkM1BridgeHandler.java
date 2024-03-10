@@ -109,6 +109,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     public void initialize() {
         updateStatus(ThingStatus.UNKNOWN);
         initializeFuture = scheduler.schedule(this::scheduledInitialize, 1, TimeUnit.SECONDS);
+        executor.scheduleWithFixedDelay(commWatchdog, 0, 60, TimeUnit.SECONDS);
         return;
     }
 
@@ -128,7 +129,6 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
             connection.sendCommand(new ZonePartition());
             connection.sendCommand(new ZoneStatus());
             connection.sendCommand(new ArmingStatus());
-            executor.scheduleAtFixedRate(commWatchdog, 0, 60, TimeUnit.SECONDS);
             updateStatus(ThingStatus.ONLINE, ThingStatusDetail.CONFIGURATION_PENDING, "Requesting version from alarm");
         } else {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, "Unable to open socket to alarm");
@@ -151,7 +151,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
             connection.sendCommand(new ZonePartition());
             connection.sendCommand(new ZoneStatus());
             connection.sendCommand(new ArmingStatus());
-            executor.scheduleAtFixedRate(commWatchdog, 0, 10, TimeUnit.SECONDS);
+            executor.scheduleWithFixedDelay(commWatchdog, 0, 10, TimeUnit.SECONDS);
             updateStatus(ThingStatus.ONLINE, ThingStatusDetail.CONFIGURATION_PENDING, "Requesting version from alarm");
         } else {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, "Unable to open socket to alarm");
@@ -166,7 +166,8 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         public void run() {
             if (LocalDateTime.now().isAfter(lastEthernetTestTime.plusSeconds(70))) {
                 logger.warn("Elk communications timeout.  Reinitialize comms.");
-                initialize();
+                connection.shutdown();
+                scheduledInitialize();
             }
         }
     };
