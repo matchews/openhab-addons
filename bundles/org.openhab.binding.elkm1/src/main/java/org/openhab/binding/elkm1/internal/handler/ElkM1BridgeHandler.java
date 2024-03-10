@@ -138,6 +138,11 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         connection = new ElkAlarmConnection(config, messageFactory);
         connection.addElkListener(this);
 
+        if (config.useSSL) {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_PENDING,
+                    "Opening SSL/TLS server connection");
+        }
+
         if (connection.initialize()) {
             connection.sendCommand(new Version());
             connection.sendCommand(new ZoneDefinition());
@@ -177,8 +182,10 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     @Override
     public void handleConfigurationUpdate(Map<String, Object> configurationParameters) {
         super.handleConfigurationUpdate(configurationParameters);
-        this.connection.removeElkListener(this);
-        this.connection.shutdown();
+        if (this.connection != null) {
+            this.connection.removeElkListener(this);
+            this.connection.shutdown();
+        }
         this.connection = new ElkAlarmConnection(getConfigAs(ElkAlarmConfig.class), messageFactory);
         connection.addElkListener(this);
         if (connection.initialize()) {
