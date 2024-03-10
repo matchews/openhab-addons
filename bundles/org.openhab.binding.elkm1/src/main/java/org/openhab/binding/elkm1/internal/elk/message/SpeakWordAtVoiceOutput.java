@@ -22,7 +22,7 @@ import org.openhab.binding.elkm1.internal.elk.ElkVoiceWords;
 /**
  * Speaks the word at the voice output.
  *
- * @author David Bennett - Initial COntribution
+ * @author Matt Myers - Initial COntribution
  */
 @NonNullByDefault
 public class SpeakWordAtVoiceOutput extends ElkMessage {

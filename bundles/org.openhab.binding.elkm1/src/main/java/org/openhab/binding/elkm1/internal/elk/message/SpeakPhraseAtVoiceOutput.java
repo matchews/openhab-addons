@@ -22,7 +22,7 @@ import org.openhab.binding.elkm1.internal.elk.ElkVoicePhrases;
 /**
  * Speaks the selected phrase to the elk system.
  *
- * @author David Bennett - Initial Contribution
+ * @author Matt Myers - Initial Contribution
  */
 @NonNullByDefault
 public class SpeakPhraseAtVoiceOutput extends ElkMessage {
