@@ -76,7 +76,8 @@ public enum ElkCommand {
     ZonePartitionReply("ZP"),
     ZoneStatusRequest("zs"),
     ZoneStatusReply("ZS"),
-    ZoneAnalogVolatageReply("ZV");
+    ZoneAnalogVolatageRequest("zv"),
+    ZoneAnalogVoltageReply("ZV");
 
     private final String myValue;
 
