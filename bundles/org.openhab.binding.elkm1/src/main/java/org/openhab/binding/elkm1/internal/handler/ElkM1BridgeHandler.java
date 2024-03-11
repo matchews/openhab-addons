@@ -163,7 +163,9 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         public void run() {
             if (LocalDateTime.now().isAfter(lastEthernetTestTime.plusSeconds(100))) {
                 logger.warn("Elk communications timeout.  Reinitialize comms.");
-                connection.shutdown();
+                if (connection != null) {
+                    connection.shutdown();
+                }
                 scheduledInitialize();
             }
         }
