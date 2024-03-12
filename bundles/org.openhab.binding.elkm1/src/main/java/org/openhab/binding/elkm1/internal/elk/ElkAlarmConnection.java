@@ -39,6 +39,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.X509TrustManager;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.elkm1.internal.config.ElkAlarmConfig;
 import org.openhab.binding.elkm1.internal.elk.message.EthernetModuleTestReply;
@@ -50,7 +51,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author David Bennett - Initial Contribution
  */
-// @NonNullByDefault
+@NonNullByDefault
 public class ElkAlarmConnection implements HandshakeCompletedListener {
     private final Logger logger = LoggerFactory.getLogger(ElkAlarmConnection.class);
     private final ElkAlarmConfig config;
@@ -301,16 +302,17 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
     }
 
     @Override
-    public void handshakeCompleted(HandshakeCompletedEvent event) {
-        logger.debug("SSL handshake completed");
-
-        try {
-            SSLSession session = event.getSession();
-            logger.debug("Cipher Suite: {}", event.getCipherSuite());
-            logger.debug("Protocol: {}", session.getProtocol());
-            logger.debug("Peer host: {}", session.getPeerHost());
-        } catch (Exception e) {
-            logger.error("HandshakeCompletedError", e);
+    public void handshakeCompleted(@Nullable HandshakeCompletedEvent event) {
+        if (event != null) {
+            logger.debug("SSL handshake completed");
+            try {
+                SSLSession session = event.getSession();
+                logger.debug("Cipher Suite: {}", event.getCipherSuite());
+                logger.debug("Protocol: {}", session.getProtocol());
+                logger.debug("Peer host: {}", session.getPeerHost());
+            } catch (Exception e) {
+                logger.error("HandshakeCompletedError", e);
+            }
         }
     }
 
@@ -318,6 +320,7 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
      * Trustmanager that will trust the Elkm1 self-signed certificate
      *
      */
+
     public class TrustManager implements X509TrustManager {
         @Override
         public X509Certificate[] getAcceptedIssuers() {
@@ -325,17 +328,17 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
         }
 
         @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        public void checkClientTrusted(X509Certificate @Nullable [] chain, @Nullable String authType)
+                throws CertificateException {
         }
 
         @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            for (int i = 0; i < chain.length; i++) {
-                if (!(chain[i] instanceof java.security.cert.X509Certificate)) {
+        public void checkServerTrusted(X509Certificate @Nullable [] chain, @Nullable String authType)
+                throws CertificateException {
+            for (X509Certificate cert : chain) {
+                if (!(cert instanceof java.security.cert.X509Certificate)) {
                     continue;
                 }
-                java.security.cert.X509Certificate cert = chain[i];
-
                 // Ensure certificate issued for Elk
                 if (!cert.getSubjectX500Principal().toString().contains("O=Elk")) {
                     logger.debug("Certificate issued to unknown entity: {}", cert.getSubjectX500Principal());

@@ -18,9 +18,9 @@
 			<parameter name="port" type="integer" min="0" max="65335" required="true">
 				<label>Port</label>
 				<default>2101</default>
-				<description>The port to connect to on the elk alarm system.</description>
+				<description>The port to connect to on the elk alarm system. Default non-secure port 2101. Default secure port 2601.</description>
 			</parameter>
-			<parameter name="userCode" type="integer" required="true">
+			<parameter name="userCode" type="text" required="true">
 				<label>User Code</label>
 				<description>The user code for access to the elk alarm data.</description>
 				<context>password</context>

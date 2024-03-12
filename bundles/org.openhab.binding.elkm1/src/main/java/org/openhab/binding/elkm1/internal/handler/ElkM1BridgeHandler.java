@@ -129,19 +129,18 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     }
 
     public void scheduledInitialize() {
-        // Long running initialization should be done asynchronously in background.
-        updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_PENDING, "Opening server connection");
-
-        // Load up the config and then get the connection to the elk setup.
-        messageFactory = new ElkMessageFactory();
         ElkAlarmConfig config = getConfigAs(ElkAlarmConfig.class);
-        connection = new ElkAlarmConnection(config, messageFactory);
-        connection.addElkListener(this);
+        messageFactory = new ElkMessageFactory();
 
         if (config.useSSL) {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_PENDING,
                     "Opening SSL/TLS server connection");
+        } else {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_PENDING, "Opening server connection");
         }
+
+        connection = new ElkAlarmConnection(config, messageFactory);
+        connection.addElkListener(this);
 
         if (connection.initialize()) {
             connection.sendCommand(new Version());
@@ -180,15 +179,18 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
 
     /**
      * Called when the configuration is updated. Reconnect to the elk.
+     * TODO Trying to eliminate this routine and let the BasethingHandler dispose and call initialize
+     * Hayward doesn't override this routine
      */
-    @Override
-    public void handleConfigurationUpdate(Map<String, Object> configurationParameters) {
+    // @Override
+    public void handleConfigurationUpdateBAK(Map<String, Object> configurationParameters) {
         super.handleConfigurationUpdate(configurationParameters);
         if (this.connection != null) {
             this.connection.removeElkListener(this);
             this.connection.shutdown();
         }
         this.connection = new ElkAlarmConnection(getConfigAs(ElkAlarmConfig.class), messageFactory);
+
         connection.addElkListener(this);
         if (connection.initialize()) {
             connection.sendCommand(new Version());

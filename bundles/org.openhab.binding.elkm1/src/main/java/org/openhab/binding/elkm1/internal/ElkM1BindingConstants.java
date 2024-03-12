@@ -49,8 +49,8 @@ public class ElkM1BindingConstants {
     public static final String CHANNEL_AREA_STATE = "state";
     public static final String CHANNEL_AREA_ARMUP = "armup";
     public static final String CHANNEL_AREA_ARMED = "armed";
-    public static final String CHANNEL_AREA_USERCODE = "usernumber"; // mlm
-    public static final String CHANNEL_AREA_COMMAND = "command"; // mlm
+    public static final String CHANNEL_AREA_USERCODE = "usernumber";
+    public static final String CHANNEL_AREA_COMMAND = "command";
 
     // The properties associated with the thing
     public static final String PROPERTY_VERSION = "version";

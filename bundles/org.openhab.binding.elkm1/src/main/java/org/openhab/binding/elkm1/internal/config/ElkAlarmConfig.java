@@ -25,7 +25,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 public class ElkAlarmConfig {
     public String host = "";
     public int port;
-    public int userCode;
+    public String userCode = "";
     public boolean useSSL;
     public String username = "";
     public String password = "";
