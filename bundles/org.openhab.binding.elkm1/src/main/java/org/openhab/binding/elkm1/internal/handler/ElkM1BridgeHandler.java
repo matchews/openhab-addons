@@ -87,13 +87,14 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     private @Nullable ScheduledFuture<?> commWatchdogFuture;
     public @Nullable ElkAlarmConnection connection;
     private ElkMessageFactory messageFactory = new ElkMessageFactory();
-    private boolean[] areas = new boolean[ElkMessageFactory.MAX_AREAS];
+    private boolean[] areas;
     private List<ElkM1HandlerListener> listeners = new ArrayList<ElkM1HandlerListener>();
     private LocalDateTime lastEthernetTestTime = LocalDateTime.now();
     private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     public ElkM1BridgeHandler(Bridge thing) {
         super(thing);
+        areas = new boolean[ElkMessageFactory.MAX_AREAS];
         for (int i = 0; i < areas.length; i++) {
             areas[i] = false;
         }
@@ -131,6 +132,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     public void scheduledInitialize() {
         ElkAlarmConfig config = getConfigAs(ElkAlarmConfig.class);
         messageFactory = new ElkMessageFactory();
+        areas = new boolean[ElkMessageFactory.MAX_AREAS];
 
         if (config.useSSL) {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_PENDING,
@@ -175,34 +177,6 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
      */
     public void startScan() {
         connection.sendCommand(new ZoneStatus());
-    }
-
-    /**
-     * Called when the configuration is updated. Reconnect to the elk.
-     * TODO Trying to eliminate this routine and let the BasethingHandler dispose and call initialize
-     * Hayward doesn't override this routine
-     */
-    // @Override
-    public void handleConfigurationUpdateBAK(Map<String, Object> configurationParameters) {
-        super.handleConfigurationUpdate(configurationParameters);
-        if (this.connection != null) {
-            this.connection.removeElkListener(this);
-            this.connection.shutdown();
-        }
-        this.connection = new ElkAlarmConnection(getConfigAs(ElkAlarmConfig.class), messageFactory);
-
-        connection.addElkListener(this);
-        if (connection.initialize()) {
-            connection.sendCommand(new Version());
-            connection.sendCommand(new ZoneDefinition());
-            connection.sendCommand(new ZonePartition());
-            connection.sendCommand(new ZoneStatus());
-            connection.sendCommand(new ArmingStatus());
-            executor.scheduleWithFixedDelay(commWatchdog, 0, 10, TimeUnit.SECONDS);
-            updateStatus(ThingStatus.ONLINE, ThingStatusDetail.CONFIGURATION_PENDING, "Requesting version from alarm");
-        } else {
-            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, "Unable to open socket to alarm");
-        }
     }
 
     /**
