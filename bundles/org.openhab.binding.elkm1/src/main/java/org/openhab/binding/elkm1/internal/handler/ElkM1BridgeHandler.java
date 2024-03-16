@@ -125,20 +125,20 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     public void initialize() {
         updateStatus(ThingStatus.UNKNOWN);
         initializeFuture = scheduler.schedule(this::scheduledInitialize, 1, TimeUnit.SECONDS);
-        commWatchdogFuture = scheduler.scheduleWithFixedDelay(commWatchdog, 30, 120, TimeUnit.SECONDS);
         return;
     }
 
     public void scheduledInitialize() {
+        commWatchdogFuture = scheduler.scheduleWithFixedDelay(commWatchdog, 120, 120, TimeUnit.SECONDS);
         ElkAlarmConfig config = getConfigAs(ElkAlarmConfig.class);
         messageFactory = new ElkMessageFactory();
         areas = new boolean[ElkMessageFactory.MAX_AREAS];
 
         if (config.useSSL) {
-            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_PENDING,
+            updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.CONFIGURATION_PENDING,
                     "Opening SSL/TLS server connection");
         } else {
-            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_PENDING, "Opening server connection");
+            updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.CONFIGURATION_PENDING, "Opening server connection");
         }
 
         connection = new ElkAlarmConnection(config, messageFactory);
@@ -150,7 +150,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
             connection.sendCommand(new ZonePartition());
             connection.sendCommand(new ZoneStatus());
             connection.sendCommand(new ArmingStatus());
-            updateStatus(ThingStatus.ONLINE, ThingStatusDetail.CONFIGURATION_PENDING, "Requesting version from alarm");
+            updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.CONFIGURATION_PENDING, "Requesting version from alarm");
         } else {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, "Unable to open socket to alarm");
         }
@@ -360,7 +360,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
      */
     public void updateArmedState(int area, ElkAlarmArmedState armed) throws Exception {
         ElkAlarmConfig config = getConfigAs(ElkAlarmConfig.class);
-        String pincode = String.format("%06d", config.userCode);
+        String pincode = ("000000" + config.userCode).substring(config.userCode.length());
         switch (armed) {
             case ArmedAway:
                 connection.sendCommand(new ArmAway(area, pincode));
@@ -427,13 +427,25 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     }
 
     /**
+     * Cancel Future
+     */
+    public void cancelFuture(@Nullable ScheduledFuture<?> future) {
+        if (future != null) {
+            future.cancel(false);
+        }
+    }
+
+    /**
      * Shutdown the bridge
      */
     @Override
     public void dispose() {
-        connection.shutdown();
+        cancelFuture(commWatchdogFuture);
+        if (connection != null) {
+            connection.shutdown();
+            connection = null;
+        }
         areas = new boolean[0];
-        connection = null;
         assert (listeners.isEmpty());
         super.dispose();
     }

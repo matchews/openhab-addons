@@ -35,6 +35,7 @@ import javax.net.SocketFactory;
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.X509TrustManager;
@@ -175,6 +176,10 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
         } catch (UnknownHostException e) {
             logger.error("Unable to open connection to Elk alarm: {}:{}", config.host, config.port, e);
             return false;
+        } catch (SSLException e) {
+            logger.error("Unable to open connection to Elk alarm: {}:{}.  Must use secure Elk port.", config.host,
+                    config.port, e);
+            return false;
         } catch (IOException e) {
             logger.error("Unable to open connection to Elk alarm: {}:{}", config.host, config.port, e);
             return false;
@@ -276,8 +281,12 @@ public class ElkAlarmConnection implements HandshakeCompletedListener {
                 } catch (IOException e) {
                     if (e.getMessage().equals("Socket closed")) {
                         logger.error("Error reading from Elk alarm.  Socket Closed. {}:{}", config.host, config.port);
+                        return;
                     } else {
-                        logger.error("Error reading from Elk alarm: {}:{}", config.host, config.port, e);
+                        logger.error(
+                                "Error reading from Elk alarm: {}:{}.  Check hostname/address and secure/non-secure port.",
+                                config.host, config.port, e);
+                        return;
                     }
                 }
             }
