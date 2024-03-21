@@ -155,7 +155,7 @@ public class intellifireHandler extends BaseThingHandler {
 
                     CookieStore cs = httpClient.getCookieStore();
 
-                    addCookie(cs, "user", "adf", "iftapi.net");
+                    // addCookie(cs, "user", "adf", "iftapi.net");
 
                     int httpResponseCode = httpResponse.getStatus();
                     String httpResponseContent = httpResponse.getContentAsString();
