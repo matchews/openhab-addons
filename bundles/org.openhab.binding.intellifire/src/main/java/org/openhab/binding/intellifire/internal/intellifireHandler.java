@@ -41,6 +41,8 @@ import org.openhab.core.types.RefreshType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+
 /**
  * The {@link intellifireHandler} is responsible for handling commands, which are
  * sent to one of the channels.
@@ -113,15 +115,7 @@ public class intellifireHandler extends BaseThingHandler {
 
         for (int retry = 0; retry <= 5; retry++) {
             try {
-
-                // Cookie: auth_cookie=9735A4B66F6E2FD015D301CCA830FC33;
-                // user=19168ACABFBE2F0579D4635AA279C71E5273A5EBE8457FC53A1A377C39775BE5;
-                // auth_cookie=9735A4B66F6E2FD015D301CCA830FC33;
-                // user=19168ACABFBE2F0579D4635AA279C71E5273A5EBE8457FC53A1A377C39775BE5
-
                 for (int i = 0; i < 100; i++) {
-
-                    config.hostname = "http://iftapi.net/a/login";
 
                     /*
                      * for (Enumeration<?> e = headers.keys(); e.hasMoreElements();) {
@@ -135,6 +129,7 @@ public class intellifireHandler extends BaseThingHandler {
                      * request.timeout(timeout, TimeUnit.MILLISECONDS);
                      * headers.forEach(request::header);
                      */
+                    config.hostname = "http://iftapi.net/a/login";
 
                     request = httpClient.newRequest(config.hostname).header(HttpHeader.HOST, "iftapi.net")
                             .header(HttpHeader.CONNECTION, "keep-alive")
@@ -147,23 +142,51 @@ public class intellifireHandler extends BaseThingHandler {
                             .content(new StringContentProvider(urlParameters), "text/plain;charset=UTF-8")
                             .header(HttpHeader.CONTENT_LENGTH, urlParameterslength).send();
 
-                    /*
-                     * Set-Cookie: user=19168ACABFBE2F0579D4635AA279C71E5273A5EBE8457FC53A1A377C39775BE5; path=/
-                     * Set-Cookie: auth_cookie=D0A2D58912613CDA89331378B801EB85; path=/
-                     * Set-Cookie: web_client_id=02C7FEA9A86B5A4669955E2D645B0FA2; path=/
-                     */
-
                     CookieStore cs = httpClient.getCookieStore();
-
                     // addCookie(cs, "user", "adf", "iftapi.net");
 
-                    int httpResponseCode = httpResponse.getStatus();
-                    String httpResponseContent = httpResponse.getContentAsString();
+                    if (httpResponse.getStatus() != 204) {
+                        logger.info("Login failed with http status code: {}", httpResponse.getStatus());
+                    }
 
-                    logger.info("httpResponseCode: {}", httpResponseCode);
+                    logger.info("httpResponseCode: {}", httpResponse.getStatus());
                     logger.info("Headers: {}\tCookies: {}", request.getHeaders(), request.getCookies());
-                    logger.info("httpResponseContent: {}", httpResponseContent);
+                    logger.info("httpResponseContent: {}", httpResponse.getContentAsString());
 
+                    config.hostname = "http://iftapi.net/a/enumlocations";
+                    config.hostname = "http://iftapi.net/a/getusername";
+
+                    Request request2 = httpClient.newRequest(config.hostname).header(HttpHeader.HOST, "iftapi.net")
+                            .header(HttpHeader.CONNECTION, "keep-alive")
+                            .agent("IntellifireTouch/1 CFNetwork/1492.0.1 Darwin/23.3.0").method(HttpMethod.POST)
+                            .header(HttpHeader.ACCEPT, "*/*").header(HttpHeader.ACCEPT_LANGUAGE, "en-US,en;q=0.9")
+                            .header(HttpHeader.ACCEPT_ENCODING, "gzip, deflate").version(HttpVersion.HTTP_1_1)
+                            .timeout(10, TimeUnit.SECONDS);
+
+                    final URI baseUri = URI.create("http://iftapi.net");
+
+                    cs.get(baseUri).forEach(cookie -> {
+                        request2.cookie(cookie);
+                    });
+
+                    httpResponse = request2
+                            .content(new StringContentProvider(urlParameters), "text/plain;charset=UTF-8")
+                            .header(HttpHeader.CONTENT_LENGTH, urlParameterslength).send();
+
+                    if (httpResponse.getStatus() != 200) {
+                        logger.info("Login failed with http status code: {}", httpResponse.getStatus());
+                    }
+
+                    logger.info("httpResponseCode: {}", httpResponse.getStatus());
+                    logger.info("Headers: {}\tCookies: {}", request.getHeaders(), request.getCookies());
+                    logger.info("httpResponseContent: {}", httpResponse.getContentAsString());
+
+                    final Gson gson = new Gson();
+
+                    getUsername getUsername = gson.fromJson(httpResponse.getContentAsString(), getUsername.class);
+
+                    // KodiUniqueID uniqueID = gson.fromJson(item.get(PROPERTY_UNIQUEID), KodiUniqueID.class);
+                    logger.info("getUsername: {}", getUsername.username);
                 }
 
             } catch (ExecutionException e) {
