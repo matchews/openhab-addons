@@ -58,6 +58,7 @@ public class intellifireHandler extends BaseThingHandler {
     private @Nullable ScheduledFuture<?> pollTelemetryFuture;
     private @Nullable ScheduledFuture<?> pollAlarmsFuture;
     private int commFailureCount;
+    private @Nullable CookieStore cs;
 
     public intellifireHandler(Thing thing, HttpClient httpClient) {
         super(thing);
@@ -82,111 +83,69 @@ public class intellifireHandler extends BaseThingHandler {
     }
 
     public synchronized boolean login() throws InterruptedException {
+        final Gson gson = new Gson();
         String xmlResponse;
         String status;
 
-        config.hostname = "http://iftapi.net/";
-        // 54.186.69.10
+        // *****Login to Intellifire server and retrieve cookies
+        String test = httpResponseContent(intellifireBindingConstants.URL_LOGIN,
+                "username=mmyers75@icloud.com&password=R39gVXg@ng&zQ3^6");
+
+        String test2 = httpResponseContent(intellifireBindingConstants.URL_ENUMLOCATIONS, "");
+
+        String test3 = httpResponseContent(intellifireBindingConstants.URL_GETUSERNAME, "");
+
+        getUsername getUsername = gson.fromJson(test3, getUsername.class);
+
+        // KodiUniqueID uniqueID = gson.fromJson(item.get(PROPERTY_UNIQUEID), KodiUniqueID.class);
+        logger.info("getUsername: {}", getUsername.username);
 
         /*
-         * data = {"username": username, "password": password}
-         *
-         *
-         * PACKAGE_VERSION = importlib.metadata.version("intellifire4py")
-         * USER_AGENT = f"intellifire4py/{PACKAGE_VERSION}"
-         *
-         *
-         * headers={"user-agent": USER_AGENT}
-         * self._session.post( # type: ignore[union-attr]
-         * f"{self.prefix}://iftapi.net/a/login", data=data
+         * location_id: str
+         * location_name: str
+         * wifi_essid: str
+         * wifi_password: str
+         * postal_code: str
+         * user_class: int
          */
 
-        // *****Login to Hayward server
-        String urlParameters = "username=mmyers75@icloud.com&password=R39gVXg@ng&zQ3^6";
-
-        String test = httpXmlResponse(urlParameters);
         return true;
     }
 
-    public synchronized String httpXmlResponse(String urlParameters) throws InterruptedException {
-        String urlParameterslength = Integer.toString(urlParameters.length());
-        String statusMessage;
-        Request request;
+    public synchronized String httpResponseContent(String url, String content) throws InterruptedException {
 
         for (int retry = 0; retry <= 5; retry++) {
             try {
                 for (int i = 0; i < 100; i++) {
 
-                    /*
-                     * for (Enumeration<?> e = headers.keys(); e.hasMoreElements();) {
-                     * String key = (String) e.nextElement();
-                     * String val = (String) headers.get(key);
-                     * request.header(key, val);
-                     * }
-                     */
-                    /*
-                     * httpClient.newRequest(uri, httpMethod, httpContent, httpContentType).thenAccept(request -> {
-                     * request.timeout(timeout, TimeUnit.MILLISECONDS);
-                     * headers.forEach(request::header);
-                     */
-                    config.hostname = "http://iftapi.net/a/login";
+                    Request request = httpRequestBuilder(url);
 
-                    request = httpClient.newRequest(config.hostname).header(HttpHeader.HOST, "iftapi.net")
-                            .header(HttpHeader.CONNECTION, "keep-alive")
-                            .agent("IntellifireTouch/1 CFNetwork/1492.0.1 Darwin/23.3.0").method(HttpMethod.POST)
-                            .header(HttpHeader.ACCEPT, "*/*").header(HttpHeader.ACCEPT_LANGUAGE, "en-US,en;q=0.9")
-                            .header(HttpHeader.ACCEPT_ENCODING, "gzip, deflate").version(HttpVersion.HTTP_1_1)
-                            .timeout(10, TimeUnit.SECONDS);
-
-                    ContentResponse httpResponse = request
-                            .content(new StringContentProvider(urlParameters), "text/plain;charset=UTF-8")
-                            .header(HttpHeader.CONTENT_LENGTH, urlParameterslength).send();
-
-                    CookieStore cs = httpClient.getCookieStore();
+                    cs = httpClient.getCookieStore();
                     // addCookie(cs, "user", "adf", "iftapi.net");
+
+                    // load cookies into request
+                    cs.get(intellifireBindingConstants.URI_COOKIE).forEach(cookie -> {
+                        request.cookie(cookie);
+                    });
+
+                    ContentResponse httpResponse = httpRequestBuilder(url)
+                            .content(new StringContentProvider(content), "text/plain;charset=UTF-8")
+                            .header(HttpHeader.CONTENT_LENGTH, Integer.toString(content.length())).send();
 
                     if (httpResponse.getStatus() != 204) {
                         logger.info("Login failed with http status code: {}", httpResponse.getStatus());
                     }
 
                     logger.info("httpResponseCode: {}", httpResponse.getStatus());
-                    logger.info("Headers: {}\tCookies: {}", request.getHeaders(), request.getCookies());
+                    logger.info("Headers: {}\tCookies: {}", request.getHeaders(),
+                            httpClient.getCookieStore().toString());
                     logger.info("httpResponseContent: {}", httpResponse.getContentAsString());
 
-                    config.hostname = "http://iftapi.net/a/enumlocations";
-                    config.hostname = "http://iftapi.net/a/getusername";
+                    // store any received cookies
+                    cs = httpClient.getCookieStore();
 
-                    Request request2 = httpClient.newRequest(config.hostname).header(HttpHeader.HOST, "iftapi.net")
-                            .header(HttpHeader.CONNECTION, "keep-alive")
-                            .agent("IntellifireTouch/1 CFNetwork/1492.0.1 Darwin/23.3.0").method(HttpMethod.POST)
-                            .header(HttpHeader.ACCEPT, "*/*").header(HttpHeader.ACCEPT_LANGUAGE, "en-US,en;q=0.9")
-                            .header(HttpHeader.ACCEPT_ENCODING, "gzip, deflate").version(HttpVersion.HTTP_1_1)
-                            .timeout(10, TimeUnit.SECONDS);
+                    return httpResponse.getContentAsString();
 
-                    final URI baseUri = URI.create("http://iftapi.net");
-
-                    cs.get(baseUri).forEach(cookie -> {
-                        request2.cookie(cookie);
-                    });
-
-                    httpResponse = request2
-                            .content(new StringContentProvider(urlParameters), "text/plain;charset=UTF-8")
-                            .header(HttpHeader.CONTENT_LENGTH, urlParameterslength).send();
-
-                    if (httpResponse.getStatus() != 200) {
-                        logger.info("Login failed with http status code: {}", httpResponse.getStatus());
-                    }
-
-                    logger.info("httpResponseCode: {}", httpResponse.getStatus());
-                    logger.info("Headers: {}\tCookies: {}", request.getHeaders(), request.getCookies());
-                    logger.info("httpResponseContent: {}", httpResponse.getContentAsString());
-
-                    final Gson gson = new Gson();
-
-                    getUsername getUsername = gson.fromJson(httpResponse.getContentAsString(), getUsername.class);
-
-                    // KodiUniqueID uniqueID = gson.fromJson(item.get(PROPERTY_UNIQUEID), KodiUniqueID.class);
-                    logger.info("getUsername: {}", getUsername.username);
                 }
 
             } catch (ExecutionException e) {
@@ -206,6 +165,18 @@ public class intellifireHandler extends BaseThingHandler {
             }
         }
         return "";
+    }
+
+    private Request httpRequestBuilder(String url) {
+        Request request = httpClient.newRequest(url)
+                .header(HttpHeader.HOST, intellifireBindingConstants.HTTP_HEADERS_HOST)
+                .header(HttpHeader.CONNECTION, intellifireBindingConstants.HTTP_HEADERS_CONNECTION)
+                .agent("IntellifireTouch/1 CFNetwork/1492.0.1 Darwin/23.3.0").method(HttpMethod.POST)
+                .header(HttpHeader.ACCEPT, intellifireBindingConstants.HTTP_HEADERS_ACCEPT)
+                .header(HttpHeader.ACCEPT_LANGUAGE, intellifireBindingConstants.HTTP_HEADERS_lANGUAGE)
+                .header(HttpHeader.ACCEPT_ENCODING, intellifireBindingConstants.HTTP_HEADERS_ACCEPTENCODING)
+                .version(HttpVersion.HTTP_1_1).timeout(10, TimeUnit.SECONDS);
+        return request;
     }
 
     private void addCookie(CookieStore cookieStore, String name, String value, String domain) {
