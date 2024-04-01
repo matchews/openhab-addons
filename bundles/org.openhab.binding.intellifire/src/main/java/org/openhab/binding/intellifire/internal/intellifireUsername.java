@@ -16,6 +16,6 @@ package org.openhab.binding.intellifire.internal;
  *
  * @author Matt Myers - Initial contribution
  */
-public class getUsername {
+public class intellifireUsername {
     String username;
 }

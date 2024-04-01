@@ -4,7 +4,7 @@
 	xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
 	xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
 
-	<thing-type id="fireplace">
+	<thing-type id="light">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge"/>
 		</supported-bridge-type-refs>
@@ -14,33 +14,15 @@
 		<category>HVAC</category>
 
 		<channels>
-			<channel id="flame" typeId="flame"/>
-			<channel id="fan" typeId="fan"/>
 			<channel id="light" typeId="light"/>
-			<channel id="timerEnable" typeId="timerEnable"/>
-			<channel id="timeRemaining" typeId="timeRemaining"/>
 		</channels>
 
 	</thing-type>
 
-	<channel-type id="flame">
+	<channel-type id="light">
 		<item-type>Dimmer</item-type>
-		<label>Flame</label>
-		<category>Fire</category>
-		<state min="0" max="100" step="20" pattern="%d %unit%" readOnly="false"/>
-	</channel-type>
-
-	<channel-type id="timerEnable">
-		<item-type>Switch</item-type>
-		<label>Timer Enable</label>
-		<category>Switch</category>
-		<state readOnly="false">
-		</state>
-	</channel-type>
-
-	<channel-type id="timeRemaining">
-		<item-type>Number:Time</item-type>
-		<label>Time Remaining</label>
-		<category>Time</category>
+		<label>Light</label>
+		<category>Light</category>
+		<state min="0" max="100" step="33" pattern="%d %unit%" readOnly="false"/>
 	</channel-type>
 </thing:thing-descriptions>

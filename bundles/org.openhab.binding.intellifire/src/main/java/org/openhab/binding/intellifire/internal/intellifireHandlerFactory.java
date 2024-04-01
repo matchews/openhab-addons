@@ -12,7 +12,7 @@
  */
 package org.openhab.binding.intellifire.internal;
 
-import static org.openhab.binding.intellifire.internal.intellifireBindingConstants.THING_TYPE_FIREPLACE;
+import static org.openhab.binding.intellifire.internal.intellifireBindingConstants.*;
 
 import java.util.Set;
 
@@ -20,6 +20,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.client.HttpClient;
 import org.openhab.core.io.net.http.HttpClientFactory;
+import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingTypeUID;
 import org.openhab.core.thing.binding.BaseThingHandlerFactory;
@@ -39,7 +40,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(configurationPid = "binding.intellifire", service = ThingHandlerFactory.class)
 public class intellifireHandlerFactory extends BaseThingHandlerFactory {
 
-    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Set.of(THING_TYPE_FIREPLACE);
+    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Set.of(THING_TYPE_BRIDGE, THING_TYPE_FAN,
+            THING_TYPE_FIREPLACE, THING_TYPE_LIGHT, THING_TYPE_THERMOSTAT);
     private final HttpClient httpClient;
 
     @Override
@@ -56,8 +58,10 @@ public class intellifireHandlerFactory extends BaseThingHandlerFactory {
     protected @Nullable ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
-        if (THING_TYPE_FIREPLACE.equals(thingTypeUID)) {
-            return new intellifireHandler(thing, httpClient);
+        if (thing instanceof Bridge) {
+            if (THING_TYPE_BRIDGE.equals(thingTypeUID)) {
+                return new intellifireBridgeHandler((Bridge) thing, httpClient);
+            }
         }
 
         return null;

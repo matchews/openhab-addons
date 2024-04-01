@@ -12,8 +12,6 @@
  */
 package org.openhab.binding.intellifire.internal;
 
-import static org.openhab.binding.intellifire.internal.intellifireBindingConstants.CHANNEL_FIREPLACE_FLAME;
-
 import java.net.CookieStore;
 import java.net.HttpCookie;
 import java.net.URI;
@@ -31,11 +29,11 @@ import org.eclipse.jetty.client.util.StringContentProvider;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.HttpVersion;
+import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
-import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
 import org.openhab.core.thing.ThingStatusDetail;
-import org.openhab.core.thing.binding.BaseThingHandler;
+import org.openhab.core.thing.binding.BaseBridgeHandler;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.RefreshType;
 import org.slf4j.Logger;
@@ -44,24 +42,24 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 
 /**
- * The {@link intellifireHandler} is responsible for handling commands, which are
+ * The {@link intellifireBridgeHandler} is responsible for handling commands, which are
  * sent to one of the channels.
  *
  * @author Matt Myers - Initial contribution
  */
 @NonNullByDefault
-public class intellifireHandler extends BaseThingHandler {
-    private final Logger logger = LoggerFactory.getLogger(intellifireHandler.class);
-    private @Nullable intellifireConfiguration config;
+public class intellifireBridgeHandler extends BaseBridgeHandler {
+    private final Logger logger = LoggerFactory.getLogger(intellifireBridgeHandler.class);
     private final HttpClient httpClient;
+    private int commFailureCount;
+    private @Nullable intellifireConfiguration config;
     private @Nullable ScheduledFuture<?> initializeFuture;
     private @Nullable ScheduledFuture<?> pollTelemetryFuture;
     private @Nullable ScheduledFuture<?> pollAlarmsFuture;
-    private int commFailureCount;
     private @Nullable CookieStore cs;
 
-    public intellifireHandler(Thing thing, HttpClient httpClient) {
-        super(thing);
+    public intellifireBridgeHandler(Bridge bridge, HttpClient httpClient) {
+        super(bridge);
         this.httpClient = httpClient;
     }
 
@@ -84,30 +82,24 @@ public class intellifireHandler extends BaseThingHandler {
 
     public synchronized boolean login() throws InterruptedException {
         final Gson gson = new Gson();
-        String xmlResponse;
-        String status;
+        String httpResponse;
 
         // *****Login to Intellifire server and retrieve cookies
-        String test = httpResponseContent(intellifireBindingConstants.URL_LOGIN,
+        httpResponse = httpResponseContent(intellifireBindingConstants.URL_LOGIN,
                 "username=mmyers75@icloud.com&password=R39gVXg@ng&zQ3^6");
 
-        String test2 = httpResponseContent(intellifireBindingConstants.URL_ENUMLOCATIONS, "");
+        httpResponse = httpResponseContent(intellifireBindingConstants.URL_GETUSERNAME, "");
+        intellifireUsername username = gson.fromJson(httpResponse, intellifireUsername.class);
+        logger.info("getUsername: {}", username.username);
 
-        String test3 = httpResponseContent(intellifireBindingConstants.URL_GETUSERNAME, "");
+        httpResponse = httpResponseContent(intellifireBindingConstants.URL_ENUMLOCATIONS, "");
+        intellifireLocations locations = gson.fromJson(httpResponse, intellifireLocations.class);
 
-        getUsername getUsername = gson.fromJson(test3, getUsername.class);
+        httpResponse = httpResponseContent("http://iftapi.net/a/enumfireplaces?location_id=16340519383768891688", "");
+        intellifireFireplaces fireplaces = gson.fromJson(httpResponse, intellifireFireplaces.class);
 
-        // KodiUniqueID uniqueID = gson.fromJson(item.get(PROPERTY_UNIQUEID), KodiUniqueID.class);
-        logger.info("getUsername: {}", getUsername.username);
-
-        /*
-         * location_id: str
-         * location_name: str
-         * wifi_essid: str
-         * wifi_password: str
-         * postal_code: str
-         * user_class: int
-         */
+        httpResponse = httpResponseContent("http://iftapi.net/a/8A9F68701D0441F3AE22F4D9A0591841/apppoll", "");
+        intellifirePollData pollData = gson.fromJson(httpResponse, intellifirePollData.class);
 
         return true;
     }
@@ -196,7 +188,7 @@ public class intellifireHandler extends BaseThingHandler {
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        if (CHANNEL_FIREPLACE_FLAME.equals(channelUID.getId())) {
+        if (intellifireBindingConstants.CHANNEL_FIREPLACE_FLAME.equals(channelUID.getId())) {
             if (command instanceof RefreshType) {
                 // TODO: handle data refresh
             }
