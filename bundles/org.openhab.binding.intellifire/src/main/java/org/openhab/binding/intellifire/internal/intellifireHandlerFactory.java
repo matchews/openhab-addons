@@ -40,8 +40,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(configurationPid = "binding.intellifire", service = ThingHandlerFactory.class)
 public class intellifireHandlerFactory extends BaseThingHandlerFactory {
 
-    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Set.of(THING_TYPE_BRIDGE, THING_TYPE_FAN,
-            THING_TYPE_FIREPLACE, THING_TYPE_LIGHT, THING_TYPE_THERMOSTAT);
+    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Set.of(THING_TYPE_ACCOUNT_BRIDGE,
+            THING_TYPE_FAN, THING_TYPE_FIREPLACE, THING_TYPE_LIGHT, THING_TYPE_REMOTE);
     private final HttpClient httpClient;
 
     @Override
@@ -58,12 +58,21 @@ public class intellifireHandlerFactory extends BaseThingHandlerFactory {
     protected @Nullable ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
-        if (thing instanceof Bridge) {
-            if (THING_TYPE_BRIDGE.equals(thingTypeUID)) {
-                return new intellifireBridgeHandler((Bridge) thing, httpClient);
-            }
+        if (thing instanceof Bridge && THING_TYPE_ACCOUNT_BRIDGE.equals(thingTypeUID)) {
+            return new intellifireBridgeHandler((Bridge) thing, httpClient);
         }
-
+        if (thing instanceof Thing && THING_TYPE_FAN.equals(thingTypeUID)) {
+            // return new intellifireFanHandler(thing);
+        }
+        if (thing instanceof Thing && THING_TYPE_FIREPLACE.equals(thingTypeUID)) {
+            // return new intellifireFireplaceHandler(thing);
+        }
+        if (thing instanceof Thing && THING_TYPE_LIGHT.equals(thingTypeUID)) {
+            // return new intellifireLightHandler(thing);
+        }
+        if (thing instanceof Thing && THING_TYPE_REMOTE.equals(thingTypeUID)) {
+            // return new intellifireRemoteHandler(thing);
+        }
         return null;
     }
 }

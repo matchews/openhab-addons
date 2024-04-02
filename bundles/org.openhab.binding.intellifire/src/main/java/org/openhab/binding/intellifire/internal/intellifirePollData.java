@@ -39,13 +39,13 @@ public class intellifirePollData {
     int remote_uptime;
     int remote_connection_quality;
     int ecm_latency;
-    String ipv4_address;
+    public String ipv4_address;
     List<String> errors;
-    int feature_light;
-    int feature_thermostat;
-    int power_vent;
-    int feature_fan;
+    public int feature_light;
+    public int feature_thermostat;
+    public int power_vent;
+    public int feature_fan;
     String firmware_version;
-    String firmware_version_string;
+    public String firmware_version_string;
     String brand;
 }

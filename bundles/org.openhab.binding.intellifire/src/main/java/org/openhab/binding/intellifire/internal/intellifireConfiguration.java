@@ -25,7 +25,7 @@ public class intellifireConfiguration {
     /**
      * Sample configuration parameters. Replace with your own.
      */
-    public String hostname = "";
+    public String username = "";
     public String password = "";
-    public int refreshInterval = 600;
+    public int refreshInterval = 15;
 }

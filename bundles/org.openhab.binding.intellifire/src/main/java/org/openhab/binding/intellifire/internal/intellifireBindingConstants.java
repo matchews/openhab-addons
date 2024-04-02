@@ -13,6 +13,7 @@
 package org.openhab.binding.intellifire.internal;
 
 import java.net.URI;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.core.thing.ThingTypeUID;
@@ -29,12 +30,17 @@ public class intellifireBindingConstants {
     private static final String BINDING_ID = "intellifire";
 
     // List of all Thing Type UIDs
-    public static final ThingTypeUID THING_TYPE_BRIDGE = new ThingTypeUID(BINDING_ID, "bridge");
+    public static final ThingTypeUID THING_TYPE_ACCOUNT_BRIDGE = new ThingTypeUID(BINDING_ID, "account");
     public static final ThingTypeUID THING_TYPE_FAN = new ThingTypeUID(BINDING_ID, "fan");
     public static final ThingTypeUID THING_TYPE_FIREPLACE = new ThingTypeUID(BINDING_ID, "fireplace");
     public static final ThingTypeUID THING_TYPE_LIGHT = new ThingTypeUID(BINDING_ID, "light");
-    public static final ThingTypeUID THING_TYPE_POWERVENT = new ThingTypeUID(BINDING_ID, "powerVent");
-    public static final ThingTypeUID THING_TYPE_THERMOSTAT = new ThingTypeUID(BINDING_ID, "thermostat");
+    public static final ThingTypeUID THING_TYPE_REMOTE = new ThingTypeUID(BINDING_ID, "remote");
+
+    public static final Set<ThingTypeUID> BRIDGE_THING_TYPES_UIDS = Set.of(THING_TYPE_ACCOUNT_BRIDGE);
+
+    public static final Set<ThingTypeUID> THING_TYPES_UIDS = Set.of(intellifireBindingConstants.THING_TYPE_FAN,
+            intellifireBindingConstants.THING_TYPE_FIREPLACE, intellifireBindingConstants.THING_TYPE_LIGHT,
+            intellifireBindingConstants.THING_TYPE_REMOTE);
 
     // List of all Channel ids
     public static final String CHANNEL_FIREPLACE_FLAME = "fireplaceFlame";
@@ -50,11 +56,15 @@ public class intellifireBindingConstants {
     public static final String CHANNEL_THERMO_TEMPERATURE = "thermoTemperature";
 
     // Properties
-    public static final String PROPERTY_BRIDGE_UPTIME = "bridgeUptime";
-    public static final String PROPERTY_BRIDGE_FIRMWAREVERSION = "bridgeFirmwareVersion";
-    public static final String PROPERTY_BRIDGE_BRAND = "bridgeBrand";
-    public static final String PROPERTY_BRIDGE_IPADDRESS = "bridgeIPAddress";
+
+    public static final String PROPERTY_FIREPLACE_BRAND = "fireplaceBrand";
+    public static final String PROPERTY_FIREPLACE_FIRMWAREVERSION = "fireplaceFirmwareVersion";
+    public static final String PROPERTY_FIREPLACE_IPADDRESS = "fireplaceIPAddress";
     public static final String PROPERTY_FIREPLACE_NAME = "fireplaceName";
+    public static final String PROPERTY_FIREPLACE_SERIAL = "fireplaceSerial";
+    public static final String PROPERTY_FIREPLACE_UPTIME = "fireplaceUptime";
+
+    public static final String PROPERTY_SYSTEM_ID = "systemID";
 
     // http Connection
     public static final String HTTP_HEADERS_HOST = "iftapi.net";

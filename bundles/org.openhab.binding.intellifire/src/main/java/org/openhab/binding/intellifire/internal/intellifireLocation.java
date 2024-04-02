@@ -18,16 +18,15 @@ import java.util.List;
  *
  * @author Matt Myers - Initial contribution
  */
-public class intellifireLocations {
-    public static class location {
-        String location_id;
-        String location_name;
-        String wifi_essid;
-        String wifi_password;
-        String postal_code;
-        String user_class;
+public class intellifireLocation {
+    public static class fireplace {
+        public String serial;
+        public String brand;
+        public String name;
+        public String apikey;
+        public int power;
     }
 
-    private List<location> locations;
-    int email_notifications_enabled;
+    public List<fireplace> fireplaces;
+    public String location_name;
 }
