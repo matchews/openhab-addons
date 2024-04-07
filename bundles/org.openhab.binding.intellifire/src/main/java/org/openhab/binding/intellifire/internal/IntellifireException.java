@@ -15,17 +15,26 @@ package org.openhab.binding.intellifire.internal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * The {@link intellifireConfiguration} class contains fields mapping thing configuration parameters.
+ * The {@link IntellifireException} is thrown during the getMspConfig, mspConfigDiscovery, getTelemetry,
+ * evaluateXPath and httpXmlResponse methods//todo
  *
  * @author Matt Myers - Initial contribution
  */
 @NonNullByDefault
-public class intellifireConfiguration {
+public class IntellifireException extends Exception {
 
     /**
-     * Sample configuration parameters. Replace with your own.
+     * The {@link IntellifireException} is thrown by //toDO
+     *
      */
-    public String username = "";
-    public String password = "";
-    public int refreshInterval = 15;
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     *
+     * @param message Hayward error message
+     */
+    public IntellifireException(String message) {
+        super(message);
+    }
 }

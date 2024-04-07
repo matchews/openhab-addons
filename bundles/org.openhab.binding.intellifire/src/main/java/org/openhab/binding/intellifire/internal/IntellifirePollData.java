@@ -18,34 +18,34 @@ import java.util.List;
  *
  * @author Matt Myers - Initial contribution
  */
-public class intellifirePollData {
-    String timestamp;
-    String name;
-    int temperature;
-    int battery;
-    int pilot;
-    int light;
-    int height;
-    int fanspeed;
-    int hot;
-    int power;
-    int schedule_enable;
-    int thermostat;
-    int setpoint;
-    int timer;
-    int timeremaining;
-    int prepurge;
-    int remote_downtime;
-    int remote_uptime;
-    int remote_connection_quality;
-    int ecm_latency;
+public class IntellifirePollData {
+    public String timestamp;
+    public String name;
+    public int temperature;
+    public int battery;
+    public int pilot;
+    public int light;
+    public int height;
+    public int fanspeed;
+    public int hot;
+    public int power;
+    public int schedule_enable;
+    public int thermostat;
+    public int setpoint;
+    public int timer;
+    public int timeremaining;
+    public int prepurge;
+    public int remote_downtime;
+    public int remote_uptime;
+    public int remote_connection_quality;
+    public int ecm_latency;
     public String ipv4_address;
-    List<String> errors;
+    public List<String> errors;
     public int feature_light;
     public int feature_thermostat;
     public int power_vent;
     public int feature_fan;
-    String firmware_version;
+    public String firmware_version;
     public String firmware_version_string;
-    String brand;
+    public String brand;
 }

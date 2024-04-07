@@ -9,8 +9,8 @@
 		<description>Connection to cloud server and local fireplace</description>
 
 		<properties>
-			<property name="vendor">Intellifire</property>
-			<property name="model">IFT-WFM</property>
+			<property name="Vendor">Intellifire</property>
+			<property name="Server Address">http://iftapi.net</property>
 		</properties>
 
 		<config-description>

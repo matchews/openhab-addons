@@ -12,21 +12,11 @@
  */
 package org.openhab.binding.intellifire.internal;
 
-import java.util.List;
-
 /**
  *
  * @author Matt Myers - Initial contribution
  */
-public class intellifireLocation {
-    public static class fireplace {
-        public String serial;
-        public String brand;
-        public String name;
-        public String apikey;
-        public int power;
-    }
-
-    public List<fireplace> fireplaces;
-    public String location_name;
+@SuppressWarnings("checkstyle:MemberNameCheck")
+public class IntellifireUsername {
+    public String username;
 }

@@ -12,10 +12,20 @@
  */
 package org.openhab.binding.intellifire.internal;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
+ * The {@link IntellifireConfiguration} class contains fields mapping thing configuration parameters.
  *
  * @author Matt Myers - Initial contribution
  */
-public class intellifireUsername {
-    String username;
+@NonNullByDefault
+public class IntellifireConfiguration {
+
+    /**
+     * Sample configuration parameters. Replace with your own.
+     */
+    public String username = "";
+    public String password = "";
+    public int refreshInterval = 15;
 }

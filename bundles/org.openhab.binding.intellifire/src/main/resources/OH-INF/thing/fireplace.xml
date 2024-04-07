@@ -10,31 +10,34 @@
 		</supported-bridge-type-refs>
 
 		<label>Intellifire Light</label>
-		<description>Light thing for Intellifire binding</description>
+		<description>Fireplace thing for Intellifire binding</description>
 		<category>HVAC</category>
 
 		<channels>
-
+			<channel id="power" typeId="power"/>
 			<channel id="battery" typeId="battery"/>
 			<channel id="ecmLatency" typeId="ecmLatency"/>
 			<channel id="errors" typeId="errors"/>
-			<channel id="flame" typeId="flame"/>
+			<channel id="flameHeight" typeId="flameHeight"/>
 			<channel id="hot" typeId="hot"/>
-			<channel id="pilot" typeId="pilot"/>
-			<channel id="ACpower" typeId="ACpower"/>
-			<channel id="prepurge" typeId="prePurge"/>
+			<channel id="coldClimatePilot" typeId="coldClimatePilot"/>
+			<channel id="prePurge" typeId="prePurge"/>
 
 		</channels>
 
 		<properties>
-			<property name="brand"></property>
-			<property name="ipAddress"></property>
-			<property name="firmwareVersion"></property>
-			<property name="name"></property>
-			<property name="serialNumber"></property>
+			<property name="Brand"></property>
+			<property name="Firmware Version"></property>
+			<property name="IP Address"></property>
+			<property name="Location ID"></property>
+			<property name="Model">IFT-WFM</property>
+			<property name="Name"></property>
+			<property name="Serial Number"></property>
+			<property name="Vendor">Intellifire</property>
 		</properties>
 
-
+		<representation-property>uniqueId
+		</representation-property>
 
 	</thing-type>
 	<channel-type id="battery">
@@ -61,12 +64,11 @@
 		</state>
 	</channel-type>
 
-
-	<channel-type id="flame">
+	<channel-type id="flameHeight">
 		<item-type>Dimmer</item-type>
 		<label>Flame</label>
 		<category>Fire</category>
-		<state min="0" max="100" step="20" pattern="%d %unit%" readOnly="false"/>
+		<state min="0" max="5" step="1" pattern="%d %unit%" readOnly="false"/>
 	</channel-type>
 
 	<channel-type id="hot">
@@ -77,19 +79,11 @@
 		</state>
 	</channel-type>
 
-	<channel-type id="pilot">
+	<channel-type id="coldClimatePilot">
 		<item-type>Switch</item-type>
-		<label>Pilot</label>
+		<label>Cold Climate Pilot</label>
 		<category>Switch</category>
-		<state readOnly="true">
-		</state>
-	</channel-type>
-
-	<channel-type id="ACpower">
-		<item-type>Switch</item-type>
-		<label>Hot</label>
-		<category>Switch</category>
-		<state readOnly="true">
+		<state readOnly="false">
 		</state>
 	</channel-type>
 
@@ -98,6 +92,14 @@
 		<label>Pre Purge</label>
 		<category>Switch</category>
 		<state readOnly="true">
+		</state>
+	</channel-type>
+
+	<channel-type id="power">
+		<item-type>Switch</item-type>
+		<label>Fireplace</label>
+		<category>Switch</category>
+		<state readOnly="false">
 		</state>
 	</channel-type>
 </thing:thing-descriptions>

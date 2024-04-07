@@ -11,11 +11,20 @@
 
 		<label>Intellifire Light</label>
 		<description>Light thing for Intellifire binding</description>
-		<category>HVAC</category>
+		<category>Lightbulb</category>
 
 		<channels>
 			<channel id="light" typeId="light"/>
 		</channels>
+
+		<properties>
+			<property name="Location ID"></property>
+			<property name="Serial Number"></property>
+			<property name="Vendor">Intellifire</property>
+		</properties>
+
+		<representation-property>uniqueId
+		</representation-property>
 
 	</thing-type>
 
@@ -23,6 +32,6 @@
 		<item-type>Dimmer</item-type>
 		<label>Light</label>
 		<category>Light</category>
-		<state min="0" max="100" step="33" pattern="%d %unit%" readOnly="false"/>
+		<state min="0" max="3" step="1" pattern="%d %unit%" readOnly="false"/>
 	</channel-type>
 </thing:thing-descriptions>
