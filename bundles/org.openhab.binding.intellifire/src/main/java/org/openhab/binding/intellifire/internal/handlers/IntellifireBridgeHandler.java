@@ -93,8 +93,6 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
 
         try {
             login();
-            IntellifireAccount accountLocations = getAccountLocations();
-            // this.account = accountLocations;
             // IntellifireUsername username = getUsername();
             updateStatus(ThingStatus.ONLINE);
             initPolling(0);
@@ -138,37 +136,19 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
     }
 
     public boolean poll() throws IntellifireException, InterruptedException {
+        for (Thing thing : getThing().getThings()) {
+            if (thing.getHandler() instanceof IntellifireThingHandler) {
+                IntellifireThingHandler handler = (IntellifireThingHandler) thing.getHandler();
+                if (handler != null) {
+                    Map<String, String> properties = new HashMap<>();
+                    properties = thing.getProperties();
+                    String thingSerialNumber = properties.get(IntellifireBindingConstants.PROPERTY_SERIALNUMBER);
 
-        IntellifireAccount account = getAccountLocations();
-
-        for (int i = 0; i < account.locations.size(); i++) {
-            String locationID = account.locations.get(i).location_id.toString();
-            IntellifireLocation location = getFireplaces(locationID);
-            for (int j = 0; j < location.fireplaces.size(); j++) {
-                // Construct representative property
-                String fireplaceLocationID = account.locations.get(i).location_id;
-                String fireplaceSerialNumber = location.fireplaces.get(j).serial;
-
-                // Poll fireplace
-                IntellifirePollData pollData = cloudPollFireplace(location.fireplaces.get(j).serial);
-
-                for (Thing thing : getThing().getThings()) {
-                    if (thing.getHandler() instanceof IntellifireThingHandler) {
-                        IntellifireThingHandler handler = (IntellifireThingHandler) thing.getHandler();
-                        if (handler != null) {
-                            Map<String, String> properties = new HashMap<>();
-                            properties = thing.getProperties();
-
-                            String thingLocationID = properties.get(IntellifireBindingConstants.PROPERTY_LOCATIONID);
-                            String thingSerialNumber = properties
-                                    .get(IntellifireBindingConstants.PROPERTY_SERIALNUMBER);
-
-                            if (thingLocationID.equals(fireplaceLocationID)
-                                    && thingSerialNumber.equals(fireplaceSerialNumber)) {
-                                if (pollData != null) {
-                                    handler.poll(pollData);
-                                }
-                            }
+                    // Poll fireplace
+                    if (thingSerialNumber != null) {
+                        IntellifirePollData pollData = cloudPollFireplace(thingSerialNumber);
+                        if (pollData != null) {
+                            handler.poll(pollData);
                         }
                     }
                 }

@@ -6,7 +6,6 @@ Dimmer light icon brightness doesn't work with 0-3
 halt poll when sending command.  Restart poll.
 error proof http response codes/content
 Error enumerations
-Only poll account during discovery and initialize
 Long Poll
 Local Poll/commands??
 
