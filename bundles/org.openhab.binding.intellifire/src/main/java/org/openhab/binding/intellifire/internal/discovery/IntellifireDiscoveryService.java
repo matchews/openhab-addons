@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.intellifire.internal.IntellifireAccount;
+import org.openhab.binding.intellifire.internal.IntellifireAccount2;
 import org.openhab.binding.intellifire.internal.IntellifireBindingConstants;
 import org.openhab.binding.intellifire.internal.IntellifireException;
 import org.openhab.binding.intellifire.internal.IntellifireLocation;
@@ -52,9 +53,12 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
     protected void startScan() {
         try {
             IntellifireAccount account = thingHandler.getAccountLocations();
+            // IntellifireAccount2 account2 = thingHandler.getAccountLocations();
+            IntellifireAccount2 account2 = new IntellifireAccount2();
             for (int i = 0; i < account.locations.size(); i++) {
                 String locationID = account.locations.get(i).location_id;
                 IntellifireLocation location = thingHandler.getFireplaces(locationID);
+                // account2.locations.get(i).fireplaces.add(location);
                 for (int j = 0; j < location.fireplaces.size(); j++) {
 
                     // Construct thing name

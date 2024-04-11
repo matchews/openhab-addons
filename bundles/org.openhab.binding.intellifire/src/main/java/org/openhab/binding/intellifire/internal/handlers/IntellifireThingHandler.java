@@ -65,7 +65,7 @@ public abstract class IntellifireThingHandler extends BaseThingHandler {
             case "Number":
                 return new DecimalType(value);
             case "Number:Time":
-                return new QuantityType<>(Integer.parseInt(value), Units.SECOND);
+                return new QuantityType<>(Integer.parseInt(value), Units.MINUTE);
             case "Number:Temperature":
                 return new QuantityType<>(Integer.parseInt(value), SIUnits.CELSIUS);
             case "Switch":

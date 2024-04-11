@@ -15,6 +15,7 @@ package org.openhab.binding.intellifire.internal.handlers;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jetty.http.HttpMethod;
 import org.openhab.binding.intellifire.internal.IntellifireBindingConstants;
+import org.openhab.binding.intellifire.internal.IntellifireError;
 import org.openhab.binding.intellifire.internal.IntellifireException;
 import org.openhab.binding.intellifire.internal.IntellifirePollData;
 import org.openhab.core.thing.Bridge;
@@ -48,7 +49,7 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
 
         String errors = "";
         for (int i = 0; i < pollData.errors.size(); i++) {
-            errors = errors + ", " + pollData.errors.get(i);
+            errors = errors + ", " + IntellifireError.fromErrorCode(pollData.errors.get(i));
         }
 
         updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_ERRORS, errors);
@@ -71,62 +72,63 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
             return;
         }
         Bridge bridge = getBridge();
-        if (bridge != null) {
-            IntellifireBridgeHandler bridgehandler = (IntellifireBridgeHandler) bridge.getHandler();
-            if (bridgehandler != null) {
-                try {
-                    String serialNumber = bridgehandler.getSerialNumber(thing.getProperties());
-                    String cmdURL = "http://iftapi.net/a/" + serialNumber + "/apppost";
-                    String httpResponse;
-                    String content;
+        if (bridge != null && bridge.getHandler() instanceof IntellifireBridgeHandler bridgehandler) {
+            try {
+                String serialNumber = bridgehandler.getSerialNumber(thing.getProperties());
+                String cmdURL = "http://iftapi.net/a/" + serialNumber + "/apppost";
+                String httpResponse;
+                String content;
 
-                    switch (channelUID.getId()) {
-                        case IntellifireBindingConstants.CHANNEL_FIREPLACE_POWER:
-                            content = "power=" + this.cmdToString(command);
+                // Pause polling while sending command
+                bridgehandler.clearPolling();
+                bridgehandler.initPolling(5);
+
+                switch (channelUID.getId()) {
+                    case IntellifireBindingConstants.CHANNEL_FIREPLACE_POWER:
+                        content = "power=" + this.cmdToString(command);
+                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        break;
+
+                    case IntellifireBindingConstants.CHANNEL_FIREPLACE_FLAMEHEIGHT:
+                        if (this.cmdToInt(command) >= 1 && this.cmdToInt(command) <= 5) {
+                            content = "power=1";
                             httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
-                            break;
 
-                        case IntellifireBindingConstants.CHANNEL_FIREPLACE_FLAMEHEIGHT:
-                            if (this.cmdToInt(command) >= 1 && this.cmdToInt(command) <= 5) {
-                                content = "power=1";
-                                httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
-
-                            } else {
-                                content = "power=0";
-                                httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
-                            }
-                            content = "height=" + (this.cmdToInt(command) - 1);
+                        } else {
+                            content = "power=0";
                             httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
-                            break;
+                        }
+                        content = "height=" + (this.cmdToInt(command) - 1);
+                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        break;
 
-                        case IntellifireBindingConstants.CHANNEL_FIREPLACE_COLDCLIMATEPILOT:
-                            content = "pilot=" + this.cmdToString(command);
-                            httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
-                            break;
+                    case IntellifireBindingConstants.CHANNEL_FIREPLACE_COLDCLIMATEPILOT:
+                        content = "pilot=" + this.cmdToString(command);
+                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        break;
 
-                        case IntellifireBindingConstants.CHANNEL_FIREPLACE_PREPURGE:
-                            content = "prepurge=" + this.cmdToString(command);
-                            httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
-                            break;
+                    case IntellifireBindingConstants.CHANNEL_FIREPLACE_PREPURGE:
+                        content = "prepurge=" + this.cmdToString(command);
+                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        break;
 
-                        default:
-                            logger.warn("intellifireCommand Unsupported type {}", channelUID);
-                            return;
-                    }
-
-                    if (!httpResponse.equals("204")) {
-                        logger.warn("Unable to send command {} to Intellifire's server.", content);
-                        this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
+                    default:
+                        logger.warn("intellifireCommand Unsupported type {}", channelUID);
                         return;
-                    }
+                }
 
-                } catch (InterruptedException e) {
+                if (!"204".equals(httpResponse)) {
+                    logger.warn("Unable to send command {} to Intellifire's server.", content);
+                    this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
                     return;
                 }
-                this.updateStatus(ThingStatus.ONLINE);
-            } else {
-                this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
+
+            } catch (InterruptedException e) {
+                return;
             }
+            this.updateStatus(ThingStatus.ONLINE);
+        } else {
+            this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
         }
     }
 }

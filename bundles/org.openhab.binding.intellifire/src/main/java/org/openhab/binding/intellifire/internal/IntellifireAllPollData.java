@@ -12,14 +12,24 @@
  */
 package org.openhab.binding.intellifire.internal;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
-
 /**
  *
  * @author Matt Myers - Initial contribution
  */
-@NonNullByDefault
-@SuppressWarnings("checkstyle:MemberNameCheck")
-public class IntellifireUsername {
-    public String username = "";
+public class IntellifireAllPollData {
+    public IntellifireAllPollData(String serialNumber, IntellifirePollData pollData) {
+        this.serialNumber = serialNumber;
+        this.pollData = pollData;
+    }
+
+    public String serialNumber;
+    public IntellifirePollData pollData;
+
+    /*
+     * public String getPollData(String serialNUmber){
+     *
+     *
+     * return pollData
+     * }
+     */
 }

@@ -52,38 +52,39 @@ public class IntellifireLightHandler extends IntellifireThingHandler {
             return;
         }
         Bridge bridge = getBridge();
-        if (bridge != null) {
-            IntellifireBridgeHandler bridgehandler = (IntellifireBridgeHandler) bridge.getHandler();
-            if (bridgehandler != null) {
-                try {
-                    String serialNumber = bridgehandler.getSerialNumber(thing.getProperties());
-                    String cmdURL = "http://iftapi.net/a/" + serialNumber + "/apppost";
-                    String httpResponse;
-                    String content;
+        if (bridge != null && bridge.getHandler() instanceof IntellifireBridgeHandler bridgehandler) {
+            try {
+                String serialNumber = bridgehandler.getSerialNumber(thing.getProperties());
+                String cmdURL = "http://iftapi.net/a/" + serialNumber + "/apppost";
+                String httpResponse;
+                String content;
 
-                    switch (channelUID.getId()) {
-                        case IntellifireBindingConstants.CHANNEL_LIGHT:
-                            content = "light=" + this.cmdToString(command);
-                            httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
-                            break;
-                        default:
-                            logger.warn("intellifireCommand Unsupported type {}", channelUID);
-                            return;
-                    }
+                // Pause polling while sending command
+                bridgehandler.clearPolling();
+                bridgehandler.initPolling(5);
 
-                    if (!httpResponse.equals("204")) {
-                        logger.warn("Unable to send command {} to Intellifire's server.", content);
-                        this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
+                switch (channelUID.getId()) {
+                    case IntellifireBindingConstants.CHANNEL_LIGHT:
+                        content = "light=" + this.cmdToString(command);
+                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        break;
+                    default:
+                        logger.warn("intellifireCommand Unsupported type {}", channelUID);
                         return;
-                    }
+                }
 
-                } catch (InterruptedException e) {
+                if (!"204".equals(httpResponse)) {
+                    logger.warn("Unable to send command {} to Intellifire's server.", content);
+                    this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
                     return;
                 }
-                this.updateStatus(ThingStatus.ONLINE);
-            } else {
-                this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
+
+            } catch (InterruptedException e) {
+                return;
             }
+            this.updateStatus(ThingStatus.ONLINE);
+        } else {
+            this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
         }
     }
 }
