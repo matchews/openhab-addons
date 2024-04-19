@@ -56,12 +56,12 @@ public enum IntellifireError {
         return this.errorMessage;
     }
 
-    public static IntellifireError fromErrorCode(String errorCode) {
+    public static String fromErrorCode(String errorCode) {
         for (IntellifireError error : IntellifireError.values()) {
-            // if (error.getErrorMessage().equals(Integer.parseInt(errorCode))) {
-            // return error;
-            // }
+            if (error.errorCode == Integer.parseInt(errorCode)) {
+                return error.errorMessage;
+            }
         }
-        return NONE;
+        return "";
     }
 }

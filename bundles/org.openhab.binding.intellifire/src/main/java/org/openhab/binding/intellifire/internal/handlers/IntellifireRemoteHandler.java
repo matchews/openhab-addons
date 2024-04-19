@@ -17,6 +17,9 @@ import org.eclipse.jetty.http.HttpMethod;
 import org.openhab.binding.intellifire.internal.IntellifireBindingConstants;
 import org.openhab.binding.intellifire.internal.IntellifireException;
 import org.openhab.binding.intellifire.internal.IntellifirePollData;
+import org.openhab.core.library.types.OnOffType;
+import org.openhab.core.library.unit.SIUnits;
+import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
@@ -47,10 +50,12 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
         updateData(IntellifireBindingConstants.CHANNEL_REMOTE_DOWNTIME, Integer.toString(pollData.remote_downtime));
         updateData(IntellifireBindingConstants.CHANNEL_REMOTE_ENABLE, Integer.toString(pollData.thermostat));
 
-        updateData(IntellifireBindingConstants.CHANNEL_REMOTE_SETPOINT, Integer.toString(pollData.setpoint / 100));
-
+        // Setpoint is set to zero when disabled. Ignore and do not display zero.
+        if (!(pollData.setpoint == 0)) {
+            updateData(IntellifireBindingConstants.CHANNEL_REMOTE_SETPOINT, Integer.toString(pollData.setpoint / 100));
+        }
         updateData(IntellifireBindingConstants.CHANNEL_REMOTE_TEMPERATURE, Integer.toString(pollData.temperature));
-        updateData(IntellifireBindingConstants.CHANNEL_REMOTE_TIMER, Integer.toString(pollData.timeremaining / 60));
+        updateData(IntellifireBindingConstants.CHANNEL_REMOTE_TIMER, Integer.toString(pollData.timeremaining / 60 + 1));
         updateData(IntellifireBindingConstants.CHANNEL_REMOTE_TIMERENABLE, Integer.toString(pollData.timer));
         updateData(IntellifireBindingConstants.CHANNEL_REMOTE_UPTIME, Integer.toString(pollData.remote_uptime));
         this.updateStatus(ThingStatus.ONLINE);
@@ -66,8 +71,8 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
             try {
                 String serialNumber = bridgehandler.getSerialNumber(thing.getProperties());
                 String cmdURL = "http://iftapi.net/a/" + serialNumber + "/apppost";
-                String httpResponse;
-                String content;
+                String httpResponse = "";
+                String content = "";
 
                 // Pause polling while sending command
                 bridgehandler.clearPolling();
@@ -75,44 +80,52 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
 
                 switch (channelUID.getId()) {
                     case IntellifireBindingConstants.CHANNEL_REMOTE_ENABLE:
-                        content = "thermostat_setpoint=" + this.cmdToString(command);
+                        // Set to 72F when enabled (2 implied decimal points)
+                        if (command == OnOffType.ON) {
+                            content = "setpoint=2220";
+                        } else {
+                            content = "setpoint=0";
+                        }
                         httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_REMOTE_SETPOINT:
-                        if (this.cmdToInt(command) >= 1 && this.cmdToInt(command) <= 5) {
-                            content = "power=1";
-                            httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
-
+                        // ToDo losing decimal places here.
+                        int celciusCommand = this.cmdToInt(command, SIUnits.CELSIUS);
+                        if (celciusCommand < 7) {
+                            content = "setpoint=" + 7 * 100;
+                        } else if (celciusCommand > 37) {
+                            content = "setpoint=" + 37 * 100;
                         } else {
-                            content = "power=0";
-                            httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                            content = "setpoint=" + celciusCommand * 100;
                         }
-                        content = "height=" + (this.cmdToInt(command) - 1);
                         httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_REMOTE_TIMER:
-                        content = "pilot=" + this.cmdToInt(command) * 60;
+                        content = "timeremaining=" + this.cmdToInt(command, Units.MINUTE) * 60;
                         httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_REMOTE_TIMERENABLE:
-                        content = "prepurge=" + this.cmdToString(command);
-                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        if (command == OnOffType.OFF) {
+                            content = "timeremaining=0";
+                            httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        } else {
+                            content = "timeremaining=" + 60 * 60;
+                            httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        }
                         break;
 
                     default:
                         logger.warn("intellifireCommand Unsupported type {}", channelUID);
                         return;
                 }
-
                 if (!"204".equals(httpResponse)) {
                     logger.warn("Unable to send command {} to Intellifire's server.", content);
                     this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
                     return;
                 }
-
             } catch (InterruptedException e) {
                 return;
             }

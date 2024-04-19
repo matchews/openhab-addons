@@ -14,6 +14,8 @@ package org.openhab.binding.intellifire.internal;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  *
  * @author Matt Myers - Initial contribution
@@ -27,8 +29,22 @@ public class IntellifireAccount {
         public String wifi_password = "";
         public String postal_code = "";
         public String user_class = "";
+        public @Nullable IntellifireLocation fireplaces;
     }
 
-    public List<location> locations;
+    public @Nullable List<location> locations;
     public int email_notifications_enabled = 0;
+
+    public IntellifirePollData getPollData(String serialNumber) {
+        if (this.locations != null) {
+            for (int i = 0; i < this.locations.size(); i++) {
+                for (int j = 0; j < this.locations.get(i).fireplaces.fireplaces.size(); j++) {
+                    if (serialNumber.equals(this.locations.get(i).fireplaces.fireplaces.get(j).serial)) {
+                        return this.locations.get(i).fireplaces.fireplaces.get(j).pollData;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 }

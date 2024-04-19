@@ -13,9 +13,7 @@
 package org.openhab.binding.intellifire.internal.handlers;
 
 import java.net.CookieStore;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -33,8 +31,6 @@ import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.HttpVersion;
 import org.openhab.binding.intellifire.internal.IntellifireAccount;
-import org.openhab.binding.intellifire.internal.IntellifireAccount2;
-import org.openhab.binding.intellifire.internal.IntellifireAllPollData;
 import org.openhab.binding.intellifire.internal.IntellifireBindingConstants;
 import org.openhab.binding.intellifire.internal.IntellifireConfiguration;
 import org.openhab.binding.intellifire.internal.IntellifireException;
@@ -70,7 +66,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
     private @Nullable ScheduledFuture<?> initializeFuture;
     private @Nullable ScheduledFuture<?> pollTelemetryFuture;
     private @Nullable CookieStore cs;
-    private IntellifireAccount2 account2 = new IntellifireAccount2();
+    private @Nullable IntellifireAccount account = new IntellifireAccount();
 
     @Override
     public Collection<Class<? extends ThingHandlerService>> getServices() {
@@ -93,7 +89,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         config = getConfigAs(IntellifireConfiguration.class);
 
         try {
-            if (login()) {
+            if (login() && setupAccountData()) {
                 logger.debug("Succesfully opened connection to Intellifire's server: {} Username:{} ",
                         IntellifireBindingConstants.URI_COOKIE, config.username);
                 initPolling(0);
@@ -108,6 +104,9 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                 return;
             }
         } catch (InterruptedException e) {
+            logger.error("Intellifire fireplace thing", e);
+
+        } catch (IntellifireException e) {
             logger.error("Intellifire fireplace thing", e);
         }
     }
@@ -150,59 +149,31 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         }
     }
 
+    public boolean setupAccountData() throws IntellifireException, InterruptedException {
+        account = getAccountLocations();
+        for (int i = 0; i < account.locations.size(); i++) {
+            String locationID = account.locations.get(i).location_id;
+            account.locations.get(i).fireplaces = getFireplaces(locationID);
+        }
+        return true;
+    }
+
     public boolean poll() throws IntellifireException, InterruptedException {
-        List<IntellifireAllPollData> allPollData = new ArrayList<>();
-        IntellifirePollData localPollData = null;
+
+        // Retrieve poll data for each fireplace
+        for (int i = 0; i < account.locations.size(); i++) {
+            for (int j = 0; j < account.locations.get(i).fireplaces.fireplaces.size(); j++) {
+                String serialNumber = account.locations.get(i).fireplaces.fireplaces.get(j).serial;
+                account.locations.get(i).fireplaces.fireplaces.get(j).pollData = cloudPollFireplace(serialNumber);
+            }
+        }
 
         for (Thing thing : getThing().getThings()) {
             if (thing.getHandler() instanceof IntellifireThingHandler) {
                 IntellifireThingHandler handler = (IntellifireThingHandler) thing.getHandler();
                 if (handler != null) {
                     String thingSerialNumber = getSerialNumber(thing.getProperties());
-
-                    /*
-                     * if (allPollData.contains(thingSerialNumber)) {
-                     * int Index = allPollData.indexOf(thingSerialNumber);
-                     * localPollData = allPollData.get(Index).pollData;
-                     * } else {
-                     *
-                     * localPollData = cloudPollFireplace(thingSerialNumber);
-                     *
-                     * }
-                     */
-
-                    for (IntellifireAllPollData pollRecord : allPollData) {
-                        if (pollRecord.serialNumber.equals(thingSerialNumber)) {
-                            handler.poll(pollRecord.pollData);
-                        } else {
-                            localPollData = cloudPollFireplace(thingSerialNumber);
-                        }
-                    }
-
-                    /*
-                     * if (localPollData != null) {
-                     * handler.poll(localPollData);
-                     * }
-                     */
-                    localPollData = cloudPollFireplace(thingSerialNumber);
-                    allPollData.add(new IntellifireAllPollData(thingSerialNumber, localPollData));
-                    /*
-                     * if (!fireplaceSerialNumbers.contains(thingSerialNumber)) {
-                     * fireplaceSerialNumbers.add(thingSerialNumber);
-                     *
-                     * }
-                     */
-
-                    // Poll fireplace
-                    /*
-                     * if (thingSerialNumber != null) {
-                     * logger.info(thing.getLabel());
-                     * IntellifirePollData pollData = cloudPollFireplace(thingSerialNumber);
-                     * if (pollData != null) {
-                     * handler.poll(pollData);
-                     * }
-                     * }
-                     */
+                    handler.poll(account.getPollData(thingSerialNumber));
                 }
             }
         }
@@ -216,6 +187,9 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                 "username=" + config.username + "&password=" + config.password);
         if ("204".equals(httpResponse)) {
             return true;
+        } else if ("422".equals(httpResponse)) {
+            logger.warn("Login failed.  Check username and password.");
+            return false;
         } else {
             return false;
         }
@@ -235,10 +209,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         final Gson gson = new Gson();
 
         String httpResponse = httpResponseContent(IntellifireBindingConstants.URL_ENUMLOCATIONS, HttpMethod.POST, "");
-        IntellifireAccount locations = gson.fromJson(httpResponse, IntellifireAccount.class);
-        IntellifireAccount2 locations2 = gson.fromJson(httpResponse, IntellifireAccount2.class);
-
-        return locations;
+        return gson.fromJson(httpResponse, IntellifireAccount.class);
     }
 
     public synchronized @Nullable IntellifireLocation getFireplaces(String locationID) throws InterruptedException {
@@ -291,16 +262,19 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
 
                 int httpResponseStatusCode = httpResponse.getStatus();
                 if (httpResponseStatusCode != 200 && httpResponseStatusCode != 204) {
-                    logger.info("Login failed with http status code: {}", httpResponse.getStatus());
+                    logger.warn("{} failed with http response: {}", getCallingMethod(), httpResponse);
+                } else {
+                    logger.debug("{} http response: {}", getCallingMethod(), httpResponse);
                 }
-
-                logger.trace("httpResponseCode: {}", httpResponse.getStatus());
 
                 // List<HttpCookie> cookies = httpClient.getCookieStore().getCookies();
 
                 logger.trace("Headers:\n{}", request.getHeaders());
                 logger.trace("Cookies: {}", httpClient.getCookieStore().getCookies().toString());
-                logger.debug("httpResponseContent: {}", httpResponse.getContentAsString());
+
+                if (!httpResponse.getContentAsString().isEmpty()) {
+                    logger.trace("{} httpResponseContent: {}", getCallingMethod(), httpResponse.getContentAsString());
+                }
 
                 // store any received cookies
                 cs = httpClient.getCookieStore();

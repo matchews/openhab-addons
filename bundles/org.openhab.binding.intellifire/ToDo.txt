@@ -1,31 +1,47 @@
+Failed command should log error, but i don't see why to take the thing offline
 
-
-EnumLocation = 200 return content
-EnumFireplaces = 200 return content
-Poll = 200 return content
-
-Login = 200 no content
-Send Command = 204 no content
-
-
-Debug: rtn 200
-Trace: rtn conent
-
-
+Combine light and fan into fireplace thing? (light:light, fan:fan)
 
 Dimmer light icon brightness doesn't work with 0-3
+Flame height not working in homekit
 
-halt poll when sending command.  Restart poll.
-error proof http response codes/content
-Error enumerations
+http vs https
+verify SSL certificate
+
 Long Poll
+long_poll_url = f"{self.prefix}://iftapi.net/a/{self._serial}/applongpoll"
+Set timeout to 60 seconds
+No change = 408 after 47 seconds - Repeat long poll
+Change = 200 with APPoll Data + Etag header
+
 Local Poll/commands??
 getusername used in python code?
 
 Logging
 ReadMe
+    Timer must have unit metatadata set to minutes
+    
 
-Prepurge command?
+2024-04-16 06:37:23.379 [WARN ] [e.internal.SseItemStatesEventBuilder] - Attempting to send a state update of an item which doesn't exist: __ob__
+2024-04-16 06:37:23.379 [WARN ] [e.internal.SseItemStatesEventBuilder] - Attempting to send a state update of an item which doesn't exist: __v_isRef
+
+
+
+    THERMOSTAT_SETPOINT = {
+        "cloud_command": "thermostat_setpoint",
+        "local_command": "thermostat_setpoint",
+        "min": 0,
+        "max": 3700,
+    }  # 0 = disable thermostat
+    TIME_REMAINING = {
+        "cloud_command": "time_remaining",
+        "local_command": "time_remaining",
+        "min": 0,
+        "max": 10800,
+    }  # multiples of 60 - 0 = disable
+    
+    
+
 
                             content = "thermostat_setpoint=3700";
                             // 0 to disable thermostat

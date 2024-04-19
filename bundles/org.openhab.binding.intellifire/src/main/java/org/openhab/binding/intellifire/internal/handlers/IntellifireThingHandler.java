@@ -15,7 +15,10 @@ package org.openhab.binding.intellifire.internal.handlers;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.measure.Unit;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.intellifire.internal.IntellifireException;
 import org.openhab.binding.intellifire.internal.IntellifirePollData;
 import org.openhab.core.library.types.DecimalType;
@@ -89,15 +92,22 @@ public abstract class IntellifireThingHandler extends BaseThingHandler {
         }
     }
 
-    public int cmdToInt(Command command) {
+    public int cmdToInt(Command command, @Nullable Unit<?> unit) {
         if (command == OnOffType.OFF) {
             return 0;
         } else if (command == OnOffType.ON) {
             return 1;
         } else if (command instanceof DecimalType decimalCommand) {
             return decimalCommand.intValue();
-        } else if (command instanceof QuantityType quantityCommand) {
-            return quantityCommand.intValue();
+        } else if (command instanceof QuantityType<?> quantityCommand) {
+            if (unit == SIUnits.CELSIUS) {
+                return quantityCommand.toUnit(SIUnits.CELSIUS).intValue();
+            } else if (unit == Units.MINUTE) {
+                return quantityCommand.toUnit(Units.MINUTE).intValue();
+            } else {
+                return 0;
+            }
+
         } else {
             return 0;
         }

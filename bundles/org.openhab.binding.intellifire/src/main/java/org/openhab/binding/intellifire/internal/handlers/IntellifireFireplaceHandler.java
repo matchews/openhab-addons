@@ -49,7 +49,7 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
 
         String errors = "";
         for (int i = 0; i < pollData.errors.size(); i++) {
-            errors = errors + ", " + IntellifireError.fromErrorCode(pollData.errors.get(i));
+            errors = errors + IntellifireError.fromErrorCode(pollData.errors.get(i)) + " ";
         }
 
         updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_ERRORS, errors);
@@ -90,7 +90,7 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_FIREPLACE_FLAMEHEIGHT:
-                        if (this.cmdToInt(command) >= 1 && this.cmdToInt(command) <= 5) {
+                        if (this.cmdToInt(command, null) >= 1 && this.cmdToInt(command, null) <= 5) {
                             content = "power=1";
                             httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
 
@@ -98,17 +98,12 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                             content = "power=0";
                             httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
                         }
-                        content = "height=" + (this.cmdToInt(command) - 1);
+                        content = "height=" + (this.cmdToInt(command, null) - 1);
                         httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_FIREPLACE_COLDCLIMATEPILOT:
                         content = "pilot=" + this.cmdToString(command);
-                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
-                        break;
-
-                    case IntellifireBindingConstants.CHANNEL_FIREPLACE_PREPURGE:
-                        content = "prepurge=" + this.cmdToString(command);
                         httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
                         break;
 

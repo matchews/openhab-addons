@@ -83,7 +83,7 @@
 		<item-type>Number:Time</item-type>
 		<label>Timer</label>
 		<category>Time</category>
-		<state min="0" max="180" step="1.0" pattern="%d %unit%" readOnly="false"/>
+		<state min="0" max="180" step="1.0" pattern="%d min" readOnly="false"/>
 	</channel-type>
 
 	<channel-type id="timerEnable">
