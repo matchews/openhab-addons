@@ -78,17 +78,16 @@ public abstract class IntellifireThingHandler extends BaseThingHandler {
         }
     }
 
-    public String cmdToString(Command command) {
-        if (command == OnOffType.OFF) {
-            return "0";
-        } else if (command == OnOffType.ON) {
-            return "1";
-        } else if (command instanceof DecimalType decimalCommand) {
-            return decimalCommand.toString();
-        } else if (command instanceof QuantityType quantityCommand) {
-            return quantityCommand.format("%1.0f");
+    public float cmdToFloat(Command command, @Nullable Unit<?> unit) {
+        if (command instanceof QuantityType<?> quantityCommand) {
+            if (unit == SIUnits.CELSIUS) {
+                return quantityCommand.toUnit(SIUnits.CELSIUS).floatValue();
+            } else {
+                return 0;
+            }
+
         } else {
-            return command.toString();
+            return 0;
         }
     }
 
@@ -110,6 +109,20 @@ public abstract class IntellifireThingHandler extends BaseThingHandler {
 
         } else {
             return 0;
+        }
+    }
+
+    public String cmdToString(Command command) {
+        if (command == OnOffType.OFF) {
+            return "0";
+        } else if (command == OnOffType.ON) {
+            return "1";
+        } else if (command instanceof DecimalType decimalCommand) {
+            return decimalCommand.toString();
+        } else if (command instanceof QuantityType quantityCommand) {
+            return quantityCommand.format("%1.0f");
+        } else {
+            return command.toString();
         }
     }
 

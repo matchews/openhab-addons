@@ -91,13 +91,13 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
 
                     case IntellifireBindingConstants.CHANNEL_REMOTE_SETPOINT:
                         // ToDo losing decimal places here.
-                        int celciusCommand = this.cmdToInt(command, SIUnits.CELSIUS);
+                        float celciusCommand = this.cmdToFloat(command, SIUnits.CELSIUS);
                         if (celciusCommand < 7) {
                             content = "setpoint=" + 7 * 100;
                         } else if (celciusCommand > 37) {
                             content = "setpoint=" + 37 * 100;
                         } else {
-                            content = "setpoint=" + celciusCommand * 100;
+                            content = "setpoint=" + Math.round(celciusCommand * 100);
                         }
                         httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
                         break;
