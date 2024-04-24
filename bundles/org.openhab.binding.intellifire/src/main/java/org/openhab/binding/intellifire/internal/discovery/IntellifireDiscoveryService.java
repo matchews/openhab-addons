@@ -21,6 +21,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.intellifire.internal.IntellifireAccount;
 import org.openhab.binding.intellifire.internal.IntellifireBindingConstants;
 import org.openhab.binding.intellifire.internal.IntellifireException;
+import org.openhab.binding.intellifire.internal.IntellifireLocation;
 import org.openhab.binding.intellifire.internal.IntellifirePollData;
 import org.openhab.binding.intellifire.internal.handlers.IntellifireBridgeHandler;
 import org.openhab.core.config.discovery.AbstractThingHandlerDiscoveryService;
@@ -55,8 +56,10 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
 
             for (int i = 0; i < account.locations.size(); i++) {
                 String locationID = account.locations.get(i).locationId;
-                // IntellifireLocation location = thingHandler.getFireplaces(locationID);
-                account.locations.get(i).fireplaces = thingHandler.getFireplaces(locationID);
+                IntellifireLocation fireplaces = thingHandler.getFireplaces(locationID);
+                if (fireplaces != null) {
+                    account.locations.get(i).fireplaces = fireplaces;
+                }
 
                 // for (int j = 0; j < location.fireplaces.size(); j++) {
                 for (int j = 0; j < account.locations.get(i).fireplaces.fireplaces.size(); j++) {

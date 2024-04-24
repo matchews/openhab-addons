@@ -86,7 +86,7 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
                         } else {
                             content = "setpoint=0";
                         }
-                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content, 10);
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_REMOTE_SETPOINT:
@@ -99,21 +99,21 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
                         } else {
                             content = "setpoint=" + Math.round(celciusCommand * 100);
                         }
-                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content, 10);
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_REMOTE_TIMER:
                         content = "timeremaining=" + this.cmdToInt(command, Units.MINUTE) * 60;
-                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content, 10);
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_REMOTE_TIMERENABLE:
                         if (command == OnOffType.OFF) {
                             content = "timeremaining=0";
-                            httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                            httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content, 10);
                         } else {
                             content = "timeremaining=" + 60 * 60;
-                            httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                            httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content, 10);
                         }
                         break;
 

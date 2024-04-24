@@ -12,6 +12,7 @@
  */
 package org.openhab.binding.intellifire.internal;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -38,20 +39,18 @@ public class IntellifireAccount {
         public String postalCode = "";
         @SerializedName(value = "user_class")
         public String userClass = "";
-        public @Nullable IntellifireLocation fireplaces;
+        public IntellifireLocation fireplaces = new IntellifireLocation();
     }
 
-    public @Nullable List<Location> locations;
+    public List<Location> locations = new ArrayList<>();
     @SerializedName(value = "email_notifications_enabled")
     public int emailNotificationsEnabled = 0;
 
     public @Nullable IntellifirePollData getPollData(String serialNumber) {
-        if (this.locations != null) {
-            for (int i = 0; i < this.locations.size(); i++) {
-                for (int j = 0; j < this.locations.get(i).fireplaces.fireplaces.size(); j++) {
-                    if (serialNumber.equals(this.locations.get(i).fireplaces.fireplaces.get(j).serial)) {
-                        return this.locations.get(i).fireplaces.fireplaces.get(j).pollData;
-                    }
+        for (int i = 0; i < this.locations.size(); i++) {
+            for (int j = 0; j < this.locations.get(i).fireplaces.fireplaces.size(); j++) {
+                if (serialNumber.equals(this.locations.get(i).fireplaces.fireplaces.get(j).serial)) {
+                    return this.locations.get(i).fireplaces.fireplaces.get(j).pollData;
                 }
             }
         }

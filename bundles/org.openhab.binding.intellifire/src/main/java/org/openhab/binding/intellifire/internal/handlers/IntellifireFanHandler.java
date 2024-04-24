@@ -66,7 +66,7 @@ public class IntellifireFanHandler extends IntellifireThingHandler {
                 switch (channelUID.getId()) {
                     case IntellifireBindingConstants.CHANNEL_FAN:
                         content = "fanspeed=" + Integer.toString(this.cmdToInt(command, null) / 25);
-                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content, 10);
                         break;
                     default:
                         logger.warn("intellifireCommand Unsupported type {}", channelUID);

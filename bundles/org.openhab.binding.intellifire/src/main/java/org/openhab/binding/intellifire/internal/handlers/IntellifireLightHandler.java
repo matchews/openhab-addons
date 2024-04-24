@@ -66,7 +66,7 @@ public class IntellifireLightHandler extends IntellifireThingHandler {
                 switch (channelUID.getId()) {
                     case IntellifireBindingConstants.CHANNEL_LIGHT:
                         content = "light=" + Integer.toString(this.cmdToInt(command, null) / 33);
-                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content, 10);
                         break;
                     default:
                         logger.warn("intellifireCommand Unsupported type {}", channelUID);

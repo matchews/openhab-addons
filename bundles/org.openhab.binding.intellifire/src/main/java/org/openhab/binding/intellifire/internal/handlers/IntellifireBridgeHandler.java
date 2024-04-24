@@ -62,11 +62,11 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
     private final Logger logger = LoggerFactory.getLogger(IntellifireBridgeHandler.class);
     private final HttpClient httpClient;
     private int commFailureCount;
-    private @Nullable IntellifireConfiguration config;
     private @Nullable ScheduledFuture<?> initializeFuture;
     private @Nullable ScheduledFuture<?> pollTelemetryFuture;
     private @Nullable CookieStore cs;
     public IntellifireAccount account = new IntellifireAccount();
+    private IntellifireConfiguration config = new IntellifireConfiguration();
 
     @Override
     public Collection<Class<? extends ThingHandlerService>> getServices() {
@@ -150,10 +150,11 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
 
     public boolean setupAccountData() throws IntellifireException, InterruptedException {
         getAccountLocations();
-        if (account != null) {
-            for (int i = 0; i < account.locations.size(); i++) {
-                String locationID = account.locations.get(i).locationId;
-                account.locations.get(i).fireplaces = getFireplaces(locationID);
+        for (int i = 0; i < account.locations.size(); i++) {
+            String locationID = account.locations.get(i).locationId;
+            IntellifireLocation fireplaces = getFireplaces(locationID);
+            if (fireplaces != null) {
+                account.locations.get(i).fireplaces = fireplaces;
             }
         }
         return true;
@@ -190,7 +191,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
     public synchronized boolean login() throws InterruptedException {
         // Login to Intellifire cloud server and retrieve cookies
         String httpResponse = httpResponseContent(IntellifireBindingConstants.URL_LOGIN, HttpMethod.POST,
-                "username=" + config.username + "&password=" + config.password);
+                "username=" + config.username + "&password=" + config.password, 10);
         if ("204".equals(httpResponse)) {
             return true;
         } else if ("422".equals(httpResponse)) {
@@ -204,7 +205,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
     public synchronized IntellifireUsername getUsername() throws InterruptedException {
         final Gson gson = new Gson();
 
-        String httpResponse = httpResponseContent(IntellifireBindingConstants.URL_GETUSERNAME, HttpMethod.POST, "");
+        String httpResponse = httpResponseContent(IntellifireBindingConstants.URL_GETUSERNAME, HttpMethod.POST, "", 10);
         IntellifireUsername username = gson.fromJson(httpResponse, IntellifireUsername.class);
         logger.trace("getUsername: {}", username.username);
 
@@ -214,7 +215,8 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
     public synchronized void getAccountLocations() throws InterruptedException {
         final Gson gson = new Gson();
 
-        String httpResponse = httpResponseContent(IntellifireBindingConstants.URL_ENUMLOCATIONS, HttpMethod.POST, "");
+        String httpResponse = httpResponseContent(IntellifireBindingConstants.URL_ENUMLOCATIONS, HttpMethod.POST, "",
+                10);
         IntellifireAccount accountData = gson.fromJson(httpResponse, IntellifireAccount.class);
 
         if (accountData != null) {
@@ -226,7 +228,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         final Gson gson = new Gson();
 
         String httpResponse = httpResponseContent("http://iftapi.net/a/enumfireplaces?location_id=" + locationID,
-                HttpMethod.POST, "");
+                HttpMethod.POST, "", 10);
         IntellifireLocation fireplaces = gson.fromJson(httpResponse, IntellifireLocation.class);
 
         return fireplaces;
@@ -237,7 +239,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         final Gson gson = new Gson();
 
         String httpResponse = httpResponseContent("http://iftapi.net/a/" + serialNumber + "/apppoll", HttpMethod.POST,
-                "");
+                "", 10);
         IntellifirePollData pollData = gson.fromJson(httpResponse, IntellifirePollData.class);
 
         return pollData;
@@ -246,17 +248,17 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
     public synchronized @Nullable IntellifirePollData localPollFireplace(String IPaddress) throws InterruptedException {
         final Gson gson = new Gson();
 
-        String httpResponse = httpResponseContent("http://" + IPaddress + "/poll", HttpMethod.GET, "");
+        String httpResponse = httpResponseContent("http://" + IPaddress + "/poll", HttpMethod.GET, "", 10);
         IntellifirePollData pollData = gson.fromJson(httpResponse, IntellifirePollData.class);
 
         return pollData;
     }
 
-    public synchronized String httpResponseContent(String url, HttpMethod method, String content)
+    public synchronized String httpResponseContent(String url, HttpMethod method, String content, int timeout)
             throws InterruptedException {
         for (int retry = 0; retry <= 5; retry++) {
             try {
-                Request request = httpRequestBuilder(url, method);
+                Request request = httpRequestBuilder(url, method, timeout);
 
                 cs = httpClient.getCookieStore();
 
@@ -266,7 +268,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                         request.cookie(cookie);
                     });
                 }
-                ContentResponse httpResponse = httpRequestBuilder(url, method)
+                ContentResponse httpResponse = httpRequestBuilder(url, method, timeout)
                         .content(new StringContentProvider(content), "text/plain;charset=UTF-8")
                         .header(HttpHeader.CONTENT_LENGTH, Integer.toString(content.length())).send();
 
@@ -309,7 +311,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         return "";
     }
 
-    private Request httpRequestBuilder(String url, HttpMethod method) {
+    private Request httpRequestBuilder(String url, HttpMethod method, int timeout) {
         Request request = httpClient.newRequest(url)
                 .header(HttpHeader.HOST, IntellifireBindingConstants.HTTP_HEADERS_HOST)
                 .header(HttpHeader.CONNECTION, IntellifireBindingConstants.HTTP_HEADERS_CONNECTION)
@@ -317,7 +319,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                 .header(HttpHeader.ACCEPT, IntellifireBindingConstants.HTTP_HEADERS_ACCEPT)
                 .header(HttpHeader.ACCEPT_LANGUAGE, IntellifireBindingConstants.HTTP_HEADERS_LANGUAGE)
                 .header(HttpHeader.ACCEPT_ENCODING, IntellifireBindingConstants.HTTP_HEADERS_ACCEPTENCODING)
-                .version(HttpVersion.HTTP_1_1).timeout(10, TimeUnit.SECONDS);
+                .version(HttpVersion.HTTP_1_1).timeout(timeout, TimeUnit.SECONDS);
         return request;
     }
 

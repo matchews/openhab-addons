@@ -86,25 +86,25 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                 switch (channelUID.getId()) {
                     case IntellifireBindingConstants.CHANNEL_FIREPLACE_POWER:
                         content = "power=" + this.cmdToString(command);
-                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content, 10);
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_FIREPLACE_FLAMEHEIGHT:
                         if (this.cmdToInt(command, null) >= 1 && this.cmdToInt(command, null) <= 5) {
                             content = "power=1";
-                            httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                            httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content, 10);
 
                         } else {
                             content = "power=0";
-                            httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                            httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content, 10);
                         }
                         content = "height=" + (this.cmdToInt(command, null) - 1);
-                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content, 10);
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_FIREPLACE_COLDCLIMATEPILOT:
                         content = "pilot=" + this.cmdToString(command);
-                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
+                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content, 10);
                         break;
 
                     default:
@@ -113,7 +113,7 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                 }
 
                 if (!"204".equals(httpResponse)) {
-                    logger.warn("Unable to send command {} to Intellifire's server.", content);
+                    logger.warn("Unable to send command {} to Intellifire's server.", content, 10);
                     this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
                     return;
                 }
