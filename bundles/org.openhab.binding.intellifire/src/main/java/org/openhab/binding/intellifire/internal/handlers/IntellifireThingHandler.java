@@ -80,7 +80,7 @@ public abstract class IntellifireThingHandler extends BaseThingHandler {
 
     public float cmdToFloat(Command command, @Nullable Unit<?> unit) {
         if (command instanceof QuantityType<?> quantityCommand) {
-            if (unit == SIUnits.CELSIUS) {
+            if (unit.equals(SIUnits.CELSIUS)) {
                 return quantityCommand.toUnit(SIUnits.CELSIUS).floatValue();
             } else {
                 return 0;
@@ -99,9 +99,9 @@ public abstract class IntellifireThingHandler extends BaseThingHandler {
         } else if (command instanceof DecimalType decimalCommand) {
             return decimalCommand.intValue();
         } else if (command instanceof QuantityType<?> quantityCommand) {
-            if (unit == SIUnits.CELSIUS) {
+            if (unit.equals(SIUnits.CELSIUS)) {
                 return quantityCommand.toUnit(SIUnits.CELSIUS).intValue();
-            } else if (unit == Units.MINUTE) {
+            } else if (unit.equals(Units.MINUTE)) {
                 return quantityCommand.toUnit(Units.MINUTE).intValue();
             } else {
                 return 0;
