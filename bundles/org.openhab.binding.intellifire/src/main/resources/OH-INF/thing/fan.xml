@@ -32,7 +32,7 @@
 		<item-type>Dimmer</item-type>
 		<label>Fan</label>
 		<category>Fan</category>
-		<state min="0" max="4" step="1" pattern="%d %unit%" readOnly="false"/>
+		<state min="0" max="100" step="25" pattern="%d %unit%" readOnly="false"/>
 	</channel-type>
 
 </thing:thing-descriptions>

@@ -42,7 +42,7 @@ public class IntellifireLightHandler extends IntellifireThingHandler {
 
     @Override
     public void poll(IntellifirePollData pollData) throws IntellifireException {
-        updateData(IntellifireBindingConstants.CHANNEL_LIGHT, Integer.toString(pollData.light));
+        updateData(IntellifireBindingConstants.CHANNEL_LIGHT, String.valueOf(Math.round(pollData.light * 33.3)));
         this.updateStatus(ThingStatus.ONLINE);
     }
 
@@ -65,7 +65,7 @@ public class IntellifireLightHandler extends IntellifireThingHandler {
 
                 switch (channelUID.getId()) {
                     case IntellifireBindingConstants.CHANNEL_LIGHT:
-                        content = "light=" + this.cmdToString(command);
+                        content = "light=" + Integer.toString(this.cmdToInt(command, null) / 33);
                         httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
                         break;
                     default:

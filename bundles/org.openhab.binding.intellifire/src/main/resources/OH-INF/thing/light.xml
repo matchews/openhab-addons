@@ -32,6 +32,6 @@
 		<item-type>Dimmer</item-type>
 		<label>Light</label>
 		<category>Light</category>
-		<state min="0" max="3" step="1" pattern="%d %unit%" readOnly="false"/>
+		<state min="0" max="100" step="33" pattern="%d %unit%" readOnly="false"/>
 	</channel-type>
 </thing:thing-descriptions>

@@ -42,7 +42,7 @@ public class IntellifireFanHandler extends IntellifireThingHandler {
 
     @Override
     public void poll(IntellifirePollData pollData) throws IntellifireException {
-        updateData(IntellifireBindingConstants.CHANNEL_FAN, Integer.toString(pollData.fanspeed));
+        updateData(IntellifireBindingConstants.CHANNEL_FAN, Integer.toString(pollData.fanspeed * 25));
         this.updateStatus(ThingStatus.ONLINE);
     }
 
@@ -65,7 +65,7 @@ public class IntellifireFanHandler extends IntellifireThingHandler {
 
                 switch (channelUID.getId()) {
                     case IntellifireBindingConstants.CHANNEL_FAN:
-                        content = "fanspeed=" + this.cmdToString(command);
+                        content = "fanspeed=" + Integer.toString(this.cmdToInt(command, null) / 25);
                         httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content);
                         break;
                     default:
