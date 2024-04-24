@@ -14,20 +14,24 @@ package org.openhab.binding.intellifire.internal;
 
 import java.util.List;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  *
  * @author Matt Myers - Initial contribution
  */
 public class IntellifireLocation {
-    public static class fireplace {
+    public static class Fireplace {
         public String serial;
         public String brand;
         public String name;
-        public String apikey;
+        @SerializedName(value = "apikey")
+        public String apiKey;
         public int power;
         public IntellifirePollData pollData;
     }
 
-    public List<fireplace> fireplaces;
-    public String location_name;
+    public List<Fireplace> fireplaces;
+    @SerializedName(value = "location_name")
+    public String locationName;
 }

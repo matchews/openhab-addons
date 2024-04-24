@@ -27,36 +27,6 @@ ReadMe
 
 
 
-    THERMOSTAT_SETPOINT = {
-        "cloud_command": "thermostat_setpoint",
-        "local_command": "thermostat_setpoint",
-        "min": 0,
-        "max": 3700,
-    }  # 0 = disable thermostat
-    TIME_REMAINING = {
-        "cloud_command": "time_remaining",
-        "local_command": "time_remaining",
-        "min": 0,
-        "max": 10800,
-    }  # multiples of 60 - 0 = disable
-    
-    
-
-
-                            content = "thermostat_setpoint=3700";
-                            // 0 to disable thermostat
-
-
-                            // No Beep
-                            content = "soft_reset=1";
-
-                            // 422 Response
-                            content = "time_remaining=10800";
-
-                            // 422 Response
-                            content = "thermostat_setpoint=3700";
-
-
 
             204 Success – command accepted
             403 Not authorized (bad email address or authorization cookie)

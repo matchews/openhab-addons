@@ -46,8 +46,8 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
     @Override
     public void poll(IntellifirePollData pollData) throws IntellifireException {
         updateData(IntellifireBindingConstants.CHANNEL_REMOTE_CONNECTIONQUALITY,
-                Integer.toString(pollData.remote_connection_quality));
-        updateData(IntellifireBindingConstants.CHANNEL_REMOTE_DOWNTIME, Integer.toString(pollData.remote_downtime));
+                Integer.toString(pollData.remoteConnectionQuality));
+        updateData(IntellifireBindingConstants.CHANNEL_REMOTE_DOWNTIME, Integer.toString(pollData.remoteDowntime));
         updateData(IntellifireBindingConstants.CHANNEL_REMOTE_ENABLE, Integer.toString(pollData.thermostat));
 
         // Setpoint is set to zero when disabled. Ignore and do not display zero.
@@ -57,7 +57,7 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
         updateData(IntellifireBindingConstants.CHANNEL_REMOTE_TEMPERATURE, Integer.toString(pollData.temperature));
         updateData(IntellifireBindingConstants.CHANNEL_REMOTE_TIMER, Integer.toString(pollData.timeremaining / 60 + 1));
         updateData(IntellifireBindingConstants.CHANNEL_REMOTE_TIMERENABLE, Integer.toString(pollData.timer));
-        updateData(IntellifireBindingConstants.CHANNEL_REMOTE_UPTIME, Integer.toString(pollData.remote_uptime));
+        updateData(IntellifireBindingConstants.CHANNEL_REMOTE_UPTIME, Integer.toString(pollData.remoteUptime));
         this.updateStatus(ThingStatus.ONLINE);
     }
 

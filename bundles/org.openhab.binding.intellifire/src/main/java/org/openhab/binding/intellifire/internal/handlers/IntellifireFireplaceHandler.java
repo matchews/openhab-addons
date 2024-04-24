@@ -45,7 +45,7 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
     public void poll(IntellifirePollData pollData) throws IntellifireException {
         updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_POWER, Integer.toString(pollData.power));
         updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_BATTERY, Integer.toString(pollData.battery));
-        updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_ECMLATENCY, Integer.toString(pollData.ecm_latency));
+        updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_ECMLATENCY, Integer.toString(pollData.ecmLatency));
 
         String errors = "";
         for (int i = 0; i < pollData.errors.size(); i++) {

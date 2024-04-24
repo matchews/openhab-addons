@@ -51,7 +51,7 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
         try {
             IntellifireAccount account = thingHandler.getAccountLocations();
             for (int i = 0; i < account.locations.size(); i++) {
-                String locationID = account.locations.get(i).location_id;
+                String locationID = account.locations.get(i).locationId;
                 // IntellifireLocation location = thingHandler.getFireplaces(locationID);
                 account.locations.get(i).fireplaces = thingHandler.getFireplaces(locationID);
 
@@ -82,16 +82,16 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
                             .cloudPollFireplace(serialNumber);
 
                     properties.put(IntellifireBindingConstants.PROPERTY_FIREPLACE_FIRMWAREVERSION,
-                            account.locations.get(i).fireplaces.fireplaces.get(j).pollData.firmware_version_string);
+                            account.locations.get(i).fireplaces.fireplaces.get(j).pollData.firmwareVersionString);
                     properties.put(IntellifireBindingConstants.PROPERTY_FIREPLACE_IPADDRESS,
-                            account.locations.get(i).fireplaces.fireplaces.get(j).pollData.ipv4_address);
+                            account.locations.get(i).fireplaces.fireplaces.get(j).pollData.ipv4Address);
 
                     // Add device
                     onDeviceDiscovered(IntellifireBindingConstants.THING_TYPE_FIREPLACE, thingName + " Fireplace",
                             properties);
 
                     // Fan
-                    if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.feature_fan == 1) {
+                    if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.featureFan == 1) {
                         properties.clear();
                         uniqueId = String.format("%s-%s-%s", locationID, serialNumber, "fan");
                         properties.put(IntellifireBindingConstants.PROPERTY_LOCATIONID, locationID);
@@ -101,7 +101,7 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
                     }
 
                     // Light
-                    if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.feature_light == 1) {
+                    if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.featureLight == 1) {
                         properties.clear();
                         uniqueId = String.format("%s-%s-%s", locationID, serialNumber, "light");
                         properties.put(IntellifireBindingConstants.PROPERTY_LOCATIONID, locationID);
@@ -112,7 +112,7 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
                     }
 
                     // Remote
-                    if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.feature_thermostat == 1) {
+                    if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.featureThermostat == 1) {
                         properties.clear();
                         uniqueId = String.format("%s-%s-%s", locationID, serialNumber, "thermostat");
                         properties.put(IntellifireBindingConstants.PROPERTY_LOCATIONID, locationID);

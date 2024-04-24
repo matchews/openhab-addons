@@ -14,6 +14,8 @@ package org.openhab.binding.intellifire.internal;
 
 import java.util.List;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  *
  * @author Matt Myers - Initial contribution
@@ -29,23 +31,35 @@ public class IntellifirePollData {
     public int fanspeed;
     public int hot;
     public int power;
-    public int schedule_enable;
+    @SerializedName(value = "schedule_enable")
+    public int scheduleEnable;
     public int thermostat;
     public int setpoint;
     public int timer;
     public int timeremaining;
     public int prepurge;
-    public int remote_downtime;
-    public int remote_uptime;
-    public int remote_connection_quality;
-    public int ecm_latency;
-    public String ipv4_address;
+    @SerializedName(value = "remote_downtime")
+    public int remoteDowntime;
+    @SerializedName(value = "remote_uptime")
+    public int remoteUptime;
+    @SerializedName(value = "remote_connection_quality")
+    public int remoteConnectionQuality;
+    @SerializedName(value = "ecm_latency")
+    public int ecmLatency;
+    @SerializedName(value = "ipv4_address")
+    public String ipv4Address;
     public List<String> errors;
-    public int feature_light;
-    public int feature_thermostat;
-    public int power_vent;
-    public int feature_fan;
-    public String firmware_version;
-    public String firmware_version_string;
+    @SerializedName(value = "feature_light")
+    public int featureLight;
+    @SerializedName(value = "feature_thermostat")
+    public int featureThermostat;
+    @SerializedName(value = "power_vent")
+    public int featurePowerVent;
+    @SerializedName(value = "feature_fan")
+    public int featureFan;
+    @SerializedName(value = "firmware_version")
+    public String firmwareVersion;
+    @SerializedName(value = "firmware_version_string")
+    public String firmwareVersionString;
     public String brand;
 }

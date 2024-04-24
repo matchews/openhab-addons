@@ -16,24 +16,33 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  *
  * @author Matt Myers - Initial contribution
  */
 // @NonNullByDefault
 public class IntellifireAccount {
-    public static class location {
-        public String location_id = "";
-        public String location_name = "";
-        public String wifi_essid = "";
-        public String wifi_password = "";
-        public String postal_code = "";
-        public String user_class = "";
+    public static class Location {
+        @SerializedName(value = "location_id")
+        public String locationId = "";
+        @SerializedName(value = "location_name")
+        public String locationName = "";
+        @SerializedName(value = "wifi_essid")
+        public String wifiEssid = "";
+        @SerializedName(value = "wifi_password")
+        public String wifiPassword = "";
+        @SerializedName(value = "postal_code")
+        public String postalCode = "";
+        @SerializedName(value = "user_class")
+        public String userClass = "";
         public @Nullable IntellifireLocation fireplaces;
     }
 
-    public @Nullable List<location> locations;
-    public int email_notifications_enabled = 0;
+    public @Nullable List<Location> locations;
+    @SerializedName(value = "email_notifications_enabled")
+    public int emailNotificationsEnabled = 0;
 
     public IntellifirePollData getPollData(String serialNumber) {
         if (this.locations != null) {

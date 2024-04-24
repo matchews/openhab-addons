@@ -19,7 +19,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * @author Matt Myers - Initial contribution
  */
 @NonNullByDefault
-@SuppressWarnings("checkstyle:MemberNameCheck")
 public class IntellifireUsername {
     public String username = "";
 }
