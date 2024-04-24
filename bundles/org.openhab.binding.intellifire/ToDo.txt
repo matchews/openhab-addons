@@ -17,6 +17,8 @@ Change = 200 with APPoll Data + Etag header
 Local Poll/commands??
 getusername used in python code?
 
+IntellifireCloudCommands needed??
+
 Logging
 ReadMe
     Timer must have unit metatadata set to minutes

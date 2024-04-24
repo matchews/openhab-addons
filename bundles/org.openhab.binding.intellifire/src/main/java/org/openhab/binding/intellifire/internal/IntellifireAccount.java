@@ -14,6 +14,7 @@ package org.openhab.binding.intellifire.internal;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
@@ -22,7 +23,7 @@ import com.google.gson.annotations.SerializedName;
  *
  * @author Matt Myers - Initial contribution
  */
-// @NonNullByDefault
+@NonNullByDefault
 public class IntellifireAccount {
     public static class Location {
         @SerializedName(value = "location_id")
@@ -44,7 +45,7 @@ public class IntellifireAccount {
     @SerializedName(value = "email_notifications_enabled")
     public int emailNotificationsEnabled = 0;
 
-    public IntellifirePollData getPollData(String serialNumber) {
+    public @Nullable IntellifirePollData getPollData(String serialNumber) {
         if (this.locations != null) {
             for (int i = 0; i < this.locations.size(); i++) {
                 for (int j = 0; j < this.locations.get(i).fireplaces.fireplaces.size(); j++) {

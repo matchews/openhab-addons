@@ -21,6 +21,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.intellifire.internal.IntellifireAccount;
 import org.openhab.binding.intellifire.internal.IntellifireBindingConstants;
 import org.openhab.binding.intellifire.internal.IntellifireException;
+import org.openhab.binding.intellifire.internal.IntellifirePollData;
 import org.openhab.binding.intellifire.internal.handlers.IntellifireBridgeHandler;
 import org.openhab.core.config.discovery.AbstractThingHandlerDiscoveryService;
 import org.openhab.core.config.discovery.DiscoveryResult;
@@ -49,7 +50,9 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
     @Override
     protected void startScan() {
         try {
-            IntellifireAccount account = thingHandler.getAccountLocations();
+            thingHandler.getAccountLocations();
+            IntellifireAccount account = thingHandler.account;
+
             for (int i = 0; i < account.locations.size(); i++) {
                 String locationID = account.locations.get(i).locationId;
                 // IntellifireLocation location = thingHandler.getFireplaces(locationID);
@@ -77,10 +80,10 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
                             account.locations.get(i).fireplaces.fireplaces.get(j).name);
 
                     // Fireplace properties from cloudPoll
-                    // IntellifirePollData pollData = thingHandler.cloudPollFireplace(serialNumber);
-                    account.locations.get(i).fireplaces.fireplaces.get(j).pollData = thingHandler
-                            .cloudPollFireplace(serialNumber);
-
+                    IntellifirePollData cloudPollFireplace = thingHandler.cloudPollFireplace(serialNumber);
+                    if (cloudPollFireplace != null) {
+                        account.locations.get(i).fireplaces.fireplaces.get(j).pollData = cloudPollFireplace;
+                    }
                     properties.put(IntellifireBindingConstants.PROPERTY_FIREPLACE_FIRMWAREVERSION,
                             account.locations.get(i).fireplaces.fireplaces.get(j).pollData.firmwareVersionString);
                     properties.put(IntellifireBindingConstants.PROPERTY_FIREPLACE_IPADDRESS,

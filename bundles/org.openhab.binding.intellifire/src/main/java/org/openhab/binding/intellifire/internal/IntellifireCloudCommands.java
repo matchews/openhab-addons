@@ -12,12 +12,14 @@
  */
 package org.openhab.binding.intellifire.internal;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  *
  * @author Matt Myers - Initial contribution
  */
+@NonNullByDefault
 public class IntellifireCloudCommands {
-
     public static final String POWER = "power";
     public static final String LIGHT = "light";
 }

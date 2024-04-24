@@ -12,7 +12,10 @@
  */
 package org.openhab.binding.intellifire.internal;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -20,18 +23,19 @@ import com.google.gson.annotations.SerializedName;
  *
  * @author Matt Myers - Initial contribution
  */
+@NonNullByDefault
 public class IntellifireLocation {
     public static class Fireplace {
-        public String serial;
-        public String brand;
-        public String name;
+        public String serial = "";
+        public String brand = "";
+        public String name = "";
         @SerializedName(value = "apikey")
-        public String apiKey;
+        public String apiKey = "";
         public int power;
-        public IntellifirePollData pollData;
+        public IntellifirePollData pollData = new IntellifirePollData();
     }
 
-    public List<Fireplace> fireplaces;
+    public List<Fireplace> fireplaces = new ArrayList<>();
     @SerializedName(value = "location_name")
-    public String locationName;
+    public String locationName = "";
 }

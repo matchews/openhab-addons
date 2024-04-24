@@ -12,7 +12,10 @@
  */
 package org.openhab.binding.intellifire.internal;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -20,9 +23,10 @@ import com.google.gson.annotations.SerializedName;
  *
  * @author Matt Myers - Initial contribution
  */
+@NonNullByDefault
 public class IntellifirePollData {
-    public String timestamp;
-    public String name;
+    public String timestamp = "";
+    public String name = "";
     public int temperature;
     public int battery;
     public int pilot;
@@ -47,8 +51,8 @@ public class IntellifirePollData {
     @SerializedName(value = "ecm_latency")
     public int ecmLatency;
     @SerializedName(value = "ipv4_address")
-    public String ipv4Address;
-    public List<String> errors;
+    public String ipv4Address = "";
+    public List<String> errors = new ArrayList<>();
     @SerializedName(value = "feature_light")
     public int featureLight;
     @SerializedName(value = "feature_thermostat")
@@ -58,8 +62,8 @@ public class IntellifirePollData {
     @SerializedName(value = "feature_fan")
     public int featureFan;
     @SerializedName(value = "firmware_version")
-    public String firmwareVersion;
+    public String firmwareVersion = "";
     @SerializedName(value = "firmware_version_string")
-    public String firmwareVersionString;
-    public String brand;
+    public String firmwareVersionString = "";
+    public String brand = "";
 }
