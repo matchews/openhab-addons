@@ -113,7 +113,7 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                 }
 
                 if (!"204".equals(httpResponse)) {
-                    logger.warn("Unable to send command {} to Intellifire's server.", content, 10);
+                    logger.warn("Unable to send command {} to Intellifire's server.", content);
                     this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
                     return;
                 }
