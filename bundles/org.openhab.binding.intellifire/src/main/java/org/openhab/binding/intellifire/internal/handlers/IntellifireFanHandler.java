@@ -54,7 +54,7 @@ public class IntellifireFanHandler extends IntellifireThingHandler {
         Bridge bridge = getBridge();
         if (bridge != null && bridge.getHandler() instanceof IntellifireBridgeHandler bridgehandler) {
             try {
-                String serialNumber = bridgehandler.getSerialNumber(thing.getProperties());
+                String serialNumber = bridgehandler.getSerialNumberProperty(thing.getProperties());
                 String cmdURL = "http://iftapi.net/a/" + serialNumber + "/apppost";
                 String httpResponse;
                 String content;

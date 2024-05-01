@@ -82,4 +82,8 @@ public class IntellifireBindingConstants {
     public static final String URL_ENUMLOCATIONS = "http://iftapi.net/a/enumlocations";
     public static final String URL_GETUSERNAME = "http://iftapi.net/a/getusername";
     public static final URI URI_COOKIE = URI.create("http://iftapi.net");
+
+    // polling
+    public static final boolean CLOUD_POLLING = true;
+    public static final boolean LOCAL_POLLING = false;
 }

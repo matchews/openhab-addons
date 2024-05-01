@@ -8,16 +8,12 @@ Flame height not working in homekit
 http vs https
 verify SSL certificate
 
-Long Poll
-long_poll_url = f"{self.prefix}://iftapi.net/a/{self._serial}/applongpoll"
-Set timeout to 60 seconds
-No change = 408 after 47 seconds - Repeat long poll
-Change = 200 with APPoll Data + Etag header
-
-Local Poll/commands??
+Local commands
 getusername used in python code?
 
 IntellifireCloudCommands needed??
+
+Limit outgoing command frequency so we don't overload the server
 
 Logging
 ReadMe
@@ -27,13 +23,17 @@ ReadMe
 2024-04-16 06:37:23.379 [WARN ] [e.internal.SseItemStatesEventBuilder] - Attempting to send a state update of an item which doesn't exist: __ob__
 2024-04-16 06:37:23.379 [WARN ] [e.internal.SseItemStatesEventBuilder] - Attempting to send a state update of an item which doesn't exist: __v_isRef
 
-
-
-
             204 Success – command accepted
             403 Not authorized (bad email address or authorization cookie)
             404 Fireplace not found (bad serial number)
             422 Invalid Parameter (invalid command id or command value)
             
+
+**Why use this when using local polling
+Long Poll
+long_poll_url = f"{self.prefix}://iftapi.net/a/{self._serial}/applongpoll"
+Set timeout to 60 seconds
+No change = 408 after 47 seconds - Repeat long poll
+Change = 200 with APPoll Data + Etag header
 
 

@@ -89,7 +89,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         config = getConfigAs(IntellifireConfiguration.class);
 
         try {
-            if (login() && setupAccountData()) {
+            if (login() && setupAccountData() && poll(IntellifireBindingConstants.CLOUD_POLLING)) {
                 logger.debug("Succesfully opened connection to Intellifire's server: {} Username:{} ",
                         IntellifireBindingConstants.URI_COOKIE, config.username);
                 initPolling(0);
@@ -121,7 +121,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                     return;
                 }
 
-                if (!(poll())) {
+                if (!(poll(IntellifireBindingConstants.LOCAL_POLLING))) {
                     commFailureCount++;
                     return;
                 }
@@ -160,14 +160,25 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         return true;
     }
 
-    public boolean poll() throws IntellifireException, InterruptedException {
+    public boolean poll(boolean cloudPool) throws IntellifireException, InterruptedException {
         // Retrieve poll data for each fireplace
         for (int i = 0; i < account.locations.size(); i++) {
             for (int j = 0; j < account.locations.get(i).fireplaces.fireplaces.size(); j++) {
                 String serialNumber = account.locations.get(i).fireplaces.fireplaces.get(j).serial;
-                IntellifirePollData cloudPollData = cloudPollFireplace(serialNumber);
-                if (cloudPollData != null) {
-                    account.locations.get(i).fireplaces.fireplaces.get(j).pollData = cloudPollData;
+
+                if (cloudPool) {
+                    // Cloud Poll
+                    IntellifirePollData cloudPollData = cloudPollFireplace(serialNumber);
+                    if (cloudPollData != null) {
+                        account.locations.get(i).fireplaces.fireplaces.get(j).pollData = cloudPollData;
+                    }
+                } else {
+                    // Local Poll
+                    String ipAddress = account.getIPAddress(serialNumber);
+                    IntellifirePollData localPollData = localPollFireplace(ipAddress);
+                    if (localPollData != null) {
+                        account.locations.get(i).fireplaces.fireplaces.get(j).pollData = localPollData;
+                    }
                 }
             }
         }
@@ -176,7 +187,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
             if (thing.getHandler() instanceof IntellifireThingHandler) {
                 IntellifireThingHandler handler = (IntellifireThingHandler) thing.getHandler();
                 if (handler != null) {
-                    String thingSerialNumber = getSerialNumber(thing.getProperties());
+                    String thingSerialNumber = getSerialNumberProperty(thing.getProperties());
                     IntellifirePollData pollData = account.getPollData(thingSerialNumber);
                     if (pollData != null) {
                         handler.poll(pollData);
@@ -273,7 +284,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                         .header(HttpHeader.CONTENT_LENGTH, Integer.toString(content.length())).send();
 
                 int httpResponseStatusCode = httpResponse.getStatus();
-                if (httpResponseStatusCode != 200 && httpResponseStatusCode != 204) {
+                if (httpResponseStatusCode != 200 && httpResponseStatusCode != 204 && httpResponseStatusCode != 408) {
                     logger.warn("{} failed with http response: {}", getCallingMethod(), httpResponse);
                 } else {
                     logger.debug("{} http response: {}", getCallingMethod(), httpResponse);
@@ -289,7 +300,8 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                 // store any received cookies
                 cs = httpClient.getCookieStore();
 
-                if (getCallingMethod().equals("login") || getCallingMethod().equals("handleCommand")) {
+                if (getCallingMethod().equals("login") || getCallingMethod().equals("handleCommand")
+                        || httpResponseStatusCode == 408) {
                     return Integer.toString(httpResponseStatusCode);
                 } else {
                     return httpResponse.getContentAsString();
@@ -323,10 +335,19 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         return request;
     }
 
-    public String getSerialNumber(Map<String, String> properties) {
+    public String getSerialNumberProperty(Map<String, String> properties) {
         String serialNumber = properties.get(IntellifireBindingConstants.PROPERTY_SERIALNUMBER);
         if (serialNumber != null) {
             return serialNumber;
+        } else {
+            return "";
+        }
+    }
+
+    public String getIPAddressProperty(Map<String, String> properties) {
+        String ipAddress = properties.get(IntellifireBindingConstants.PROPERTY_FIREPLACE_IPADDRESS);
+        if (ipAddress != null) {
+            return ipAddress;
         } else {
             return "";
         }

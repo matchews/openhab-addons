@@ -42,11 +42,11 @@ public class IntellifirePollData {
     public int timer;
     public int timeremaining;
     public int prepurge;
-    @SerializedName(value = "remote_downtime")
+    @SerializedName(value = "remote_downtime", alternate = { "downtime" })
     public int remoteDowntime;
-    @SerializedName(value = "remote_uptime")
+    @SerializedName(value = "remote_uptime", alternate = { "uptime" })
     public int remoteUptime;
-    @SerializedName(value = "remote_connection_quality")
+    @SerializedName(value = "remote_connection_quality", alternate = { "connection_quality" })
     public int remoteConnectionQuality;
     @SerializedName(value = "ecm_latency")
     public int ecmLatency;
@@ -61,9 +61,9 @@ public class IntellifirePollData {
     public int featurePowerVent;
     @SerializedName(value = "feature_fan")
     public int featureFan;
-    @SerializedName(value = "firmware_version")
+    @SerializedName(value = "firmware_version", alternate = { "fw_version" })
     public String firmwareVersion = "";
-    @SerializedName(value = "firmware_version_string")
+    @SerializedName(value = "firmware_version_string", alternate = { "fw_ver_str" })
     public String firmwareVersionString = "";
     public String brand = "";
 }
