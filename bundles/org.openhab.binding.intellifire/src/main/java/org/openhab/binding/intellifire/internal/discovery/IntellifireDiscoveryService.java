@@ -20,7 +20,6 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.intellifire.internal.IntellifireAccount;
 import org.openhab.binding.intellifire.internal.IntellifireBindingConstants;
-import org.openhab.binding.intellifire.internal.IntellifireException;
 import org.openhab.binding.intellifire.internal.IntellifireLocation;
 import org.openhab.binding.intellifire.internal.IntellifirePollData;
 import org.openhab.binding.intellifire.internal.handlers.IntellifireBridgeHandler;
@@ -68,8 +67,7 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
 
                     // Construct representative property
                     String serialNumber = account.locations.get(i).fireplaces.fireplaces.get(j).serial;
-                    String thingType = "fireplace";
-                    String uniqueId = String.format("%s-%s-%s", locationID, serialNumber, thingType);
+                    String uniqueId = String.format("%s-%s-%s", locationID, serialNumber, "fireplace");
 
                     Map<String, Object> properties = new HashMap<>();
                     properties.put(IntellifireBindingConstants.PROPERTY_LOCATIONID, locationID);
@@ -87,9 +85,11 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
                     if (cloudPollFireplace != null) {
                         account.locations.get(i).fireplaces.fireplaces.get(j).pollData = cloudPollFireplace;
                     }
+                    properties.put(IntellifireBindingConstants.PROPERTY_APIKEY,
+                            account.locations.get(i).fireplaces.fireplaces.get(j).apiKey);
                     properties.put(IntellifireBindingConstants.PROPERTY_FIREPLACE_FIRMWAREVERSION,
                             account.locations.get(i).fireplaces.fireplaces.get(j).pollData.firmwareVersionString);
-                    properties.put(IntellifireBindingConstants.PROPERTY_FIREPLACE_IPADDRESS,
+                    properties.put(IntellifireBindingConstants.PROPERTY_IPADDRESS,
                             account.locations.get(i).fireplaces.fireplaces.get(j).pollData.ipv4Address);
 
                     // Add device
@@ -99,9 +99,13 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
                     // Fan
                     if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.featureFan == 1) {
                         properties.clear();
-                        uniqueId = String.format("%s-%s-%s", locationID, serialNumber, "fan");
+                        properties.put(IntellifireBindingConstants.PROPERTY_APIKEY,
+                                account.locations.get(i).fireplaces.fireplaces.get(j).apiKey);
+                        properties.put(IntellifireBindingConstants.PROPERTY_IPADDRESS,
+                                account.locations.get(i).fireplaces.fireplaces.get(j).pollData.ipv4Address);
                         properties.put(IntellifireBindingConstants.PROPERTY_LOCATIONID, locationID);
                         properties.put(IntellifireBindingConstants.PROPERTY_SERIALNUMBER, serialNumber);
+                        uniqueId = String.format("%s-%s-%s", locationID, serialNumber, "fan");
                         properties.put(IntellifireBindingConstants.PROPERTY_UNIQUEID, uniqueId);
                         onDeviceDiscovered(IntellifireBindingConstants.THING_TYPE_FAN, thingName + " Fan", properties);
                     }
@@ -109,9 +113,13 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
                     // Light
                     if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.featureLight == 1) {
                         properties.clear();
-                        uniqueId = String.format("%s-%s-%s", locationID, serialNumber, "light");
+                        properties.put(IntellifireBindingConstants.PROPERTY_APIKEY,
+                                account.locations.get(i).fireplaces.fireplaces.get(j).apiKey);
+                        properties.put(IntellifireBindingConstants.PROPERTY_IPADDRESS,
+                                account.locations.get(i).fireplaces.fireplaces.get(j).pollData.ipv4Address);
                         properties.put(IntellifireBindingConstants.PROPERTY_LOCATIONID, locationID);
                         properties.put(IntellifireBindingConstants.PROPERTY_SERIALNUMBER, serialNumber);
+                        uniqueId = String.format("%s-%s-%s", locationID, serialNumber, "light");
                         properties.put(IntellifireBindingConstants.PROPERTY_UNIQUEID, uniqueId);
                         onDeviceDiscovered(IntellifireBindingConstants.THING_TYPE_LIGHT, thingName + " Light",
                                 properties);
@@ -120,17 +128,19 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
                     // Remote
                     if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.featureThermostat == 1) {
                         properties.clear();
-                        uniqueId = String.format("%s-%s-%s", locationID, serialNumber, "thermostat");
+                        properties.put(IntellifireBindingConstants.PROPERTY_APIKEY,
+                                account.locations.get(i).fireplaces.fireplaces.get(j).apiKey);
+                        properties.put(IntellifireBindingConstants.PROPERTY_IPADDRESS,
+                                account.locations.get(i).fireplaces.fireplaces.get(j).pollData.ipv4Address);
                         properties.put(IntellifireBindingConstants.PROPERTY_LOCATIONID, locationID);
                         properties.put(IntellifireBindingConstants.PROPERTY_SERIALNUMBER, serialNumber);
+                        uniqueId = String.format("%s-%s-%s", locationID, serialNumber, "thermostat");
                         properties.put(IntellifireBindingConstants.PROPERTY_UNIQUEID, uniqueId);
                         onDeviceDiscovered(IntellifireBindingConstants.THING_TYPE_REMOTE, thingName + " Remote",
                                 properties);
                     }
                 }
             }
-        } catch (IntellifireException e) {
-            logger.warn("Exception during discovery scan: {}", e.getMessage());
         } catch (InterruptedException e) {
             logger.error("Discovery Error", e);
         }

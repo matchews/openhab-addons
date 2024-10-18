@@ -12,8 +12,9 @@
  */
 package org.openhab.binding.intellifire.internal.handlers;
 
+import java.security.NoSuchAlgorithmException;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jetty.http.HttpMethod;
 import org.openhab.binding.intellifire.internal.IntellifireBindingConstants;
 import org.openhab.binding.intellifire.internal.IntellifireException;
 import org.openhab.binding.intellifire.internal.IntellifirePollData;
@@ -42,6 +43,7 @@ public class IntellifireFanHandler extends IntellifireThingHandler {
 
     @Override
     public void poll(IntellifirePollData pollData) throws IntellifireException {
+        getThing().setProperty(IntellifireBindingConstants.PROPERTY_IPADDRESS, pollData.ipv4Address);
         updateData(IntellifireBindingConstants.CHANNEL_FAN, Integer.toString(pollData.fanspeed * 25));
         this.updateStatus(ThingStatus.ONLINE);
     }
@@ -54,19 +56,21 @@ public class IntellifireFanHandler extends IntellifireThingHandler {
         Bridge bridge = getBridge();
         if (bridge != null && bridge.getHandler() instanceof IntellifireBridgeHandler bridgehandler) {
             try {
+                String apiKey = bridgehandler.getApiKeyProperty(thing.getProperties());
                 String serialNumber = bridgehandler.getSerialNumberProperty(thing.getProperties());
-                String cmdURL = "http://iftapi.net/a/" + serialNumber + "/apppost";
+                String ipAddress = bridgehandler.getIPAddressProperty(thing.getProperties());
                 String httpResponse;
-                String content;
-
-                // Pause polling while sending command
-                bridgehandler.clearPolling();
-                bridgehandler.initPolling(5);
+                String cloudCommand;
+                String localCommand;
+                String valueString;
 
                 switch (channelUID.getId()) {
                     case IntellifireBindingConstants.CHANNEL_FAN:
-                        content = "fanspeed=" + Integer.toString(this.cmdToInt(command, null) / 25);
-                        httpResponse = bridgehandler.httpResponseContent(cmdURL, HttpMethod.POST, content, 10);
+                        cloudCommand = "fanspeed";
+                        localCommand = "fan_speed";
+                        valueString = Integer.toString(this.cmdToInt(command, null) / 25);
+                        httpResponse = bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand,
+                                localCommand, valueString);
                         break;
                     default:
                         logger.warn("intellifireCommand Unsupported type {}", channelUID);
@@ -74,11 +78,14 @@ public class IntellifireFanHandler extends IntellifireThingHandler {
                 }
 
                 if (!"204".equals(httpResponse)) {
-                    logger.warn("Unable to send command {} to Intellifire's server.", content);
                     this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
                     return;
                 }
             } catch (InterruptedException e) {
+                logger.error("Intellifire handleCommand exception: {}", e.getMessage());
+                return;
+            } catch (NoSuchAlgorithmException e) {
+                logger.error("Intellifire handleCommand exception: {}", e.getMessage());
                 return;
             }
             this.updateStatus(ThingStatus.ONLINE);

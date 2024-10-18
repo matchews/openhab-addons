@@ -45,6 +45,7 @@ public class IntellifireAccount {
     public List<Location> locations = new ArrayList<>();
     @SerializedName(value = "email_notifications_enabled")
     public int emailNotificationsEnabled = 0;
+    public String userName = "";
 
     public @Nullable IntellifirePollData getPollData(String serialNumber) {
         for (int i = 0; i < this.locations.size(); i++) {

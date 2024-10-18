@@ -13,13 +13,19 @@
 package org.openhab.binding.intellifire.internal.handlers;
 
 import java.net.CookieStore;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import javax.xml.bind.DatatypeConverter;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -89,33 +95,107 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         config = getConfigAs(IntellifireConfiguration.class);
 
         try {
-            if (login() && setupAccountData() && poll(IntellifireBindingConstants.CLOUD_POLLING)) {
+            if (login() && getUsername() && setupAccountData() && poll(IntellifireBindingConstants.CLOUD_POLLING)) {
                 logger.debug("Succesfully opened connection to Intellifire's server: {} Username:{} ",
                         IntellifireBindingConstants.URI_COOKIE, config.username);
-                initPolling(0);
+                initPolling(5);
                 logger.trace("Intellifire polling scheduled");
                 updateStatus(ThingStatus.ONLINE);
             } else {
                 updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                        "Unable to Login to Intellifire's server");
+                        "Unable to Login to Intellifire's server. Retry in 60 seconds");
                 clearPolling();
                 commFailureCount = 50;
                 initPolling(60);
                 return;
             }
         } catch (InterruptedException e) {
-            logger.error("Intellifire fireplace thing", e);
+            logger.error("Intellifire scheduledInitialize exception: {}", e.getMessage());
         } catch (IntellifireException e) {
-            logger.error("Intellifire fireplace thing", e);
+            logger.error("Intellifire scheduledInitialize exception: {}", e.getMessage());
         }
+    }
+
+    public synchronized boolean login() throws InterruptedException {
+        // Login to Intellifire cloud server and retrieve cookies
+        String httpResponse = httpResponseContent(IntellifireBindingConstants.URL_LOGIN, HttpMethod.POST,
+                IntellifireBindingConstants.HTTP_HEADERS_CONTENTTYPETEXT,
+                "username=" + config.username + "&password=" + config.password, 10);
+        if ("204".equals(httpResponse)) {
+            return true;
+        } else if ("422".equals(httpResponse)) {
+            logger.warn("Login failed.  Check username and password.");
+            return false;
+        } else {
+            return false;
+        }
+    }
+
+    public synchronized boolean getUsername() throws InterruptedException {
+        final Gson gson = new Gson();
+
+        String httpResponse = httpResponseContent(IntellifireBindingConstants.URL_GETUSERNAME, HttpMethod.POST,
+                IntellifireBindingConstants.HTTP_HEADERS_CONTENTTYPETEXT, "", 10);
+        IntellifireUsername username = gson.fromJson(httpResponse, IntellifireUsername.class);
+
+        if (username != null) {
+            account.userName = username.username.toString();
+            logger.trace("getUsername: {}", username.username);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean setupAccountData() throws IntellifireException, InterruptedException {
+        if (getAccountLocations()) {
+            for (int i = 0; i < account.locations.size(); i++) {
+                String locationID = account.locations.get(i).locationId;
+                IntellifireLocation fireplaces = getFireplaces(locationID);
+                if (fireplaces != null) {
+                    account.locations.get(i).fireplaces = fireplaces;
+                } else {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public synchronized boolean getAccountLocations() throws InterruptedException {
+        final Gson gson = new Gson();
+
+        String httpResponse = httpResponseContent(IntellifireBindingConstants.URL_ENUMLOCATIONS, HttpMethod.POST,
+                IntellifireBindingConstants.HTTP_HEADERS_CONTENTTYPETEXT, "", 10);
+        IntellifireAccount accountData = gson.fromJson(httpResponse, IntellifireAccount.class);
+
+        if (accountData != null) {
+            account = accountData;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public synchronized @Nullable IntellifireLocation getFireplaces(String locationID) throws InterruptedException {
+        final Gson gson = new Gson();
+
+        String httpResponse = httpResponseContent("http://iftapi.net/a/enumfireplaces?location_id=" + locationID,
+                HttpMethod.POST, IntellifireBindingConstants.HTTP_HEADERS_CONTENTTYPETEXT, "", 10);
+        IntellifireLocation fireplaces = gson.fromJson(httpResponse, IntellifireLocation.class);
+
+        return fireplaces;
     }
 
     public synchronized void initPolling(int initalDelay) {
         pollTelemetryFuture = scheduler.scheduleWithFixedDelay(() -> {
             try {
-                logger.trace("Intellifire Polling");
+                logger.trace("Intellifire initPolling");
                 if (commFailureCount >= 5) {
                     commFailureCount = 0;
+                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
                     clearPolling();
                     initialize();
                     return;
@@ -126,13 +206,14 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                     return;
                 }
                 if (this.thing.getStatus() != ThingStatus.ONLINE) {
+                    commFailureCount = 0;
                     updateStatus(ThingStatus.ONLINE);
                 }
             } catch (InterruptedException e) {
-                logger.debug("Intellifire Account thing: Exception during poll: {}", e.getMessage());
+                logger.error("Intellifire initPolling exception: {}", e.getMessage());
                 return;
             } catch (IntellifireException e) {
-                logger.debug("Intellifire Account thing: Exception during poll: {}", e.getMessage());
+                logger.error("Intellifire initPolling exception: {}", e.getMessage());
                 return;
             }
         }, initalDelay, config.refreshInterval, TimeUnit.SECONDS);
@@ -148,19 +229,9 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         }
     }
 
-    public boolean setupAccountData() throws IntellifireException, InterruptedException {
-        getAccountLocations();
-        for (int i = 0; i < account.locations.size(); i++) {
-            String locationID = account.locations.get(i).locationId;
-            IntellifireLocation fireplaces = getFireplaces(locationID);
-            if (fireplaces != null) {
-                account.locations.get(i).fireplaces = fireplaces;
-            }
-        }
-        return true;
-    }
-
     public boolean poll(boolean cloudPool) throws IntellifireException, InterruptedException {
+        boolean failureFlag = false;
+
         // Retrieve poll data for each fireplace
         for (int i = 0; i < account.locations.size(); i++) {
             for (int j = 0; j < account.locations.get(i).fireplaces.fireplaces.size(); j++) {
@@ -171,6 +242,8 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                     IntellifirePollData cloudPollData = cloudPollFireplace(serialNumber);
                     if (cloudPollData != null) {
                         account.locations.get(i).fireplaces.fireplaces.get(j).pollData = cloudPollData;
+                    } else {
+                        failureFlag = true;
                     }
                 } else {
                     // Local Poll
@@ -178,6 +251,8 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                     IntellifirePollData localPollData = localPollFireplace(ipAddress);
                     if (localPollData != null) {
                         account.locations.get(i).fireplaces.fireplaces.get(j).pollData = localPollData;
+                    } else {
+                        failureFlag = true;
                     }
                 }
             }
@@ -191,85 +266,144 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                     IntellifirePollData pollData = account.getPollData(thingSerialNumber);
                     if (pollData != null) {
                         handler.poll(pollData);
+                    } else {
+                        failureFlag = true;
                     }
                 }
             }
         }
 
-        return true;
-    }
-
-    public synchronized boolean login() throws InterruptedException {
-        // Login to Intellifire cloud server and retrieve cookies
-        String httpResponse = httpResponseContent(IntellifireBindingConstants.URL_LOGIN, HttpMethod.POST,
-                "username=" + config.username + "&password=" + config.password, 10);
-        if ("204".equals(httpResponse)) {
-            return true;
-        } else if ("422".equals(httpResponse)) {
-            logger.warn("Login failed.  Check username and password.");
+        if (failureFlag) {
             return false;
         } else {
-            return false;
+            return true;
         }
-    }
-
-    public synchronized IntellifireUsername getUsername() throws InterruptedException {
-        final Gson gson = new Gson();
-
-        String httpResponse = httpResponseContent(IntellifireBindingConstants.URL_GETUSERNAME, HttpMethod.POST, "", 10);
-        IntellifireUsername username = gson.fromJson(httpResponse, IntellifireUsername.class);
-        logger.trace("getUsername: {}", username.username);
-
-        return username;
-    }
-
-    public synchronized void getAccountLocations() throws InterruptedException {
-        final Gson gson = new Gson();
-
-        String httpResponse = httpResponseContent(IntellifireBindingConstants.URL_ENUMLOCATIONS, HttpMethod.POST, "",
-                10);
-        IntellifireAccount accountData = gson.fromJson(httpResponse, IntellifireAccount.class);
-
-        if (accountData != null) {
-            account = accountData;
-        }
-    }
-
-    public synchronized @Nullable IntellifireLocation getFireplaces(String locationID) throws InterruptedException {
-        final Gson gson = new Gson();
-
-        String httpResponse = httpResponseContent("http://iftapi.net/a/enumfireplaces?location_id=" + locationID,
-                HttpMethod.POST, "", 10);
-        IntellifireLocation fireplaces = gson.fromJson(httpResponse, IntellifireLocation.class);
-
-        return fireplaces;
     }
 
     public synchronized @Nullable IntellifirePollData cloudPollFireplace(String serialNumber)
-            throws IntellifireException, InterruptedException {
+            throws InterruptedException {
         final Gson gson = new Gson();
 
         String httpResponse = httpResponseContent("http://iftapi.net/a/" + serialNumber + "/apppoll", HttpMethod.POST,
-                "", 10);
+                IntellifireBindingConstants.HTTP_HEADERS_CONTENTTYPETEXT, "", 10);
         IntellifirePollData pollData = gson.fromJson(httpResponse, IntellifirePollData.class);
-
         return pollData;
     }
 
     public synchronized @Nullable IntellifirePollData localPollFireplace(String IPaddress) throws InterruptedException {
         final Gson gson = new Gson();
 
-        String httpResponse = httpResponseContent("http://" + IPaddress + "/poll", HttpMethod.GET, "", 10);
+        String httpResponse = httpResponseContent("http://" + IPaddress + "/poll", HttpMethod.GET,
+                IntellifireBindingConstants.HTTP_HEADERS_CONTENTTYPETEXT, "", 10);
         IntellifirePollData pollData = gson.fromJson(httpResponse, IntellifirePollData.class);
-
         return pollData;
     }
 
-    public synchronized String httpResponseContent(String url, HttpMethod method, String content, int timeout)
+    public String sendCommand(String serialNumber, String IPaddress, String apiKeyHexString, String cloudCommand,
+            String localCommand, String value) throws InterruptedException, NoSuchAlgorithmException {
+        // Pause polling while sending command
+        clearPolling();
+
+        // Try local command
+        String localResponse = sendLocalCommand(IPaddress, apiKeyHexString, localCommand, value);
+
+        // If local command fails, try cloud command.
+        if (("204").equals(localResponse)) {
+            // Success. Restart polling
+            initPolling(5);
+            return localResponse;
+        } else {
+            logger.warn("Local command {} failed.  Attemping cloud command.", localCommand);
+            // Cloud Command
+            String cloudResponse = sendCloudCommand(serialNumber, cloudCommand, value);
+
+            // Log cloud error
+            if (!("204").equals(localResponse)) {
+                logger.warn("Cloud command {} failed.", cloudCommand);
+            }
+            // Restart polling
+            initPolling(5);
+
+            return cloudResponse;
+        }
+    }
+
+    private String sendCloudCommand(String serialNumber, String cloudCommand, String value)
             throws InterruptedException {
+        String cloudCmdURL = "http://iftapi.net/a/" + serialNumber + "/apppost";
+        String content = cloudCommand + "=" + value;
+        String response = httpResponseContent(cloudCmdURL, HttpMethod.POST,
+                IntellifireBindingConstants.HTTP_HEADERS_CONTENTTYPETEXT, content, 10);
+        return response;
+    }
+
+    private String sendLocalCommand(String IPaddress, String apiKeyHexString, String command, String value)
+            throws InterruptedException, NoSuchAlgorithmException {
+        String localCmdURL = "http://" + IPaddress + "/post";
+
+        // Get challenge string from local fireplace
+        String challengeHexStr = getChallengeString(IPaddress);
+
+        // Assemble command string
+        String commandStr = "post:command=" + command + "&value=" + value;
+
+        // Concatenate apiKey, challenge, command
+        byte[] apiKeyBytes = decodeHexString(apiKeyHexString);
+        byte[] challengeBytes = decodeHexString(challengeHexStr);
+        byte[] commandBytes = commandStr.getBytes();
+
+        byte[] apiChallengePayloadBytes = null;
+        ByteBuffer buffer1 = ByteBuffer.allocate(apiKeyBytes.length + challengeBytes.length + commandBytes.length);
+        buffer1.put(apiKeyBytes);
+        buffer1.put(challengeBytes);
+        buffer1.put(commandBytes);
+        apiChallengePayloadBytes = buffer1.array();
+
+        // Create hash
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] apiChallengePayloadHash = digest.digest(apiChallengePayloadBytes);
+
+        // Prepend the apiKey (yes, another copy of the apiKey)
+        byte[] apiApiChallengePayload = null;
+        ByteBuffer buffer = ByteBuffer.allocate(apiKeyBytes.length + apiChallengePayloadHash.length);
+        buffer.put(apiKeyBytes);
+        buffer.put(apiChallengePayloadHash);
+        apiApiChallengePayload = buffer.array();
+
+        // Hash again
+        byte[] apiApiChallengePayloadHash = digest.digest(apiApiChallengePayload);
+
+        String responseHexString = encodeHexString(apiApiChallengePayloadHash);
+
+        // Hash the username and convert to hex string
+        byte[] usernameHash = digest.digest(account.userName.getBytes());
+        String userNameHexString = encodeHexString(usernameHash);
+
+        // Assemble the url encoded form
+        Map<String, String> dataMap = new LinkedHashMap<>();
+        dataMap.put("command", command);
+        dataMap.put("value", value);
+        dataMap.put("user", userNameHexString.toString().toUpperCase());
+        dataMap.put("response", responseHexString.toString().toLowerCase());
+
+        String data = "";
+        for (Map.Entry<String, String> e : dataMap.entrySet()) {
+            data = data + (data.isEmpty() ? "" : "&");
+            data = data + e.getKey() + "=" + e.getValue();
+        }
+
+        String response = httpResponseContent(localCmdURL, HttpMethod.POST,
+                IntellifireBindingConstants.HTTP_HEADERS_CONTENTTYPEURLENCODED, data, 10);
+
+        return response;
+    }
+
+    private synchronized String httpResponseContent(String url, HttpMethod method, String contentType, String content,
+            int timeout) throws InterruptedException {
         for (int retry = 0; retry <= 5; retry++) {
             try {
-                Request request = httpRequestBuilder(url, method, timeout);
+                // Initialize request to load cookies into
+                Request request = httpRequestBuilder(url, method, timeout, contentType);
 
                 cs = httpClient.getCookieStore();
 
@@ -279,12 +413,14 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                         request.cookie(cookie);
                     });
                 }
-                ContentResponse httpResponse = httpRequestBuilder(url, method, timeout)
-                        .content(new StringContentProvider(content), "text/plain;charset=UTF-8")
+                ContentResponse httpResponse = httpRequestBuilder(url, method, timeout, contentType)
+                        .content(new StringContentProvider(content), contentType)
                         .header(HttpHeader.CONTENT_LENGTH, Integer.toString(content.length())).send();
 
                 int httpResponseStatusCode = httpResponse.getStatus();
-                if (httpResponseStatusCode != 200 && httpResponseStatusCode != 204 && httpResponseStatusCode != 408) {
+
+                // Login returns 204, all others return 200
+                if (httpResponseStatusCode != 200 && httpResponseStatusCode != 204) {
                     logger.warn("{} failed with http response: {}", getCallingMethod(), httpResponse);
                 } else {
                     logger.debug("{} http response: {}", getCallingMethod(), httpResponse);
@@ -300,39 +436,64 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                 // store any received cookies
                 cs = httpClient.getCookieStore();
 
-                if (getCallingMethod().equals("login") || getCallingMethod().equals("handleCommand")
-                        || httpResponseStatusCode == 408) {
+                if (getCallingMethod().equals("login") || getCallingMethod().equals("sendCloudCommand")
+                        || getCallingMethod().equals("sendLocalCommand")) {
                     return Integer.toString(httpResponseStatusCode);
                 } else {
                     return httpResponse.getContentAsString();
                 }
-            } catch (ExecutionException e) {
-                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                        "Unable to resolve host.  Check host and your internet connection. " + e.getMessage());
-                return "";
-            } catch (TimeoutException e) {
+            } catch (ExecutionException | TimeoutException e) {
+                logger.warn("Intellifire {} error:  Try:  {} ", getCallingMethod(),
+                        (commFailureCount) * 2 + (retry + 1));
+
                 if (retry >= 2) {
-                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                            "Connection Timeout.  Check host and your internet connection. " + e.getMessage());
+                    if (getCallingMethod().equals("localPollFireplace")
+                            || getCallingMethod().equals("sendLocalCommand")) {
+
+                        String test = "";
+                    }
                     return "";
                 } else {
-                    logger.warn("Intellifire Account thing Timeout:  {} Try:  {} ", getCallingMethod(), retry + 1);
                 }
             }
         }
         return "";
     }
 
-    private Request httpRequestBuilder(String url, HttpMethod method, int timeout) {
+    private Request httpRequestBuilder(String url, HttpMethod method, int timeout, String contentType) {
         Request request = httpClient.newRequest(url)
                 .header(HttpHeader.HOST, IntellifireBindingConstants.HTTP_HEADERS_HOST)
                 .header(HttpHeader.CONNECTION, IntellifireBindingConstants.HTTP_HEADERS_CONNECTION)
+                .header(HttpHeader.CONTENT_TYPE, contentType)
                 .agent("openHAB Intellifire Binding org.openhab.binding.intellifire").method(method)
                 .header(HttpHeader.ACCEPT, IntellifireBindingConstants.HTTP_HEADERS_ACCEPT)
                 .header(HttpHeader.ACCEPT_LANGUAGE, IntellifireBindingConstants.HTTP_HEADERS_LANGUAGE)
                 .header(HttpHeader.ACCEPT_ENCODING, IntellifireBindingConstants.HTTP_HEADERS_ACCEPTENCODING)
                 .version(HttpVersion.HTTP_1_1).timeout(timeout, TimeUnit.SECONDS);
         return request;
+    }
+
+    private String getChallengeString(String IPaddress) throws InterruptedException {
+        String challengeStr = httpResponseContent("http://" + IPaddress + "/get_challenge", HttpMethod.GET,
+                IntellifireBindingConstants.HTTP_HEADERS_CONTENTTYPEURLENCODED, "", 10);
+        return challengeStr;
+    }
+
+    private String encodeHexString(byte[] bytes) {
+        return DatatypeConverter.printHexBinary(bytes);
+    }
+
+    private byte[] decodeHexString(String hexString) {
+        return DatatypeConverter.parseHexBinary(hexString);
+    }
+
+    public String getApiKeyProperty(Map<String, String> properties) {
+        String serialNumber = properties.get(IntellifireBindingConstants.PROPERTY_APIKEY);
+        if (serialNumber != null) {
+            return serialNumber;
+        } else {
+            return "";
+        }
     }
 
     public String getSerialNumberProperty(Map<String, String> properties) {
@@ -345,7 +506,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
     }
 
     public String getIPAddressProperty(Map<String, String> properties) {
-        String ipAddress = properties.get(IntellifireBindingConstants.PROPERTY_FIREPLACE_IPADDRESS);
+        String ipAddress = properties.get(IntellifireBindingConstants.PROPERTY_IPADDRESS);
         if (ipAddress != null) {
             return ipAddress;
         } else {

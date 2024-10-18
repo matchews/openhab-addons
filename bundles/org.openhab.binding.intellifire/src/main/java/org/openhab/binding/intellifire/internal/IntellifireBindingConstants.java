@@ -63,19 +63,22 @@ public class IntellifireBindingConstants {
     public static final String CHANNEL_REMOTE_UPTIME = "remoteUptime";
 
     // Properties
-    public static final String PROPERTY_FIREPLACE_BRAND = "Brand";
-    public static final String PROPERTY_FIREPLACE_FIRMWAREVERSION = "Firmware Version";
-    public static final String PROPERTY_FIREPLACE_IPADDRESS = "IP Address";
-    public static final String PROPERTY_FIREPLACE_MODEL = "Model";
-    public static final String PROPERTY_FIREPLACE_NAME = "Name";
+    public static final String PROPERTY_APIKEY = "API Key";
+    public static final String PROPERTY_IPADDRESS = "IP Address";
     public static final String PROPERTY_LOCATIONID = "Location ID";
     public static final String PROPERTY_SERIALNUMBER = "Serial Number";
     public static final String PROPERTY_UNIQUEID = "Unique ID";
+    public static final String PROPERTY_FIREPLACE_BRAND = "Brand";
+    public static final String PROPERTY_FIREPLACE_FIRMWAREVERSION = "Firmware Version";
+    public static final String PROPERTY_FIREPLACE_MODEL = "Model";
+    public static final String PROPERTY_FIREPLACE_NAME = "Name";
 
     // http Connection
     public static final String HTTP_HEADERS_ACCEPT = "*/*";
     public static final String HTTP_HEADERS_ACCEPTENCODING = "gzip, deflate";
     public static final String HTTP_HEADERS_CONNECTION = "keep-alive";
+    public static final String HTTP_HEADERS_CONTENTTYPEURLENCODED = "application/x-www-form-urlencoded";
+    public static final String HTTP_HEADERS_CONTENTTYPETEXT = "text/plain;charset=UTF-8";
     public static final String HTTP_HEADERS_HOST = "iftapi.net";
     public static final String HTTP_HEADERS_LANGUAGE = "en-US,en;q=0.9";
     public static final String URL_LOGIN = "http://iftapi.net/a/login";
