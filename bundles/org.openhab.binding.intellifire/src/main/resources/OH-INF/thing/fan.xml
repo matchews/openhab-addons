@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="intellifire"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+
+	<thing-type id="fan" listed="false">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="account"/>
+		</supported-bridge-type-refs>
+
+		<label>Intellifire Fan</label>
+		<description>Fan thing for Intellifire binding</description>
+		<category>HVAC</category>
+
+		<channels>
+			<channel id="fan" typeId="fan"/>
+		</channels>
+
+		<properties>
+			<property name="Location ID"></property>
+			<property name="Serial Number"></property>
+			<property name="Vendor">Intellifire</property>
+		</properties>
+
+		<representation-property>uniqueId
+		</representation-property>
+
+	</thing-type>
+
+	<channel-type id="fan">
+		<item-type>Dimmer</item-type>
+		<label>Fan</label>
+		<category>Fan</category>
+		<state min="0" max="100" step="25" pattern="%d %unit%" readOnly="false"/>
+	</channel-type>
+
+</thing:thing-descriptions>

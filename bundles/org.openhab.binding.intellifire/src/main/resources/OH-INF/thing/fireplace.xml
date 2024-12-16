@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="intellifire"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+
+	<thing-type id="fireplace" listed="false">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="account"/>
+		</supported-bridge-type-refs>
+
+		<label>Intellifire Light</label>
+		<description>Fireplace thing for Intellifire binding</description>
+		<category>HVAC</category>
+
+		<channels>
+			<channel id="power" typeId="power"/>
+			<channel id="battery" typeId="battery"/>
+			<channel id="ecmLatency" typeId="ecmLatency"/>
+			<channel id="errors" typeId="errors"/>
+			<channel id="flameHeight" typeId="flameHeight"/>
+			<channel id="hot" typeId="hot"/>
+			<channel id="coldClimatePilot" typeId="coldClimatePilot"/>
+			<channel id="prePurge" typeId="prePurge"/>
+
+		</channels>
+
+		<properties>
+			<property name="Brand"></property>
+			<property name="Firmware Version"></property>
+			<property name="IP Address"></property>
+			<property name="Location ID"></property>
+			<property name="Model">IFT-WFM</property>
+			<property name="Name"></property>
+			<property name="Serial Number"></property>
+			<property name="Vendor">Intellifire</property>
+		</properties>
+
+		<representation-property>uniqueId
+		</representation-property>
+
+	</thing-type>
+	<channel-type id="battery">
+		<item-type>Switch</item-type>
+		<label>Battery Power</label>
+		<category>Switch</category>
+		<state readOnly="true">
+		</state>
+	</channel-type>
+
+	<channel-type id="ecmLatency">
+		<item-type>Number</item-type>
+		<label>ECM Latency</label>
+		<category>Time</category>
+		<state readOnly="true">
+		</state>
+	</channel-type>
+
+	<channel-type id="errors">
+		<item-type>String</item-type>
+		<label>Errors</label>
+		<category>Text</category>
+		<state readOnly="true">
+		</state>
+	</channel-type>
+
+	<channel-type id="flameHeight">
+		<item-type>Dimmer</item-type>
+		<label>Flame</label>
+		<category>Fire</category>
+		<state min="0" max="5" step="1" pattern="%d %unit%" readOnly="false"/>
+	</channel-type>
+
+	<channel-type id="hot">
+		<item-type>Switch</item-type>
+		<label>Hot</label>
+		<category>Switch</category>
+		<state readOnly="true">
+		</state>
+	</channel-type>
+
+	<channel-type id="coldClimatePilot">
+		<item-type>Switch</item-type>
+		<label>Cold Climate Pilot</label>
+		<category>Switch</category>
+		<state readOnly="false">
+		</state>
+	</channel-type>
+
+	<channel-type id="prePurge">
+		<item-type>Switch</item-type>
+		<label>Pre Purge</label>
+		<category>Switch</category>
+		<state readOnly="true">
+		</state>
+	</channel-type>
+
+	<channel-type id="power">
+		<item-type>Switch</item-type>
+		<label>Fireplace</label>
+		<category>Switch</category>
+		<state readOnly="false">
+		</state>
+	</channel-type>
+</thing:thing-descriptions>

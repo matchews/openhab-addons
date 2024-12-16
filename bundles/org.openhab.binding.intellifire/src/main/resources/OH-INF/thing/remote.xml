@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="intellifire"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+
+	<thing-type id="remote" listed="false">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="account"/>
+		</supported-bridge-type-refs>
+
+		<label>Intellifire thermostat</label>
+		<description>Thermostat thing for Intellifire IFT-RC400 remote thermostat</description>
+		<category>HVAC</category>
+
+		<channels>
+			<channel id="remoteConnectionQuality" typeId="remoteConnectionQuality"/>
+			<channel id="remoteDowntime" typeId="remoteDowntime"/>
+			<channel id="remoteUptime" typeId="remoteUptime"/>
+			<channel id="roomTemperature" typeId="roomTemperature"/>
+			<channel id="thermostatEnable" typeId="thermostatEnable"/>
+			<channel id="thermostatSetpoint" typeId="thermostatSetpoint"/>
+			<channel id="timerEnable" typeId="timerEnable"/>
+			<channel id="timer" typeId="timer"/>
+		</channels>
+
+		<properties>
+			<property name="Location ID"></property>
+			<property name="Model">IFT-RFM, IFT-RC400</property>
+			<property name="Serial Number"></property>
+			<property name="Vendor">Intellifire</property>
+		</properties>
+
+		<representation-property>uniqueId
+		</representation-property>
+
+	</thing-type>
+	<channel-type id="remoteConnectionQuality">
+		<item-type>Number</item-type>
+		<label>Remote Connection Quality</label>
+		<state readOnly="true">
+		</state>
+	</channel-type>
+
+	<channel-type id="remoteDowntime">
+		<item-type>Number</item-type>
+		<label>Remote Downtime</label>
+		<category>Time</category>
+		<state readOnly="true">
+		</state>
+	</channel-type>
+
+	<channel-type id="remoteUptime">
+		<item-type>Number</item-type>
+		<label>Remote Uptime</label>
+		<category>Time</category>
+		<state min="43" max="99" step="1.0" pattern="%d %unit%" readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="roomTemperature">
+		<item-type>Number:Temperature</item-type>
+		<label>Room Temperature</label>
+		<category>Temperature</category>
+		<state pattern="%1d %unit%" readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="thermostatEnable">
+		<item-type>Switch</item-type>
+		<label>Thermostat Control</label>
+		<category>Switch</category>
+		<state readOnly="false">
+		</state>
+	</channel-type>
+
+	<channel-type id="thermostatSetpoint">
+		<item-type>Number:Temperature</item-type>
+		<label>Thermostat Setpoint</label>
+		<category>Temperature</category>
+		<state min="43" max="99" step="1.0" pattern="%d %unit%" readOnly="false"/>
+	</channel-type>
+
+	<channel-type id="timer">
+		<item-type>Number:Time</item-type>
+		<label>Timer</label>
+		<category>Time</category>
+		<state min="0" max="180" step="1.0" pattern="%d min" readOnly="false"/>
+	</channel-type>
+
+	<channel-type id="timerEnable">
+		<item-type>Switch</item-type>
+		<label>Timer Enable</label>
+		<category>Switch</category>
+		<state readOnly="false">
+		</state>
+	</channel-type>
+
+</thing:thing-descriptions>
