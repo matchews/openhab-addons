@@ -95,7 +95,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         config = getConfigAs(IntellifireConfiguration.class);
 
         try {
-            if (login() && getUsername() && setupAccountData() && poll(IntellifireBindingConstants.CLOUD_POLLING)) {
+            if (login() && setupAccountData() && getUsername() && poll(IntellifireBindingConstants.CLOUD_POLLING)) {
                 logger.debug("Succesfully opened connection to Intellifire's server: {} Username:{} ",
                         IntellifireBindingConstants.URI_COOKIE, config.username);
                 initPolling(5);
@@ -200,10 +200,20 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                     initialize();
                     return;
                 }
-
-                if (!(poll(IntellifireBindingConstants.LOCAL_POLLING))) {
-                    commFailureCount++;
-                    return;
+                if (commFailureCount < 2) {
+                    if (!(poll(IntellifireBindingConstants.LOCAL_POLLING))) {
+                        commFailureCount++;
+                        return;
+                    } else {
+                        commFailureCount = 0;
+                    }
+                } else {
+                    if (!(poll(IntellifireBindingConstants.CLOUD_POLLING))) {
+                        commFailureCount++;
+                        return;
+                    } else {
+                        commFailureCount = 0;
+                    }
                 }
                 if (this.thing.getStatus() != ThingStatus.ONLINE) {
                     commFailureCount = 0;
@@ -248,10 +258,15 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                 } else {
                     // Local Poll
                     String ipAddress = account.getIPAddress(serialNumber);
-                    IntellifirePollData localPollData = localPollFireplace(ipAddress);
-                    if (localPollData != null) {
-                        account.locations.get(i).fireplaces.fireplaces.get(j).pollData = localPollData;
+                    if (!"".equals(ipAddress)) {
+                        IntellifirePollData localPollData = localPollFireplace(ipAddress);
+                        if (localPollData != null) {
+                            account.locations.get(i).fireplaces.fireplaces.get(j).pollData = localPollData;
+                        } else {
+                            failureFlag = true;
+                        }
                     } else {
+                        logger.error("Intellifire local poll failed. Invalid local IP Address received from cloud.");
                         failureFlag = true;
                     }
                 }
@@ -272,12 +287,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                 }
             }
         }
-
-        if (failureFlag) {
-            return false;
-        } else {
-            return true;
-        }
+        return !failureFlag;
     }
 
     public synchronized @Nullable IntellifirePollData cloudPollFireplace(String serialNumber)
@@ -318,12 +328,11 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
             String cloudResponse = sendCloudCommand(serialNumber, cloudCommand, value);
 
             // Log cloud error
-            if (!("204").equals(localResponse)) {
+            if (!("204").equals(cloudResponse)) {
                 logger.warn("Cloud command {} failed.", cloudCommand);
             }
             // Restart polling
             initPolling(5);
-
             return cloudResponse;
         }
     }
@@ -343,9 +352,12 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
 
         // Get challenge string from local fireplace
         String challengeHexStr = getChallengeString(IPaddress);
+        logger.trace("Challenge string: {} received.", challengeHexStr);
 
         // Assemble command string
         String commandStr = "post:command=" + command + "&value=" + value;
+        logger.trace("Command string: {}", commandStr);
+        logger.trace("API key hex string: {}", apiKeyHexString);
 
         // Concatenate apiKey, challenge, command
         byte[] apiKeyBytes = decodeHexString(apiKeyHexString);
@@ -375,6 +387,8 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
 
         String responseHexString = encodeHexString(apiApiChallengePayloadHash);
 
+        logger.trace("Username: {}", account.userName);
+
         // Hash the username and convert to hex string
         byte[] usernameHash = digest.digest(account.userName.getBytes());
         String userNameHexString = encodeHexString(usernameHash);
@@ -400,7 +414,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
 
     private synchronized String httpResponseContent(String url, HttpMethod method, String contentType, String content,
             int timeout) throws InterruptedException {
-        for (int retry = 0; retry <= 5; retry++) {
+        for (int retry = 1; retry <= 2; retry++) {
             try {
                 // Initialize request to load cookies into
                 Request request = httpRequestBuilder(url, method, timeout, contentType);
@@ -443,17 +457,10 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                     return httpResponse.getContentAsString();
                 }
             } catch (ExecutionException | TimeoutException e) {
-                logger.warn("Intellifire {} error:  Try:  {} ", getCallingMethod(),
-                        (commFailureCount) * 2 + (retry + 1));
+                logger.warn("Intellifire {} error:  Try:  {}", getCallingMethod(), (commFailureCount) * 2 + (retry));
 
                 if (retry >= 2) {
-                    if (getCallingMethod().equals("localPollFireplace")
-                            || getCallingMethod().equals("sendLocalCommand")) {
-
-                        String test = "";
-                    }
                     return "";
-                } else {
                 }
             }
         }
@@ -487,13 +494,21 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         return DatatypeConverter.parseHexBinary(hexString);
     }
 
-    public String getApiKeyProperty(Map<String, String> properties) {
-        String serialNumber = properties.get(IntellifireBindingConstants.PROPERTY_APIKEY);
-        if (serialNumber != null) {
-            return serialNumber;
-        } else {
-            return "";
+    public String getApiKeyProperty(Map<String, String> properties) throws InterruptedException, IntellifireException {
+        String apiKey = "";
+        String locationID = properties.get(IntellifireBindingConstants.PROPERTY_LOCATIONID);
+        if (locationID != null) {
+            IntellifireLocation fireplaces = getFireplaces(locationID);
+            if (fireplaces != null) {
+                for (int j = 0; j < fireplaces.fireplaces.size(); j++) {
+                    String serialNumber = fireplaces.fireplaces.get(j).serial;
+                    if (serialNumber.equals(properties.get(IntellifireBindingConstants.PROPERTY_SERIALNUMBER))) {
+                        apiKey = fireplaces.fireplaces.get(j).apiKey;
+                    }
+                }
+            }
         }
+        return apiKey;
     }
 
     public String getSerialNumberProperty(Map<String, String> properties) {

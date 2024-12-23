@@ -1,5 +1,5 @@
 
-Things online before succesful local poll?
+Things online before successfull local poll?
 
 Combine light and fan into fireplace thing? (light:light, fan:fan)
 
@@ -13,26 +13,10 @@ verify SSL certificate
 Send Command failure causes thing offline.  Recovery?
 
 ******
-Test local IP address change.
-IP Address successfully updates on initialization.
-What to do if localPolling fails?
-    Try cloudPolling
-    Or retry out and re-initialize?
-    
-    
-    Initialize (including one cloud poll)
-    Local Poll
-        Retry local 2-3 times
-        Retry cloud 2-3 times  (if this succeeds, go back to local polling?)
-        Initialize
-    
-    
 
 HttpResponse error messages need to differentiate between internet connection and local connection.
 Might need a config option to select local, cloud, or both?
 ******
-
-getusername used in python code?
 
 
 Limit outgoing command frequency so we don't overload the server

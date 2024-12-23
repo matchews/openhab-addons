@@ -56,7 +56,9 @@ public class IntellifireLightHandler extends IntellifireThingHandler {
         Bridge bridge = getBridge();
         if (bridge != null && bridge.getHandler() instanceof IntellifireBridgeHandler bridgehandler) {
             try {
+                // Retrieve API Key in case it has changed since discovery
                 String apiKey = bridgehandler.getApiKeyProperty(thing.getProperties());
+                updateProperty(IntellifireBindingConstants.PROPERTY_APIKEY, apiKey);
                 String serialNumber = bridgehandler.getSerialNumberProperty(thing.getProperties());
                 String ipAddress = bridgehandler.getIPAddressProperty(thing.getProperties());
                 String httpResponse;
@@ -82,6 +84,9 @@ public class IntellifireLightHandler extends IntellifireThingHandler {
                     return;
                 }
 
+            } catch (IntellifireException e) {
+                logger.error("Intellifire handleCommand exception: {}", e.getMessage());
+                return;
             } catch (InterruptedException e) {
                 logger.error("Intellifire handleCommand exception: {}", e.getMessage());
                 return;
