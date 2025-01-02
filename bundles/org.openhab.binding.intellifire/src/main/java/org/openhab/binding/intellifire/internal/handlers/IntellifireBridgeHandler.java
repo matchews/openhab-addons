@@ -317,6 +317,9 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         // Try local command
         String localResponse = sendLocalCommand(IPaddress, apiKeyHexString, localCommand, value);
 
+        // 204 Success
+        // 403 Incorrect authentication
+        // 422 Invalid command name, or other parameter
         // If local command fails, try cloud command.
         if (("204").equals(localResponse)) {
             // Success. Restart polling
@@ -495,20 +498,12 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
     }
 
     public String getApiKeyProperty(Map<String, String> properties) throws InterruptedException, IntellifireException {
-        String apiKey = "";
-        String locationID = properties.get(IntellifireBindingConstants.PROPERTY_LOCATIONID);
-        if (locationID != null) {
-            IntellifireLocation fireplaces = getFireplaces(locationID);
-            if (fireplaces != null) {
-                for (int j = 0; j < fireplaces.fireplaces.size(); j++) {
-                    String serialNumber = fireplaces.fireplaces.get(j).serial;
-                    if (serialNumber.equals(properties.get(IntellifireBindingConstants.PROPERTY_SERIALNUMBER))) {
-                        apiKey = fireplaces.fireplaces.get(j).apiKey;
-                    }
-                }
-            }
+        String apiKey = properties.get(IntellifireBindingConstants.PROPERTY_APIKEY);
+        if (apiKey != null) {
+            return apiKey;
+        } else {
+            return "";
         }
-        return apiKey;
     }
 
     public String getSerialNumberProperty(Map<String, String> properties) {

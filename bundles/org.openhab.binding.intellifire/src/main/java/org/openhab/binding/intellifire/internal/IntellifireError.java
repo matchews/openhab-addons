@@ -21,28 +21,25 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @NonNullByDefault
 public enum IntellifireError {
 
-    ACCESSORY(134,
-            "Your appliance has detected that an AUX port or accessory is not functional. Please contact your dealer and report this issue."),
-    DISABLED(129,
-            "Appliance Safely Disabled: Your appliance has been disabled. Please contact your dealer and report this issue."),
+    ACCESSORY(134, "Simplifire error."),
+    DISABLED(129, "Appliance Safety Error. Appliance safely disabled"),
     DISABLED2(145,
-            "Appliance Safely Disabled: Your appliance has been disabled. Please contact your dealer and report this issue."),
-    ECMOFFLINE(3269, "ECM is offline."),
-    FAN(132, "Fan Error. Your appliance has detected that an accessory is not functional. Please contact your dealer and report this issue."),
-    FANDELAY(6,
-            "Fan Information: Fan will turn on within 3 minutes. Your appliance has a built-in delay that prevents the fan from operating within the first 3 minutes of turning on the appliance. This allows the air to be heated prior to circulation."),
-    FLAME(4, "Pilot Flame Error. Your appliance has been safely disabled. Please contact your dealer and report this issue."),
-    LIGHTS(133,
-            "Lights Error. Your appliance has detected that an accessory is not functional. Please contact your dealer and report this issue."),
+            "Appliance Disabled. One or more error conditions has led to appliance being disabled. Schedule service"),
+    ECMOFFLINE(3269,
+            "ECM Offline. WFM and ECM hardware interaction issue. Can clear on its own, may require power cycling appliance"),
+    FAN(132, "Fan Error. Check connection of fan on ACM."),
+    FANDELAY(6, "Fan will turn on in 3 minutes."),
+    FLAME(4, "Flame Error. Appliance is safely disabled."),
+    LIGHTS(133, "Lights Error. Check connection of lights on ACM"),
     MAINTENANCE(64,
-            "Maintenance: Your appliance is due for a routine maintenance check. Please contact your dealer to ensure your appliance is operating at peak performance."),
+            "300 Hour Maintenance Error. Appliance has accumulated 300 hours of burn time and should be scheduled for maintenance."),
     NONE(9999, ""),
-    OFFLINE(642, "Your appliance is currently offline."),
-    PILOTFLAME(2,
-            "Pilot Flame Error: Your appliance has been safely disabled. Please contact your dealer and report this issue."),
-    PILOTFLAME2(130,
-            "Pilot Flame Error: Your appliance has been safely disabled. Please contact your dealer and report this issue."),
-    SOFTLOCKOUT(144, "Sorry your appliance did not start. Try again by pressing Flame ON.");
+    OFFLINE(642,
+            "Appliance Offline. The module was unreachable from the server, server was down recently, or WiFi network changed. Can clear on its own"),
+    PILOTFLAME(2, "Pilot Flame Error. Appliance is safely disabled."),
+    PILOTFLAME2(130, "Pilot Flame Error. Pilot Flame failed to rectify. Appliance will be safely disabled."),
+    SOFTLOCKOUT(144,
+            "Appliance Start Error. Appliance failed to activate main burner. Try again to ignite. If persistent or frequent, contact installer for service");
 
     private final int errorCode;
     private final String errorMessage;

@@ -71,9 +71,7 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
         Bridge bridge = getBridge();
         if (bridge != null && bridge.getHandler() instanceof IntellifireBridgeHandler bridgehandler) {
             try {
-                // Retrieve API Key in case it has changed since discovery
                 String apiKey = bridgehandler.getApiKeyProperty(thing.getProperties());
-                updateProperty(IntellifireBindingConstants.PROPERTY_APIKEY, apiKey);
                 String serialNumber = bridgehandler.getSerialNumberProperty(thing.getProperties());
                 String ipAddress = bridgehandler.getIPAddressProperty(thing.getProperties());
                 String httpResponse;

@@ -1,16 +1,23 @@
 
+
+
+ECM Reset command
+
 Things online before successfull local poll?
+Send Command failure causes thing offline.  Recovery?
+with the internet disconnected, the things status showed them as online. When I tried to turn on the flame, the fireplace thing status would switch to offline, and then back to online when the start switch returned to the off position.
+
 
 Combine light and fan into fireplace thing? (light:light, fan:fan)
+Need to dynamically allocate channels
 
 Dimmer light icon brightness doesn't work with 0-3
-Flame height not working in homekit
 
 http vs https
 verify SSL certificate
 
 
-Send Command failure causes thing offline.  Recovery?
+
 
 ******
 
@@ -33,14 +40,6 @@ ReadMe
             403 Not authorized (bad email address or authorization cookie)
             404 Fireplace not found (bad serial number)
             422 Invalid Parameter (invalid command id or command value)
-            
-
-
-**Why use this when using local polling
-Long Poll
-long_poll_url = f"{self.prefix}://iftapi.net/a/{self._serial}/applongpoll"
-Set timeout to 60 seconds
-No change = 408 after 47 seconds - Repeat long poll
-Change = 200 with APPoll Data + Etag header
+           
 
 
