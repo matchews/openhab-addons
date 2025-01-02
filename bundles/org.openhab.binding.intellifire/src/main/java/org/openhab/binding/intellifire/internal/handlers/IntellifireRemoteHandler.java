@@ -24,8 +24,6 @@ import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
-import org.openhab.core.thing.ThingStatus;
-import org.openhab.core.thing.ThingStatusDetail;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.RefreshType;
 import org.slf4j.Logger;
@@ -60,7 +58,6 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
         updateData(IntellifireBindingConstants.CHANNEL_REMOTE_TIMER, Integer.toString(pollData.timeremaining / 60 + 1));
         updateData(IntellifireBindingConstants.CHANNEL_REMOTE_TIMERENABLE, Integer.toString(pollData.timer));
         updateData(IntellifireBindingConstants.CHANNEL_REMOTE_UPTIME, Integer.toString(pollData.remoteUptime));
-        this.updateStatus(ThingStatus.ONLINE);
     }
 
     @Override
@@ -74,7 +71,6 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
                 String apiKey = bridgehandler.getApiKeyProperty(thing.getProperties());
                 String serialNumber = bridgehandler.getSerialNumberProperty(thing.getProperties());
                 String ipAddress = bridgehandler.getIPAddressProperty(thing.getProperties());
-                String httpResponse;
                 String cloudCommand;
                 String localCommand;
                 String valueString;
@@ -89,8 +85,8 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
                         } else {
                             valueString = "0";
                         }
-                        httpResponse = bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand,
-                                localCommand, valueString);
+                        bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
+                                valueString);
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_REMOTE_SETPOINT:
@@ -105,16 +101,16 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
                         } else {
                             valueString = Integer.toString(Math.round(celciusCommand * 100));
                         }
-                        httpResponse = bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand,
-                                localCommand, valueString);
+                        bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
+                                valueString);
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_REMOTE_TIMER:
                         cloudCommand = "timeremaining";
                         localCommand = "time_remaining";
                         valueString = Integer.toString(this.cmdToInt(command, Units.MINUTE) * 60);
-                        httpResponse = bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand,
-                                localCommand, valueString);
+                        bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
+                                valueString);
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_REMOTE_TIMERENABLE:
@@ -122,22 +118,18 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
                         localCommand = "time_remaining";
                         if (command == OnOffType.OFF) {
                             valueString = "0";
-                            httpResponse = bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand,
-                                    localCommand, valueString);
+                            bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
+                                    valueString);
                         } else {
                             valueString = Integer.toString(60 * 60);
-                            httpResponse = bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand,
-                                    localCommand, valueString);
+                            bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
+                                    valueString);
                         }
                         break;
 
                     default:
                         logger.warn("intellifireCommand Unsupported type {}", channelUID);
                         return;
-                }
-                if (!"204".equals(httpResponse)) {
-                    this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
-                    return;
                 }
 
             } catch (IntellifireException e) {
@@ -150,9 +142,6 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
                 logger.error("Intellifire handleCommand exception: {}", e.getMessage());
                 return;
             }
-            this.updateStatus(ThingStatus.ONLINE);
-        } else {
-            this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
         }
     }
 }

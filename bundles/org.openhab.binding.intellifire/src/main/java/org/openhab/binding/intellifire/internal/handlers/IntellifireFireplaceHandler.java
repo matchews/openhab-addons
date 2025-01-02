@@ -22,8 +22,6 @@ import org.openhab.binding.intellifire.internal.IntellifirePollData;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
-import org.openhab.core.thing.ThingStatus;
-import org.openhab.core.thing.ThingStatusDetail;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.RefreshType;
 import org.slf4j.Logger;
@@ -65,7 +63,6 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
         updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_HOT, Integer.toString(pollData.hot));
         updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_COLDCLIMATEPILOT, Integer.toString(pollData.pilot));
         updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_PREPURGE, Integer.toString(pollData.prepurge));
-        this.updateStatus(ThingStatus.ONLINE);
     }
 
     @Override
@@ -79,7 +76,6 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                 String apiKey = bridgehandler.getApiKeyProperty(thing.getProperties());
                 String serialNumber = bridgehandler.getSerialNumberProperty(thing.getProperties());
                 String ipAddress = bridgehandler.getIPAddressProperty(thing.getProperties());
-                String httpResponse;
                 String cloudCommand;
                 String localCommand;
                 String valueString;
@@ -93,8 +89,8 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                         cloudCommand = "power";
                         localCommand = "power";
                         valueString = this.cmdToString(command);
-                        httpResponse = bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand,
-                                localCommand, valueString);
+                        bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
+                                valueString);
                         break;
                     case IntellifireBindingConstants.CHANNEL_FIREPLACE_FLAMEHEIGHT:
                         if (this.cmdToInt(command, null) >= 1 && this.cmdToInt(command, null) <= 5) {
@@ -102,22 +98,22 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                             cloudCommand = "power";
                             localCommand = "power";
                             valueString = "1";
-                            httpResponse = bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand,
-                                    localCommand, valueString);
+                            bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
+                                    valueString);
                             // Set flame height
                             cloudCommand = "height";
                             localCommand = "flame_height";
                             valueString = Integer.toString(this.cmdToInt(command, null) - 1);
-                            httpResponse = bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand,
-                                    localCommand, valueString);
+                            bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
+                                    valueString);
 
                         } else {
                             // Turn off power
                             cloudCommand = "power";
                             localCommand = "power";
                             valueString = "0";
-                            httpResponse = bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand,
-                                    localCommand, valueString);
+                            bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
+                                    valueString);
                         }
 
                         break;
@@ -126,17 +122,12 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                         cloudCommand = "pilot";
                         localCommand = "pilot";
                         valueString = this.cmdToString(command);
-                        httpResponse = bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand,
-                                localCommand, valueString);
+                        bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
+                                valueString);
                         break;
                     default:
                         logger.warn("intellifireCommand Unsupported type {}", channelUID);
                         return;
-                }
-
-                if (!"204".equals(httpResponse)) {
-                    this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
-                    return;
                 }
 
             } catch (IntellifireException e) {
@@ -149,9 +140,6 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                 logger.error("Intellifire handleCommand exception: {}", e.getMessage());
                 return;
             }
-            this.updateStatus(ThingStatus.ONLINE);
-        } else {
-            this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
         }
     }
 }

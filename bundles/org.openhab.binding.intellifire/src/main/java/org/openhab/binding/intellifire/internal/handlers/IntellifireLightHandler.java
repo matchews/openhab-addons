@@ -21,8 +21,6 @@ import org.openhab.binding.intellifire.internal.IntellifirePollData;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
-import org.openhab.core.thing.ThingStatus;
-import org.openhab.core.thing.ThingStatusDetail;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.RefreshType;
 import org.slf4j.Logger;
@@ -45,7 +43,6 @@ public class IntellifireLightHandler extends IntellifireThingHandler {
     public void poll(IntellifirePollData pollData) throws IntellifireException {
         getThing().setProperty(IntellifireBindingConstants.PROPERTY_IPADDRESS, pollData.ipv4Address);
         updateData(IntellifireBindingConstants.CHANNEL_LIGHT, String.valueOf(Math.round(pollData.light * 33.3)));
-        this.updateStatus(ThingStatus.ONLINE);
     }
 
     @Override
@@ -59,7 +56,6 @@ public class IntellifireLightHandler extends IntellifireThingHandler {
                 String apiKey = bridgehandler.getApiKeyProperty(thing.getProperties());
                 String serialNumber = bridgehandler.getSerialNumberProperty(thing.getProperties());
                 String ipAddress = bridgehandler.getIPAddressProperty(thing.getProperties());
-                String httpResponse;
                 String cloudCommand;
                 String localCommand;
                 String valueString;
@@ -69,17 +65,12 @@ public class IntellifireLightHandler extends IntellifireThingHandler {
                         cloudCommand = "light";
                         localCommand = "light";
                         valueString = Integer.toString(this.cmdToInt(command, null) / 33);
-                        httpResponse = bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand,
-                                localCommand, valueString);
+                        bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
+                                valueString);
                         break;
                     default:
                         logger.warn("intellifireCommand Unsupported type {}", channelUID);
                         return;
-                }
-
-                if (!"204".equals(httpResponse)) {
-                    this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
-                    return;
                 }
 
             } catch (IntellifireException e) {
@@ -92,9 +83,6 @@ public class IntellifireLightHandler extends IntellifireThingHandler {
                 logger.error("Intellifire handleCommand exception: {}", e.getMessage());
                 return;
             }
-            this.updateStatus(ThingStatus.ONLINE);
-        } else {
-            this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
         }
     }
 }

@@ -3,10 +3,7 @@
 
 ECM Reset command
 
-Things online before successfull local poll?
-Send Command failure causes thing offline.  Recovery?
-with the internet disconnected, the things status showed them as online. When I tried to turn on the flame, the fireplace thing status would switch to offline, and then back to online when the start switch returned to the off position.
-
+Things online before successful local poll? Can't do this in the init if there are multiple fireplaces.
 
 Combine light and fan into fireplace thing? (light:light, fan:fan)
 Need to dynamically allocate channels
