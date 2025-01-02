@@ -317,7 +317,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         // Try local command
         String localResponse = sendLocalCommand(IPaddress, apiKeyHexString, localCommand, value);
 
-        // 204 Success
+        // 204 Success TODO
         // 403 Incorrect authentication
         // 422 Invalid command name, or other parameter
         // If local command fails, try cloud command.
@@ -460,7 +460,8 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                     return httpResponse.getContentAsString();
                 }
             } catch (ExecutionException | TimeoutException e) {
-                logger.warn("Intellifire {} error:  Try:  {}", getCallingMethod(), (commFailureCount) * 2 + (retry));
+                logger.warn("Intellifire {} timeout. Attempt #{}", getCallingMethod(),
+                        (commFailureCount) * 2 + (retry));
 
                 if (retry >= 2) {
                     return "";
