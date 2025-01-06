@@ -56,6 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * The {@link IntellifireBridgeHandler} is responsible for handling commands, which are
@@ -109,10 +110,13 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                 initPolling(60);
                 return;
             }
-        } catch (InterruptedException e) {
-            logger.error("Intellifire scheduledInitialize exception: {}", e.getMessage());
         } catch (IntellifireException e) {
             logger.error("Intellifire scheduledInitialize exception: {}", e.getMessage());
+        } catch (InterruptedException e) {
+            logger.error("Intellifire scheduledInitialize exception: {}", e.getMessage());
+        } catch (JsonSyntaxException e) {
+            logger.error("JsonSyntaxException: {}", e.getMessage());
+            return;
         }
     }
 
@@ -131,7 +135,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         }
     }
 
-    public synchronized boolean getUsername() throws InterruptedException {
+    public synchronized boolean getUsername() throws InterruptedException, JsonSyntaxException {
         final Gson gson = new Gson();
 
         String httpResponse = httpResponseContent(IntellifireBindingConstants.URL_GETUSERNAME, HttpMethod.POST,
@@ -164,7 +168,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         }
     }
 
-    public synchronized boolean getAccountLocations() throws InterruptedException {
+    public synchronized boolean getAccountLocations() throws InterruptedException, JsonSyntaxException {
         final Gson gson = new Gson();
 
         String httpResponse = httpResponseContent(IntellifireBindingConstants.URL_ENUMLOCATIONS, HttpMethod.POST,
@@ -179,7 +183,8 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         }
     }
 
-    public synchronized @Nullable IntellifireLocation getFireplaces(String locationID) throws InterruptedException {
+    public synchronized @Nullable IntellifireLocation getFireplaces(String locationID)
+            throws InterruptedException, JsonSyntaxException {
         final Gson gson = new Gson();
 
         String httpResponse = httpResponseContent("http://iftapi.net/a/enumfireplaces?location_id=" + locationID,
@@ -219,11 +224,14 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                     commFailureCount = 0;
                     updateStatus(ThingStatus.ONLINE);
                 }
+            } catch (IntellifireException e) {
+                logger.error("Intellifire initPolling exception: {}", e.getMessage());
+                return;
             } catch (InterruptedException e) {
                 logger.error("Intellifire initPolling exception: {}", e.getMessage());
                 return;
-            } catch (IntellifireException e) {
-                logger.error("Intellifire initPolling exception: {}", e.getMessage());
+            } catch (JsonSyntaxException e) {
+                logger.error("JsonSyntaxException: {}", e.getMessage());
                 return;
             }
         }, initalDelay, config.refreshInterval, TimeUnit.SECONDS);
@@ -239,7 +247,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         }
     }
 
-    public boolean poll(boolean cloudPool) throws IntellifireException, InterruptedException {
+    public boolean poll(boolean cloudPool) throws IntellifireException, InterruptedException, JsonSyntaxException {
         boolean failureFlag = false;
 
         // Retrieve poll data for each fireplace
@@ -291,7 +299,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
     }
 
     public synchronized @Nullable IntellifirePollData cloudPollFireplace(String serialNumber)
-            throws InterruptedException {
+            throws InterruptedException, JsonSyntaxException {
         final Gson gson = new Gson();
 
         String httpResponse = httpResponseContent("http://iftapi.net/a/" + serialNumber + "/apppoll", HttpMethod.POST,
@@ -300,7 +308,8 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         return pollData;
     }
 
-    public synchronized @Nullable IntellifirePollData localPollFireplace(String IPaddress) throws InterruptedException {
+    public synchronized @Nullable IntellifirePollData localPollFireplace(String IPaddress)
+            throws InterruptedException, JsonSyntaxException {
         final Gson gson = new Gson();
 
         String httpResponse = httpResponseContent("http://" + IPaddress + "/poll", HttpMethod.GET,
