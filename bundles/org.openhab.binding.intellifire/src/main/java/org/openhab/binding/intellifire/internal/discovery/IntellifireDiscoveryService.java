@@ -92,38 +92,21 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
                     properties.put(IntellifireBindingConstants.PROPERTY_IPADDRESS,
                             account.locations.get(i).fireplaces.fireplaces.get(j).pollData.ipv4Address);
 
+                    if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.featureFan == 1) {
+                        properties.put(IntellifireBindingConstants.PROPERTY_FIREPLACE_FEATURE_FAN, 1);
+                    } else {
+                        properties.put(IntellifireBindingConstants.PROPERTY_FIREPLACE_FEATURE_FAN, 0);
+                    }
+
+                    if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.featureLight == 1) {
+                        properties.put(IntellifireBindingConstants.PROPERTY_FIREPLACE_FEATURE_LIGHT, 1);
+                    } else {
+                        properties.put(IntellifireBindingConstants.PROPERTY_FIREPLACE_FEATURE_LIGHT, 0);
+                    }
+
                     // Add device
                     onDeviceDiscovered(IntellifireBindingConstants.THING_TYPE_FIREPLACE, thingName + " Fireplace",
                             properties);
-
-                    // Fan
-                    if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.featureFan == 1) {
-                        properties.clear();
-                        properties.put(IntellifireBindingConstants.PROPERTY_APIKEY,
-                                account.locations.get(i).fireplaces.fireplaces.get(j).apiKey);
-                        properties.put(IntellifireBindingConstants.PROPERTY_IPADDRESS,
-                                account.locations.get(i).fireplaces.fireplaces.get(j).pollData.ipv4Address);
-                        properties.put(IntellifireBindingConstants.PROPERTY_LOCATIONID, locationID);
-                        properties.put(IntellifireBindingConstants.PROPERTY_SERIALNUMBER, serialNumber);
-                        uniqueId = String.format("%s-%s-%s", locationID, serialNumber, "fan");
-                        properties.put(IntellifireBindingConstants.PROPERTY_UNIQUEID, uniqueId);
-                        onDeviceDiscovered(IntellifireBindingConstants.THING_TYPE_FAN, thingName + " Fan", properties);
-                    }
-
-                    // Light
-                    if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.featureLight == 1) {
-                        properties.clear();
-                        properties.put(IntellifireBindingConstants.PROPERTY_APIKEY,
-                                account.locations.get(i).fireplaces.fireplaces.get(j).apiKey);
-                        properties.put(IntellifireBindingConstants.PROPERTY_IPADDRESS,
-                                account.locations.get(i).fireplaces.fireplaces.get(j).pollData.ipv4Address);
-                        properties.put(IntellifireBindingConstants.PROPERTY_LOCATIONID, locationID);
-                        properties.put(IntellifireBindingConstants.PROPERTY_SERIALNUMBER, serialNumber);
-                        uniqueId = String.format("%s-%s-%s", locationID, serialNumber, "light");
-                        properties.put(IntellifireBindingConstants.PROPERTY_UNIQUEID, uniqueId);
-                        onDeviceDiscovered(IntellifireBindingConstants.THING_TYPE_LIGHT, thingName + " Light",
-                                properties);
-                    }
 
                     // Remote
                     if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.featureThermostat == 1) {
@@ -141,7 +124,9 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
                     }
                 }
             }
-        } catch (InterruptedException e) {
+        } catch (
+
+        InterruptedException e) {
             logger.error("Discovery Error", e);
         }
     }

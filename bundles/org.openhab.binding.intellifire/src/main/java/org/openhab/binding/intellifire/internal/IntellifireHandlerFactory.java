@@ -20,9 +20,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.client.HttpClient;
 import org.openhab.binding.intellifire.internal.handlers.IntellifireBridgeHandler;
-import org.openhab.binding.intellifire.internal.handlers.IntellifireFanHandler;
 import org.openhab.binding.intellifire.internal.handlers.IntellifireFireplaceHandler;
-import org.openhab.binding.intellifire.internal.handlers.IntellifireLightHandler;
 import org.openhab.binding.intellifire.internal.handlers.IntellifireRemoteHandler;
 import org.openhab.core.io.net.http.HttpClientFactory;
 import org.openhab.core.thing.Bridge;
@@ -66,14 +64,8 @@ public class IntellifireHandlerFactory extends BaseThingHandlerFactory {
         if (thing instanceof Bridge && THING_TYPE_ACCOUNT_BRIDGE.equals(thingTypeUID)) {
             return new IntellifireBridgeHandler((Bridge) thing, httpClient);
         }
-        if (thing instanceof Thing && THING_TYPE_FAN.equals(thingTypeUID)) {
-            return new IntellifireFanHandler(thing);
-        }
         if (thing instanceof Thing && THING_TYPE_FIREPLACE.equals(thingTypeUID)) {
             return new IntellifireFireplaceHandler(thing);
-        }
-        if (thing instanceof Thing && THING_TYPE_LIGHT.equals(thingTypeUID)) {
-            return new IntellifireLightHandler(thing);
         }
         if (thing instanceof Thing && THING_TYPE_REMOTE.equals(thingTypeUID)) {
             return new IntellifireRemoteHandler(thing);

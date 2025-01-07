@@ -1,7 +1,4 @@
-
-
-
-ECM Reset command
+ECM Reset command only resets the WFM and will not solve a ECM Offline error
 
 Things online before successful local poll? Can't do this in the init if there are multiple fireplaces.
 
@@ -15,9 +12,7 @@ verify SSL certificate
 
 
 
-
 ******
-
 HttpResponse error messages need to differentiate between internet connection and local connection.
 Might need a config option to select local, cloud, or both?
 ******

@@ -13,6 +13,7 @@
 package org.openhab.binding.intellifire.internal.handlers;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.intellifire.internal.IntellifireBindingConstants;
@@ -20,8 +21,13 @@ import org.openhab.binding.intellifire.internal.IntellifireError;
 import org.openhab.binding.intellifire.internal.IntellifireException;
 import org.openhab.binding.intellifire.internal.IntellifirePollData;
 import org.openhab.core.thing.Bridge;
+import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
+import org.openhab.core.thing.ThingStatus;
+import org.openhab.core.thing.binding.builder.ChannelBuilder;
+import org.openhab.core.thing.binding.builder.ThingBuilder;
+import org.openhab.core.thing.type.ChannelTypeUID;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.RefreshType;
 import org.slf4j.Logger;
@@ -41,11 +47,52 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
     }
 
     @Override
+    public void initialize() {
+
+        Map<String, String> properties = thing.getProperties();
+        String fanFeature = properties.get(IntellifireBindingConstants.PROPERTY_FIREPLACE_FEATURE_FAN);
+        String lightFeature = properties.get(IntellifireBindingConstants.PROPERTY_FIREPLACE_FEATURE_LIGHT);
+
+        if ("1".equals(fanFeature)) {
+            addChannel(IntellifireBindingConstants.CHANNEL_FIREPLACE_FAN, IntellifireBindingConstants.CHANNEL_TYPE_FAN,
+                    "Dimmer");
+        }
+        if ("1".equals(lightFeature)) {
+            addChannel(IntellifireBindingConstants.CHANNEL_FIREPLACE_LIGHT,
+                    IntellifireBindingConstants.CHANNEL_TYPE_LIGHT, "Dimmer");
+        }
+        updateStatus(ThingStatus.ONLINE);
+    }
+
+    protected void addChannel(String channelUID, String channelType, String itemType) {
+        if (getThing().getChannel(channelUID) == null) {
+            final ChannelTypeUID channelTypeUID = new ChannelTypeUID(channelType);
+            ThingBuilder thingBuilder = editThing();
+            Channel channel = ChannelBuilder.create(new ChannelUID(getThing().getUID(), channelUID), itemType)
+                    .withType(channelTypeUID).build();
+            thingBuilder.withChannel(channel);
+            updateThing(thingBuilder.build());
+        }
+    }
+
+    @Override
     public void poll(IntellifirePollData pollData) throws IntellifireException {
         getThing().setProperty(IntellifireBindingConstants.PROPERTY_IPADDRESS, pollData.ipv4Address);
-        updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_POWER, Integer.toString(pollData.power));
         updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_BATTERY, Integer.toString(pollData.battery));
         updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_ECMLATENCY, Integer.toString(pollData.ecmLatency));
+
+        // If fan exists
+        if (pollData.featureFan == 1) {
+            updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_FAN, Integer.toString(pollData.fanspeed * 25));
+        }
+
+        // If light exists
+        if (pollData.featureLight == 1) {
+            updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_LIGHT,
+                    String.valueOf(Math.round(pollData.light * 33.3)));
+        }
+
+        updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_POWER, Integer.toString(pollData.power));
 
         String errors = "";
         for (int i = 0; i < pollData.errors.size(); i++) {
@@ -85,10 +132,17 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                 bridgehandler.initPolling(5);
 
                 switch (channelUID.getId()) {
-                    case IntellifireBindingConstants.CHANNEL_FIREPLACE_POWER:
-                        cloudCommand = "power";
-                        localCommand = "power";
+                    case IntellifireBindingConstants.CHANNEL_FIREPLACE_COLDCLIMATEPILOT:
+                        cloudCommand = "pilot";
+                        localCommand = "pilot";
                         valueString = this.cmdToString(command);
+                        bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
+                                valueString);
+                        break;
+                    case IntellifireBindingConstants.CHANNEL_FIREPLACE_FAN:
+                        cloudCommand = "fanspeed";
+                        localCommand = "fan_speed";
+                        valueString = Integer.toString(this.cmdToInt(command, null) / 25);
                         bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
                                 valueString);
                         break;
@@ -106,7 +160,6 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                             valueString = Integer.toString(this.cmdToInt(command, null) - 1);
                             bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
                                     valueString);
-
                         } else {
                             // Turn off power
                             cloudCommand = "power";
@@ -115,12 +168,17 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                             bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
                                     valueString);
                         }
-
                         break;
-
-                    case IntellifireBindingConstants.CHANNEL_FIREPLACE_COLDCLIMATEPILOT:
-                        cloudCommand = "pilot";
-                        localCommand = "pilot";
+                    case IntellifireBindingConstants.CHANNEL_FIREPLACE_LIGHT:
+                        cloudCommand = "light";
+                        localCommand = "light";
+                        valueString = Integer.toString(this.cmdToInt(command, null) / 33);
+                        bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
+                                valueString);
+                        break;
+                    case IntellifireBindingConstants.CHANNEL_FIREPLACE_POWER:
+                        cloudCommand = "power";
+                        localCommand = "power";
                         valueString = this.cmdToString(command);
                         bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
                                 valueString);
@@ -129,7 +187,6 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                         logger.warn("intellifireCommand Unsupported type {}", channelUID);
                         return;
                 }
-
             } catch (IntellifireException e) {
                 logger.error("Intellifire handleCommand exception: {}", e.getMessage());
                 return;

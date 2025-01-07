@@ -29,7 +29,7 @@ public class IntellifireBindingConstants {
 
     private static final String BINDING_ID = "intellifire";
 
-    // List of all Thing Type UIDs
+    // Thing Type UIDs
     public static final ThingTypeUID THING_TYPE_ACCOUNT_BRIDGE = new ThingTypeUID(BINDING_ID, "account");
     public static final ThingTypeUID THING_TYPE_FAN = new ThingTypeUID(BINDING_ID, "fan");
     public static final ThingTypeUID THING_TYPE_FIREPLACE = new ThingTypeUID(BINDING_ID, "fireplace");
@@ -42,17 +42,22 @@ public class IntellifireBindingConstants {
             IntellifireBindingConstants.THING_TYPE_FIREPLACE, IntellifireBindingConstants.THING_TYPE_LIGHT,
             IntellifireBindingConstants.THING_TYPE_REMOTE);
 
-    // List of all Channel ids
-    public static final String CHANNEL_FAN = "fan";
-    public static final String CHANNEL_FIREPLACE_POWER = "power";
+    // Channel typeIDs
+    public static final String CHANNEL_TYPE_FAN = "intellifire:fan";
+    public static final String CHANNEL_TYPE_LIGHT = "intellifire:light";
+
+    // Channel ids
     public static final String CHANNEL_FIREPLACE_BATTERY = "battery";
+    public static final String CHANNEL_FIREPLACE_COLDCLIMATEPILOT = "coldClimatePilot";
     public static final String CHANNEL_FIREPLACE_ECMLATENCY = "ecmLatency";
     public static final String CHANNEL_FIREPLACE_ERRORS = "errors";
+    public static final String CHANNEL_FIREPLACE_FAN = "fan";
     public static final String CHANNEL_FIREPLACE_FLAMEHEIGHT = "flameHeight";
     public static final String CHANNEL_FIREPLACE_HOT = "hot";
-    public static final String CHANNEL_FIREPLACE_COLDCLIMATEPILOT = "coldClimatePilot";
+    public static final String CHANNEL_FIREPLACE_LIGHT = "light";
+    public static final String CHANNEL_FIREPLACE_POWER = "power";
+
     public static final String CHANNEL_FIREPLACE_PREPURGE = "prePurge";
-    public static final String CHANNEL_LIGHT = "light";
     public static final String CHANNEL_REMOTE_CONNECTIONQUALITY = "remoteConnectionQuality";
     public static final String CHANNEL_REMOTE_DOWNTIME = "remoteDowntime";
     public static final String CHANNEL_REMOTE_ENABLE = "thermostatEnable";
@@ -70,6 +75,8 @@ public class IntellifireBindingConstants {
     public static final String PROPERTY_UNIQUEID = "Unique ID";
     public static final String PROPERTY_FIREPLACE_BRAND = "Brand";
     public static final String PROPERTY_FIREPLACE_FIRMWAREVERSION = "Firmware Version";
+    public static final String PROPERTY_FIREPLACE_FEATURE_FAN = "Fan Feature";
+    public static final String PROPERTY_FIREPLACE_FEATURE_LIGHT = "Light Feature";
     public static final String PROPERTY_FIREPLACE_MODEL = "Model";
     public static final String PROPERTY_FIREPLACE_NAME = "Name";
 
