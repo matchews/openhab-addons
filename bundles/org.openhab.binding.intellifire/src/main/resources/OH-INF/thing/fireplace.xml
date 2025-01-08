@@ -48,6 +48,14 @@
 		</state>
 	</channel-type>
 
+    <channel-type id="coldClimatePilot">
+        <item-type>Switch</item-type>
+        <label>Cold Climate Pilot</label>
+        <category>Switch</category>
+        <state readOnly="false">
+        </state>
+    </channel-type>
+    
 	<channel-type id="ecmLatency">
 		<item-type>Number</item-type>
 		<label>ECM Latency</label>
@@ -64,6 +72,13 @@
 		</state>
 	</channel-type>
 
+    <channel-type id="fan">
+        <item-type>Dimmer</item-type>
+        <label>Fan</label>
+        <category>Fan</category>
+        <state min="0" max="100" step="25" pattern="%d %unit%" readOnly="false"/>
+    </channel-type>
+    
 	<channel-type id="flameHeight">
 		<item-type>Dimmer</item-type>
 		<label>Flame</label>
@@ -79,21 +94,12 @@
 		</state>
 	</channel-type>
 
-	<channel-type id="coldClimatePilot">
-		<item-type>Switch</item-type>
-		<label>Cold Climate Pilot</label>
-		<category>Switch</category>
-		<state readOnly="false">
-		</state>
-	</channel-type>
-
-	<channel-type id="prePurge">
-		<item-type>Switch</item-type>
-		<label>Pre Purge</label>
-		<category>Switch</category>
-		<state readOnly="true">
-		</state>
-	</channel-type>
+    <channel-type id="light">
+        <item-type>Dimmer</item-type>
+        <label>Light</label>
+        <category>Light</category>
+        <state min="0" max="100" step="33" pattern="%d %unit%" readOnly="false"/>
+    </channel-type>
 
 	<channel-type id="power">
 		<item-type>Switch</item-type>
@@ -102,4 +108,12 @@
 		<state readOnly="false">
 		</state>
 	</channel-type>
+
+    <channel-type id="prePurge">
+        <item-type>Switch</item-type>
+        <label>Pre Purge</label>
+        <category>Switch</category>
+        <state readOnly="true">
+        </state>
+    </channel-type>
 </thing:thing-descriptions>
