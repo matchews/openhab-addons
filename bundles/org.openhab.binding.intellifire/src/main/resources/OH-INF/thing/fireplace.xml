@@ -14,15 +14,15 @@
 		<category>HVAC</category>
 
 		<channels>
-			<channel id="power" typeId="power"/>
+
 			<channel id="battery" typeId="battery"/>
+			<channel id="coldClimatePilot" typeId="coldClimatePilot"/>
 			<channel id="ecmLatency" typeId="ecmLatency"/>
 			<channel id="errors" typeId="errors"/>
 			<channel id="flameHeight" typeId="flameHeight"/>
 			<channel id="hot" typeId="hot"/>
-			<channel id="coldClimatePilot" typeId="coldClimatePilot"/>
+			<channel id="power" typeId="power"/>
 			<channel id="prePurge" typeId="prePurge"/>
-
 		</channels>
 
 		<properties>

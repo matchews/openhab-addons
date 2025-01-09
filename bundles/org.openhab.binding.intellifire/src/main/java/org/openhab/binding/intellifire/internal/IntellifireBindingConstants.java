@@ -56,8 +56,8 @@ public class IntellifireBindingConstants {
     public static final String CHANNEL_FIREPLACE_HOT = "hot";
     public static final String CHANNEL_FIREPLACE_LIGHT = "light";
     public static final String CHANNEL_FIREPLACE_POWER = "power";
-
     public static final String CHANNEL_FIREPLACE_PREPURGE = "prePurge";
+
     public static final String CHANNEL_REMOTE_CONNECTIONQUALITY = "remoteConnectionQuality";
     public static final String CHANNEL_REMOTE_DOWNTIME = "remoteDowntime";
     public static final String CHANNEL_REMOTE_ENABLE = "thermostatEnable";
