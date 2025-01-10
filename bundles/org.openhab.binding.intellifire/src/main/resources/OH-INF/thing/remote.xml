@@ -9,8 +9,8 @@
 			<bridge-type-ref id="account"/>
 		</supported-bridge-type-refs>
 
-		<label>Intellifire thermostat</label>
-		<description>Thermostat thing for Intellifire IFT-RC400 remote thermostat</description>
+		<label>Intellifire Remote</label>
+		<description>Remote thing for Intellifire IFT-RC400 remote thermostat</description>
 		<category>HVAC</category>
 
 		<channels>

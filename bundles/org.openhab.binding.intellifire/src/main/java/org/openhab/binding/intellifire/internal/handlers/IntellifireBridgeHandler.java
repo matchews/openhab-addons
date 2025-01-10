@@ -326,7 +326,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         // Try local command
         String localResponse = sendLocalCommand(IPaddress, apiKeyHexString, localCommand, value);
 
-        // 204 Success TODO
+        // 204 Success
         // 403 Incorrect authentication
         // 422 Invalid command name, or other parameter
         // If local command fails, try cloud command.

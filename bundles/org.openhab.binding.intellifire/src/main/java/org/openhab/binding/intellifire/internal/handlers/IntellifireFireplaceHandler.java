@@ -48,7 +48,6 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
 
     @Override
     public void initialize() {
-
         Map<String, String> properties = thing.getProperties();
         String fanFeature = properties.get(IntellifireBindingConstants.PROPERTY_FIREPLACE_FEATURE_FAN);
         String lightFeature = properties.get(IntellifireBindingConstants.PROPERTY_FIREPLACE_FEATURE_LIGHT);
