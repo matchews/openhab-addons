@@ -1,95 +1,74 @@
-# intellifire Binding
+# Intellifire Binding
 
-_Give some details about what this binding is meant for - a protocol, system, specific device._
+This binding integrates the Intellifire IFT-ECM Electronic Control Module and IFT-ACM Auxilliary Control Module using the IFT-WFM Wi-Fi Module. 
 
-_If possible, provide some resources like pictures (only PNG is supported currently), a video, etc. to give an impression of what can be done with this binding._
-_You can place such resources into a `doc` folder next to this README.md._
-
-_Put each sentence in a separate line to improve readability of diffs._
+This Wi-Fi module is used in Majestic, Heat & Glo, Heatilator, Quadra-Fire, Vermont Castings, Monessen and SimpliFire fireplaces. 
+The IFT-WFM Wi-Fi module will work along side of the IFT-RFM and corresponding IFT-RC400 touchscreen remote control.
 
 ## Supported Things
 
-_Please describe the different supported things / devices including their ThingTypeUID within this section._
-_Which different types are supported, which models were tested etc.?_
-_Note that it is planned to generate some part of this based on the XML files within ```src/main/resources/OH-INF/thing``` of your binding._
+The table below lists the Intellifire binding thing types:
 
-- `bridge`: Short description of the Bridge, if any
-- `sample`: Short description of the Thing with the ThingTypeUID `sample`
+| Things                       | Description                                                                     | Thing Type    |
+|------------------------------|---------------------------------------------------------------------------------|---------------|
+| Intellifire Account          | Connection to Intellifire's Server                                              | bridge        |
+| Fireplace                    | Fireplace (IFT-ECM)                                                             | fireplace     |
+| Remote                       | Remote (IFT-RC400)                                                              | remote        |
 
 ## Discovery
 
-_Describe the available auto-discovery features here._
-_Mention for what it works and what needs to be kept in mind when using it._
-
-## Binding Configuration
-
-_If your binding requires or supports general configuration settings, please create a folder ```cfg``` and place the configuration file ```<bindingId>.cfg``` inside it._
-_In this section, you should link to this file and provide some information about the options._
-_The file could e.g. look like:_
-
-```
-# Configuration for the intellifire Binding
-#
-# Default secret key for the pairing of the intellifire Thing.
-# It has to be between 10-40 (alphanumeric) characters.
-# This may be changed by the user for security reasons.
-secret=openHABSecret
-```
-
-_Note that it is planned to generate some part of this based on the information that is available within ```src/main/resources/OH-INF/binding``` of your binding._
-
-_If your binding does not offer any generic configurations, you can remove this section completely._
+The binding will automatically discover the Intellifire fireplace things from the cloud server using your Intellifire credentials.
+The cloud server will provide the local IP of each fireplace for local polling and further thing discovery.
 
 ## Thing Configuration
 
-_Describe what is needed to manually configure a thing, either through the UI or via a thing-file._
-_This should be mainly about its mandatory and optional configuration parameters._
+Intellifire Account Parameters:
 
-_Note that it is planned to generate some part of this based on the XML files within ```src/main/resources/OH-INF/thing``` of your binding._
-
-### `sample` Thing Configuration
-
-| Name            | Type    | Description                           | Default | Required | Advanced |
-|-----------------|---------|---------------------------------------|---------|----------|----------|
-| hostname        | text    | Hostname or IP address of the device  | N/A     | yes      | no       |
-| password        | text    | Password to access the device         | N/A     | yes      | no       |
-| refreshInterval | integer | Interval the device is polled in sec. | 600     | no       | yes      |
+| Name             | Type    | Description                           | Default | Required | Advanced |
+|------------------|---------|---------------------------------------|---------|----------|----------|
+| Username         | text    | Your Intellifire User Name            | N/A     | yes      | no       |
+| Password         | text    | Your Intellifire Password             | N/A     | yes      | no       |
+| Refresh Interval | integer | Interval the device is polled in sec. | 15      | yes      | yes      |
 
 ## Channels
 
-_Here you should provide information about available channel types, what their meaning is and how they can be used._
+### Fireplace Channels
 
-_Note that it is planned to generate some part of this based on the XML files within ```src/main/resources/OH-INF/thing``` of your binding._
+| Channel Type ID   | Item Type          | Description                      | Read Write |
+|-------------------|--------------------|----------------------------------|:----------:|
+| battery           | Switch             | Battery Status                   |      R     |
+| coldClimatePilot  | Switch             | Cold Climate Pilot               |     R/W    |
+| ecmLatency        | Number             | ECM Latency                      |      R     |
+| errors            | String             | Errors                           |      R     |
+| fan               | Dimmer             | Fan (0-4) (If equipped)          |     R/W    |
+| flameHeight       | Dimmer             | Flame Height (0-5)               |      R     |
+| hot               | Switch             | Appliance is hot                 |      R     |
+| light             | Dimmer             | Light (0-3) (If equipped)        |     R/W    |
+| power             | Switch             | Flame Power                      |     R/W    |
+| prePurge          | Switch             | Power Vent Pre-purge             |      R     |
 
-| Channel | Type   | Read/Write | Description                 |
-|---------|--------|------------|-----------------------------|
-| control | Switch | RW         | This is the control channel |
+### Remote Channels
+
+| Channel Type ID  -------- | Item Type           | Description                  | Read Write |
+|---------------------------|---------------------|------------------------------|:----------:|
+| remoteConnectionQuality   | Number              | Remote Connection Quality    |      R     |
+| remoteDowntime            | Number              | Remote Downtime              |      R     |
+| remoteUptime              | Number              | Remote Uptime                |      R     |
+| roomTemperature           | Number:Temperature  | Room Temperature             |      R     |
+| thermostatEnable          | Switch              | Thermostat Enable            |     R/W    |
+| thermostatSetpoint        | Number:Temperature  | Thermostat Setpoint          |     R/W    |
+| timer                     | Number:Time         | Timer                        |     R/W    |
+| timerEnable               | Switch              | Timer Enable                 |     R/W    |
 
 ## Full Example
 
-_Provide a full usage example based on textual configuration files._
-_*.things, *.items examples are mandatory as textual configuration is well used by many users._
-_*.sitemap examples are optional._
+Ensure the fireplace is fully functional using the Intellifire mobile application.
+After installing the binding, you will need to manually add the Intellifire Account thing and enter your credentials.
+All things can be automatically discovered by scanning the account bridge.
+Goto the inbox and add the things.
 
-### Thing Configuration
-
-```java
-Example thing configuration goes here.
-```
-
-### Item Configuration
-
-```java
-Example item configuration goes here.
-```
-
-### Sitemap Configuration
-
-```perl
-Optional Sitemap configuration goes here.
-Remove this section, if not needed.
-```
-
-## Any custom content here!
-
-_Feel free to add additional sections for whatever you think should also be mentioned about your binding!_
+The account thing will login to the cloud server to retreive a list of locations and fireplaces at each location.
+It will then cloud poll each fireplace once.
+It will then locally poll each fireplace continuously at the account refresh interval.
+If the local polling fails a number of attempts, the polling will stop, the account bridge will reset and begin the cloud login process again.
+Please note the local polling currently has a cloud dependancy in the IFT-WFM and will not function without cloud connectivity.
