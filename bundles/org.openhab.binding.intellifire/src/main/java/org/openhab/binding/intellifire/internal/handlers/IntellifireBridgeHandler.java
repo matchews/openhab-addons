@@ -176,7 +176,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         IntellifireAccount accountData = gson.fromJson(httpResponse, IntellifireAccount.class);
 
         if (accountData != null) {
-            account = accountData;
+            account.locations = accountData.locations;
             return true;
         } else {
             return false;

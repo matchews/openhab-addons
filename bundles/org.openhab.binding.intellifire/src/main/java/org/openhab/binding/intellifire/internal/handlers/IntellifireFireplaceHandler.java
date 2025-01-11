@@ -104,7 +104,7 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
             updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_FLAMEHEIGHT, "0");
         } else {
             updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_FLAMEHEIGHT,
-                    Integer.toString(pollData.height + 1));
+                    Integer.toString(pollData.height * 20));
         }
         updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_HOT, Integer.toString(pollData.hot));
         updateData(IntellifireBindingConstants.CHANNEL_FIREPLACE_COLDCLIMATEPILOT, Integer.toString(pollData.pilot));
@@ -146,7 +146,7 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                                 valueString);
                         break;
                     case IntellifireBindingConstants.CHANNEL_FIREPLACE_FLAMEHEIGHT:
-                        if (this.cmdToInt(command, null) >= 1 && this.cmdToInt(command, null) <= 5) {
+                        if (this.cmdToInt(command, null) >= 1 && this.cmdToInt(command, null) <= 100) {
                             // Turn on power
                             cloudCommand = "power";
                             localCommand = "power";
@@ -156,7 +156,7 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                             // Set flame height
                             cloudCommand = "height";
                             localCommand = "flame_height";
-                            valueString = Integer.toString(this.cmdToInt(command, null) - 1);
+                            valueString = Integer.toString(this.cmdToInt(command, null) / 20);
                             bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
                                     valueString);
                         } else {

@@ -2,36 +2,8 @@ ECM Reset command only resets the WFM and will not solve a ECM Offline error
 
 Things online before successful local poll? Can't do this in the init if there are multiple fireplaces.
 
-Combine light and fan into fireplace thing? (light:light, fan:fan)
-Need to dynamically allocate channels
-
-Dimmer light icon brightness doesn't work with 0-3
-
-http vs https
-verify SSL certificate
-
-
-
-******
-HttpResponse error messages need to differentiate between internet connection and local connection.
-Might need a config option to select local, cloud, or both?
-******
-
-
 Limit outgoing command frequency so we don't overload the server
 
 Logging
-ReadMe
-    Timer must have unit metatadata set to minutes
-    
 
-2024-04-16 06:37:23.379 [WARN ] [e.internal.SseItemStatesEventBuilder] - Attempting to send a state update of an item which doesn't exist: __ob__
-2024-04-16 06:37:23.379 [WARN ] [e.internal.SseItemStatesEventBuilder] - Attempting to send a state update of an item which doesn't exist: __v_isRef
-
-            204 Success – command accepted
-            403 Not authorized (bad email address or authorization cookie)
-            404 Fireplace not found (bad serial number)
-            422 Invalid Parameter (invalid command id or command value)
-           
-
-
+Timer must have unit metatadata set to minutes

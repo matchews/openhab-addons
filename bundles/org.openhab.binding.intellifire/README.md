@@ -34,18 +34,18 @@ Intellifire Account Parameters:
 
 ### Fireplace Channels
 
-| Channel Type ID   | Item Type          | Description                      | Read Write |
-|-------------------|--------------------|----------------------------------|:----------:|
-| battery           | Switch             | Battery Status                   |      R     |
-| coldClimatePilot  | Switch             | Cold Climate Pilot               |     R/W    |
-| ecmLatency        | Number             | ECM Latency                      |      R     |
-| errors            | String             | Errors                           |      R     |
-| fan               | Dimmer             | Fan (0-4) (If equipped)          |     R/W    |
-| flameHeight       | Dimmer             | Flame Height (0-5)               |      R     |
-| hot               | Switch             | Appliance is hot                 |      R     |
-| light             | Dimmer             | Light (0-3) (If equipped)        |     R/W    |
-| power             | Switch             | Flame Power                      |     R/W    |
-| prePurge          | Switch             | Power Vent Pre-purge             |      R     |
+| Channel Type ID   | Item Type          | Description                          | Read Write |
+|-------------------|--------------------|--------------------------------------|:----------:|
+| battery           | Switch             | Battery Status                       |      R     |
+| coldClimatePilot  | Switch             | Cold Climate Pilot                   |     R/W    |
+| ecmLatency        | Number             | ECM Latency                          |      R     |
+| errors            | String             | Errors                               |      R     |
+| fan               | Dimmer             | Fan (0-100, step 25) (If equipped)   |     R/W    |
+| flameHeight       | Dimmer             | Flame Height (0-100, step 20)        |      R     |
+| hot               | Switch             | Appliance is hot                     |      R     |
+| light             | Dimmer             | Light (0-100, step 33) (If equipped) |     R/W    |
+| power             | Switch             | Flame Power                          |     R/W    |
+| prePurge          | Switch             | Power Vent Pre-purge                 |      R     |
 
 ### Remote Channels
 
@@ -57,8 +57,10 @@ Intellifire Account Parameters:
 | roomTemperature           | Number:Temperature  | Room Temperature             |      R     |
 | thermostatEnable          | Switch              | Thermostat Enable            |     R/W    |
 | thermostatSetpoint        | Number:Temperature  | Thermostat Setpoint          |     R/W    |
-| timer                     | Number:Time         | Timer                        |     R/W    |
+| timer*                    | Number:Time         | Timer                        |     R/W    |
 | timerEnable               | Switch              | Timer Enable                 |     R/W    |
+
+*timer channel should have unit metadata set to "min" (minutes)
 
 ## Full Example
 

@@ -83,7 +83,7 @@
 		<item-type>Dimmer</item-type>
 		<label>Flame</label>
 		<category>Fire</category>
-		<state min="0" max="5" step="1" pattern="%d %unit%" readOnly="false"/>
+		<state min="0" max="100" step="20" pattern="%d %unit%" readOnly="false"/>
 	</channel-type>
 
 	<channel-type id="hot">
