@@ -3,7 +3,3 @@ ECM Reset command only resets the WFM and will not solve a ECM Offline error
 Things online before successful local poll? Can't do this in the init if there are multiple fireplaces.
 
 Limit outgoing command frequency so we don't overload the server
-
-Logging
-
-Timer must have unit metatadata set to minutes
