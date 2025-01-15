@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -38,6 +39,7 @@ import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.HttpVersion;
 import org.openhab.binding.intellifire.internal.IntellifireAccount;
 import org.openhab.binding.intellifire.internal.IntellifireBindingConstants;
+import org.openhab.binding.intellifire.internal.IntellifireCommand;
 import org.openhab.binding.intellifire.internal.IntellifireConfiguration;
 import org.openhab.binding.intellifire.internal.IntellifireException;
 import org.openhab.binding.intellifire.internal.IntellifireLocation;
@@ -71,9 +73,11 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
     private int commFailureCount;
     private @Nullable ScheduledFuture<?> initializeFuture;
     private @Nullable ScheduledFuture<?> pollTelemetryFuture;
+    private @Nullable ScheduledFuture<?> sendCommandFuture;
     private @Nullable CookieStore cs;
     public IntellifireAccount account = new IntellifireAccount();
     private IntellifireConfiguration config = new IntellifireConfiguration();
+    private final LinkedBlockingQueue<IntellifireCommand> commandQueue = new LinkedBlockingQueue<>(20);
 
     @Override
     public Collection<Class<? extends ThingHandlerService>> getServices() {
@@ -194,7 +198,8 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         return fireplaces;
     }
 
-    public synchronized void initPolling(int initalDelay) {
+    public synchronized void initPolling(int initialDelay) {
+        logger.debug("Initializing Polling");
         pollTelemetryFuture = scheduler.scheduleWithFixedDelay(() -> {
             try {
                 logger.trace("Intellifire initPolling");
@@ -234,11 +239,12 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                 logger.error("JsonSyntaxException: {}", e.getMessage());
                 return;
             }
-        }, initalDelay, config.refreshInterval, TimeUnit.SECONDS);
+        }, initialDelay, config.refreshInterval, TimeUnit.SECONDS);
         return;
     }
 
     public void clearPolling() {
+        logger.debug("Clearing Polling");
         if (pollTelemetryFuture != null) {
             pollTelemetryFuture.cancel(false);
         }
@@ -318,34 +324,74 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         return pollData;
     }
 
-    public String sendCommand(String serialNumber, String IPaddress, String apiKeyHexString, String cloudCommand,
-            String localCommand, String value) throws InterruptedException, NoSuchAlgorithmException {
+    public void queueCommand(IntellifireCommand command) throws InterruptedException, NoSuchAlgorithmException {
+        logger.debug("Queuing {}={} command to serial number: {}", command.cloudCommand, command.value,
+                command.serialNumber);
+
+        // Remove any existing/previous commands in the queue
+        commandQueue.removeIf(
+                i -> i.serialNumber.equals(command.serialNumber) && i.cloudCommand.equals(command.cloudCommand));
+
+        // Add command to the queue
+        if (!commandQueue.offer(command)) {
+            logger.warn("Maximum command queue size exceeded.");
+        }
+
+        if (sendCommandFuture != null) {
+            sendCommandFuture.cancel(false);
+        }
+
+        sendCommandFuture = scheduler.scheduleWithFixedDelay(() -> {
+            try {
+                processQueue();
+            } catch (InterruptedException e) {
+                logger.error("InterruptedException: {}", e.getMessage());
+            } catch (NoSuchAlgorithmException e) {
+                logger.error("NoSuchAlgorithmException: {}", e.getMessage());
+            }
+        }, 1000, 500, TimeUnit.MILLISECONDS);
+    }
+
+    private void processQueue() throws NoSuchAlgorithmException, InterruptedException {
+        IntellifireCommand command = commandQueue.poll();
+        if (command != null) {
+            logger.debug("Sending {}={} command to serial number: {}", command.cloudCommand, command.value,
+                    command.serialNumber);
+            sendCommand(command);
+        }
+        // Cancel futures is queue is empty
+        if (commandQueue.isEmpty()) {
+            if (sendCommandFuture != null) {
+                sendCommandFuture.cancel(false);
+            }
+        }
+    }
+
+    private synchronized void sendCommand(IntellifireCommand command)
+            throws InterruptedException, NoSuchAlgorithmException {
         // Pause polling while sending command
         clearPolling();
 
         // Try local command
-        String localResponse = sendLocalCommand(IPaddress, apiKeyHexString, localCommand, value);
+        String localResponse = sendLocalCommand(command.ipAddress, command.apiKey, command.localCommand, command.value);
 
-        // 204 Success
-        // 403 Incorrect authentication
-        // 422 Invalid command name, or other parameter
         // If local command fails, try cloud command.
         if (("204").equals(localResponse)) {
             // Success. Restart polling
             initPolling(5);
-            return localResponse;
+            return;
         } else {
-            logger.warn("Local command {} failed.  Attemping cloud command.", localCommand);
+            logger.warn("Local command {} failed.  Attemping cloud command.", command.localCommand);
             // Cloud Command
-            String cloudResponse = sendCloudCommand(serialNumber, cloudCommand, value);
+            String cloudResponse = sendCloudCommand(command.serialNumber, command.cloudCommand, command.value);
 
             // Log cloud error
             if (!("204").equals(cloudResponse)) {
-                logger.warn("Cloud command {} failed.", cloudCommand);
+                logger.warn("Cloud command {} failed.", command.cloudCommand);
             }
             // Restart polling
             initPolling(5);
-            return cloudResponse;
+            return;
         }
     }
 
@@ -447,16 +493,16 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
 
                 // Login returns 204, all others return 200
                 if (httpResponseStatusCode != 200 && httpResponseStatusCode != 204) {
-                    logger.warn("{} failed with http response: {}", getCallingMethod(), httpResponse);
+                    logger.warn("{} http response: {} {}", getCallingMethod(), httpResponseStatusCode, content);
                 } else {
-                    logger.debug("{} http response: {}", getCallingMethod(), httpResponse);
+                    logger.debug("{} http response: {} {}", getCallingMethod(), httpResponseStatusCode, content);
                 }
 
                 logger.trace("Headers:\n{}", request.getHeaders());
                 logger.trace("Cookies: {}", httpClient.getCookieStore().getCookies().toString());
 
                 if (!httpResponse.getContentAsString().isEmpty()) {
-                    logger.trace("{} httpResponseContent: {}", getCallingMethod(), httpResponse.getContentAsString());
+                    logger.trace("{} http response: {} {}", getCallingMethod(), httpResponseStatusCode, content);
                 }
 
                 // store any received cookies
@@ -547,7 +593,12 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
     @Override
     public void dispose() {
         clearPolling();
-        logger.trace("Intellifire polling cancelled");
+        logger.debug("Dispose: Intellifire polling cancelled");
+
+        if (sendCommandFuture != null) {
+            sendCommandFuture.cancel(false);
+        }
+
         super.dispose();
     }
 }

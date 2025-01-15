@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.intellifire.internal.IntellifireBindingConstants;
+import org.openhab.binding.intellifire.internal.IntellifireCommand;
 import org.openhab.binding.intellifire.internal.IntellifireException;
 import org.openhab.binding.intellifire.internal.IntellifirePollData;
 import org.openhab.core.library.types.OnOffType;
@@ -73,7 +74,8 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
                 String ipAddress = bridgehandler.getIPAddressProperty(thing.getProperties());
                 String cloudCommand;
                 String localCommand;
-                String valueString;
+                String value;
+                IntellifireCommand intellifireCommand;
 
                 switch (channelUID.getId()) {
                     case IntellifireBindingConstants.CHANNEL_REMOTE_ENABLE:
@@ -81,12 +83,13 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
                         cloudCommand = "setpoint";
                         localCommand = "thermostat_setpoint";
                         if (command == OnOffType.ON) {
-                            valueString = "2220";
+                            value = "2220";
                         } else {
-                            valueString = "0";
+                            value = "0";
                         }
-                        bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
-                                valueString);
+                        intellifireCommand = new IntellifireCommand(serialNumber, ipAddress, apiKey, cloudCommand,
+                                localCommand, value);
+                        bridgehandler.queueCommand(intellifireCommand);
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_REMOTE_SETPOINT:
@@ -95,35 +98,39 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
                         // ToDo losing decimal places here.
                         float celciusCommand = this.cmdToFloat(command, SIUnits.CELSIUS);
                         if (celciusCommand < 7) {
-                            valueString = Integer.toString(7 * 100);
+                            value = Integer.toString(7 * 100);
                         } else if (celciusCommand > 37) {
-                            valueString = Integer.toString(37 * 100);
+                            value = Integer.toString(37 * 100);
                         } else {
-                            valueString = Integer.toString(Math.round(celciusCommand * 100));
+                            value = Integer.toString(Math.round(celciusCommand * 100));
                         }
-                        bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
-                                valueString);
+                        intellifireCommand = new IntellifireCommand(serialNumber, ipAddress, apiKey, cloudCommand,
+                                localCommand, value);
+                        bridgehandler.queueCommand(intellifireCommand);
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_REMOTE_TIMER:
                         cloudCommand = "timeremaining";
                         localCommand = "time_remaining";
-                        valueString = Integer.toString(this.cmdToInt(command, Units.MINUTE) * 60);
-                        bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
-                                valueString);
+                        value = Integer.toString(this.cmdToInt(command, Units.MINUTE) * 60);
+                        intellifireCommand = new IntellifireCommand(serialNumber, ipAddress, apiKey, cloudCommand,
+                                localCommand, value);
+                        bridgehandler.queueCommand(intellifireCommand);
                         break;
 
                     case IntellifireBindingConstants.CHANNEL_REMOTE_TIMERENABLE:
                         cloudCommand = "timeremaining";
                         localCommand = "time_remaining";
                         if (command == OnOffType.OFF) {
-                            valueString = "0";
-                            bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
-                                    valueString);
+                            value = "0";
+                            intellifireCommand = new IntellifireCommand(serialNumber, ipAddress, apiKey, cloudCommand,
+                                    localCommand, value);
+                            bridgehandler.queueCommand(intellifireCommand);
                         } else {
-                            valueString = Integer.toString(60 * 60);
-                            bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
-                                    valueString);
+                            value = Integer.toString(60 * 60);
+                            intellifireCommand = new IntellifireCommand(serialNumber, ipAddress, apiKey, cloudCommand,
+                                    localCommand, value);
+                            bridgehandler.queueCommand(intellifireCommand);
                         }
                         break;
 

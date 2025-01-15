@@ -1,5 +1,17 @@
 ECM Reset command only resets the WFM and will not solve a ECM Offline error
 
 Things online before successful local poll? Can't do this in the init if there are multiple fireplaces.
+Account online with successful login
+Things online with successful local poll
+Things offline with unsuccessful local poll
 
-Limit outgoing command frequency so we don't overload the server
+Fine tune polling restart time after sendCommand. Advanced config?
+Why does the command show, then change back utnil the next poll?
+
+Homekit Fan 0 - 20% goes send ON command.
+
+Fireplace light is grouped with "Living Room Lights"
+Homekit "Turn on living room lights" Fireplace light ON. Changed 0-100. Changed 100-0
+
+JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated string at line 1 column 297 path $.feature_fan
+Add routine to retreive Json and catch Jsonexception, then print Json

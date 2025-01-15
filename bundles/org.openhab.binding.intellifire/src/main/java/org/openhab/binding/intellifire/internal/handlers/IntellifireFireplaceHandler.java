@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.intellifire.internal.IntellifireBindingConstants;
+import org.openhab.binding.intellifire.internal.IntellifireCommand;
 import org.openhab.binding.intellifire.internal.IntellifireError;
 import org.openhab.binding.intellifire.internal.IntellifireException;
 import org.openhab.binding.intellifire.internal.IntellifirePollData;
@@ -124,63 +125,67 @@ public class IntellifireFireplaceHandler extends IntellifireThingHandler {
                 String ipAddress = bridgehandler.getIPAddressProperty(thing.getProperties());
                 String cloudCommand;
                 String localCommand;
-                String valueString;
-
-                // Pause polling while sending command
-                bridgehandler.clearPolling();
-                bridgehandler.initPolling(5);
+                String value;
+                IntellifireCommand intellifireCommand;
 
                 switch (channelUID.getId()) {
                     case IntellifireBindingConstants.CHANNEL_FIREPLACE_COLDCLIMATEPILOT:
                         cloudCommand = "pilot";
                         localCommand = "pilot";
-                        valueString = this.cmdToString(command);
-                        bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
-                                valueString);
+                        value = this.cmdToString(command);
+                        intellifireCommand = new IntellifireCommand(serialNumber, ipAddress, apiKey, cloudCommand,
+                                localCommand, value);
+                        bridgehandler.queueCommand(intellifireCommand);
                         break;
                     case IntellifireBindingConstants.CHANNEL_FIREPLACE_FAN:
                         cloudCommand = "fanspeed";
                         localCommand = "fan_speed";
-                        valueString = Integer.toString(this.cmdToInt(command, null) / 25);
-                        bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
-                                valueString);
+                        value = Long.toString(Math.round(this.cmdToInt(command, null) / 25.0));
+                        intellifireCommand = new IntellifireCommand(serialNumber, ipAddress, apiKey, cloudCommand,
+                                localCommand, value);
+                        bridgehandler.queueCommand(intellifireCommand);
                         break;
                     case IntellifireBindingConstants.CHANNEL_FIREPLACE_FLAMEHEIGHT:
-                        if (this.cmdToInt(command, null) >= 1 && this.cmdToInt(command, null) <= 100) {
+                        if (this.cmdToInt(command, null) >= 10 && this.cmdToInt(command, null) <= 100) {
                             // Turn on power
                             cloudCommand = "power";
                             localCommand = "power";
-                            valueString = "1";
-                            bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
-                                    valueString);
+                            value = "1";
+                            intellifireCommand = new IntellifireCommand(serialNumber, ipAddress, apiKey, cloudCommand,
+                                    localCommand, value);
+                            bridgehandler.queueCommand(intellifireCommand);
                             // Set flame height
                             cloudCommand = "height";
                             localCommand = "flame_height";
-                            valueString = Integer.toString(this.cmdToInt(command, null) / 20 - 1);
-                            bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
-                                    valueString);
+                            value = Long.toString(Math.round(this.cmdToInt(command, null) / 20.0) - 1);
+                            intellifireCommand = new IntellifireCommand(serialNumber, ipAddress, apiKey, cloudCommand,
+                                    localCommand, value);
+                            bridgehandler.queueCommand(intellifireCommand);
                         } else {
                             // Turn off power
                             cloudCommand = "power";
                             localCommand = "power";
-                            valueString = "0";
-                            bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
-                                    valueString);
+                            value = "0";
+                            intellifireCommand = new IntellifireCommand(serialNumber, ipAddress, apiKey, cloudCommand,
+                                    localCommand, value);
+                            bridgehandler.queueCommand(intellifireCommand);
                         }
                         break;
                     case IntellifireBindingConstants.CHANNEL_FIREPLACE_LIGHT:
                         cloudCommand = "light";
                         localCommand = "light";
-                        valueString = Integer.toString(this.cmdToInt(command, null) / 33);
-                        bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
-                                valueString);
+                        value = Long.toString(Math.round(this.cmdToInt(command, null) / 33.0));
+                        intellifireCommand = new IntellifireCommand(serialNumber, ipAddress, apiKey, cloudCommand,
+                                localCommand, value);
+                        bridgehandler.queueCommand(intellifireCommand);
                         break;
                     case IntellifireBindingConstants.CHANNEL_FIREPLACE_POWER:
                         cloudCommand = "power";
                         localCommand = "power";
-                        valueString = this.cmdToString(command);
-                        bridgehandler.sendCommand(serialNumber, ipAddress, apiKey, cloudCommand, localCommand,
-                                valueString);
+                        value = this.cmdToString(command);
+                        intellifireCommand = new IntellifireCommand(serialNumber, ipAddress, apiKey, cloudCommand,
+                                localCommand, value);
+                        bridgehandler.queueCommand(intellifireCommand);
                         break;
                     default:
                         logger.warn("intellifireCommand Unsupported type {}", channelUID);
