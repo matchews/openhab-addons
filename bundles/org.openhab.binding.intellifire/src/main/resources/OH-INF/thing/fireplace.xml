@@ -60,7 +60,7 @@
 		<item-type>Number</item-type>
 		<label>ECM Latency</label>
 		<category>Time</category>
-		<state readOnly="true">
+		<state pattern="%d ticks" readOnly="true">
 		</state>
 	</channel-type>
 

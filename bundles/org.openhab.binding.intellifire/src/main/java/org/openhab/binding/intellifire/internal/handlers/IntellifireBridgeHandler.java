@@ -97,12 +97,23 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
     }
 
     public void scheduledInitialize() {
+        // Initializing sequence...
+        // Login
+        // SetupAccountData
+        // getAccountLocations
+        // getFireplaces (now we have the apiKey)
+        // getUsername
+        // cloudPoll
+        // initializeApiKeyProperty
+        // initPolling
+
         config = getConfigAs(IntellifireConfiguration.class);
 
         try {
             if (login() && setupAccountData() && getUsername() && poll(IntellifireBindingConstants.CLOUD_POLLING)) {
                 logger.debug("Succesfully opened connection to Intellifire's server: {} Username:{} ",
                         IntellifireBindingConstants.URI_COOKIE, config.username);
+                initializeApiKeyProperties();
                 initPolling(5);
                 logger.trace("Intellifire polling scheduled");
                 updateStatus(ThingStatus.ONLINE);
@@ -253,7 +264,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         }
     }
 
-    public boolean poll(boolean cloudPool) throws IntellifireException, InterruptedException, JsonSyntaxException {
+    public boolean poll(boolean cloudPoll) throws IntellifireException, InterruptedException, JsonSyntaxException {
         boolean failureFlag = false;
 
         // Retrieve poll data for each fireplace
@@ -261,7 +272,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
             for (int j = 0; j < account.locations.get(i).fireplaces.fireplaces.size(); j++) {
                 String serialNumber = account.locations.get(i).fireplaces.fireplaces.get(j).serial;
 
-                if (cloudPool) {
+                if (cloudPoll) {
                     // Cloud Poll
                     IntellifirePollData cloudPollData = cloudPollFireplace(serialNumber);
                     if (cloudPollData != null) {
@@ -276,25 +287,37 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                         IntellifirePollData localPollData = localPollFireplace(ipAddress);
                         if (localPollData != null) {
                             account.locations.get(i).fireplaces.fireplaces.get(j).pollData = localPollData;
+                            account.locations.get(i).fireplaces.fireplaces.get(j).lastLocalPollSuccesful = true;
                         } else {
                             failureFlag = true;
                         }
                     } else {
-                        logger.error("Intellifire local poll failed. Invalid local IP Address received from cloud.");
                         failureFlag = true;
+                        account.locations.get(i).fireplaces.fireplaces.get(j).lastLocalPollSuccesful = false;
+                        logger.error("Intellifire local poll failed. Appliance is offline.");
                     }
                 }
             }
         }
 
+        boolean lastPollSuccessful = false;
+
         for (Thing thing : getThing().getThings()) {
             if (thing.getHandler() instanceof IntellifireThingHandler) {
                 IntellifireThingHandler handler = (IntellifireThingHandler) thing.getHandler();
                 if (handler != null) {
-                    String thingSerialNumber = getSerialNumberProperty(thing.getProperties());
-                    IntellifirePollData pollData = account.getPollData(thingSerialNumber);
-                    if (pollData != null) {
+                    String serialNumber = getSerialNumberProperty(thing.getProperties());
+                    IntellifirePollData pollData = account.getPollData(serialNumber);
+                    lastPollSuccessful = account.getlastLocalPollSuccesful(serialNumber);
+
+                    if (pollData != null && cloudPoll) {
                         handler.poll(pollData);
+                    } else if (pollData != null && !cloudPoll && lastPollSuccessful) {
+                        handler.updateStatus(ThingStatus.ONLINE);
+                        failureFlag = true;
+                    } else if (pollData != null && !cloudPoll && !lastPollSuccessful) {
+                        handler.updateStatus(ThingStatus.OFFLINE);
+                        failureFlag = true;
                     } else {
                         failureFlag = true;
                     }
@@ -562,12 +585,16 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         }
     }
 
-    public String getSerialNumberProperty(Map<String, String> properties) {
-        String serialNumber = properties.get(IntellifireBindingConstants.PROPERTY_SERIALNUMBER);
-        if (serialNumber != null) {
-            return serialNumber;
-        } else {
-            return "";
+    public void initializeApiKeyProperties() {
+        for (Thing thing : getThing().getThings()) {
+            if (thing.getHandler() instanceof IntellifireThingHandler) {
+                IntellifireThingHandler handler = (IntellifireThingHandler) thing.getHandler();
+                if (handler != null) {
+                    String serialNumber = getSerialNumberProperty(thing.getProperties());
+                    String locationID = getLocationIDProperty(thing.getProperties());
+                    handler.updateApiKey(locationID, serialNumber, account);
+                }
+            }
         }
     }
 
@@ -575,6 +602,24 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
         String ipAddress = properties.get(IntellifireBindingConstants.PROPERTY_IPADDRESS);
         if (ipAddress != null) {
             return ipAddress;
+        } else {
+            return "";
+        }
+    }
+
+    public String getLocationIDProperty(Map<String, String> properties) {
+        String locationID = properties.get(IntellifireBindingConstants.PROPERTY_LOCATIONID);
+        if (locationID != null) {
+            return locationID;
+        } else {
+            return "";
+        }
+    }
+
+    public String getSerialNumberProperty(Map<String, String> properties) {
+        String serialNumber = properties.get(IntellifireBindingConstants.PROPERTY_SERIALNUMBER);
+        if (serialNumber != null) {
+            return serialNumber;
         } else {
             return "";
         }

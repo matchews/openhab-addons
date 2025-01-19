@@ -33,6 +33,7 @@ public class IntellifireLocation {
         public String apiKey = "";
         public int power;
         public IntellifirePollData pollData = new IntellifirePollData();
+        public boolean lastLocalPollSuccesful;
     }
 
     public List<Fireplace> fireplaces = new ArrayList<>();

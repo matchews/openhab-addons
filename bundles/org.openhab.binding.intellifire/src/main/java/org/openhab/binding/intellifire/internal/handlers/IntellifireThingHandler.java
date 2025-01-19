@@ -19,6 +19,8 @@ import javax.measure.Unit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.intellifire.internal.IntellifireAccount;
+import org.openhab.binding.intellifire.internal.IntellifireBindingConstants;
 import org.openhab.binding.intellifire.internal.IntellifireException;
 import org.openhab.binding.intellifire.internal.IntellifirePollData;
 import org.openhab.core.library.types.DecimalType;
@@ -32,6 +34,7 @@ import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
+import org.openhab.core.thing.ThingStatusDetail;
 import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
@@ -138,5 +141,24 @@ public abstract class IntellifireThingHandler extends BaseThingHandler {
             }
         }
         return channelStates;
+    }
+
+    public void updateApiKey(String locationID, String serialNumber, IntellifireAccount account) {
+        for (int i = 0; i < account.locations.size(); i++) {
+            if (account.locations.get(i).locationId.equals(locationID)) {
+                for (int j = 0; j < account.locations.get(i).fireplaces.fireplaces.size(); j++) {
+                    if (account.locations.get(i).fireplaces.fireplaces.get(j).serial.equals(serialNumber)) {
+                        getThing().setProperty(IntellifireBindingConstants.PROPERTY_APIKEY,
+                                account.locations.get(i).fireplaces.fireplaces.get(j).apiKey);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void updateStatus(ThingStatus status) {
+        updateStatus(status, ThingStatusDetail.NONE, null);
     }
 }

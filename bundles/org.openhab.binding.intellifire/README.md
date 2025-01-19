@@ -38,7 +38,7 @@ Intellifire Account Parameters:
 |-------------------|--------------------|--------------------------------------|:----------:|
 | battery           | Switch             | Battery Status                       |      R     |
 | coldClimatePilot  | Switch             | Cold Climate Pilot                   |     R/W    |
-| ecmLatency        | Number             | ECM Latency                          |      R     |
+| ecmLatency        | Number             | ECM Latency (ticks)*                 |      R     |
 | errors            | String             | Errors                               |      R     |
 | fan               | Dimmer             | Fan (0-100, step 25) (If equipped)   |     R/W    |
 | flameHeight       | Dimmer             | Flame Height (0-100, step 20)        |      R     |
@@ -46,6 +46,8 @@ Intellifire Account Parameters:
 | light             | Dimmer             | Light (0-100, step 33) (If equipped) |     R/W    |
 | power             | Switch             | Flame Power                          |     R/W    |
 | prePurge          | Switch             | Power Vent Pre-purge                 |      R     |
+
+*1 tick = 14 nanoseconds
 
 ### Remote Channels
 

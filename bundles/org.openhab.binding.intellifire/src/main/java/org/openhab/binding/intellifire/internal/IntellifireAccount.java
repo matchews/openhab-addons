@@ -68,4 +68,15 @@ public class IntellifireAccount {
         }
         return "";
     }
+
+    public boolean getlastLocalPollSuccesful(String serialNumber) {
+        for (int i = 0; i < this.locations.size(); i++) {
+            for (int j = 0; j < this.locations.get(i).fireplaces.fireplaces.size(); j++) {
+                if (serialNumber.equals(this.locations.get(i).fireplaces.fireplaces.get(j).serial)) {
+                    return this.locations.get(i).fireplaces.fireplaces.get(j).lastLocalPollSuccesful;
+                }
+            }
+        }
+        return false;
+    }
 }

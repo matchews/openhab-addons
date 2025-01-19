@@ -25,6 +25,7 @@ import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
+import org.openhab.core.thing.ThingStatus;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.RefreshType;
 import org.slf4j.Logger;
@@ -41,6 +42,11 @@ public class IntellifireRemoteHandler extends IntellifireThingHandler {
 
     public IntellifireRemoteHandler(Thing thing) {
         super(thing);
+    }
+
+    @Override
+    public void initialize() {
+        updateStatus(ThingStatus.ONLINE);
     }
 
     @Override
