@@ -313,10 +313,11 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                     if (pollData != null && cloudPoll) {
                         handler.poll(pollData);
                     } else if (pollData != null && !cloudPoll && lastPollSuccessful) {
-                        handler.updateStatus(ThingStatus.ONLINE);
-                        failureFlag = true;
+                        handler.updateStatus(ThingStatus.ONLINE, ThingStatusDetail.NONE, "");
+                        failureFlag = false;
                     } else if (pollData != null && !cloudPoll && !lastPollSuccessful) {
-                        handler.updateStatus(ThingStatus.OFFLINE);
+                        handler.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
+                                "Local poll failed.");
                         failureFlag = true;
                     } else {
                         failureFlag = true;
@@ -495,7 +496,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
 
     private synchronized String httpResponseContent(String url, HttpMethod method, String contentType, String content,
             int timeout) throws InterruptedException {
-        for (int retry = 1; retry <= 2; retry++) {
+        for (int attempt = 1; attempt <= 2; attempt++) {
             try {
                 // Initialize request to load cookies into
                 Request request = httpRequestBuilder(url, method, timeout, contentType);
@@ -513,6 +514,11 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                         .header(HttpHeader.CONTENT_LENGTH, Integer.toString(content.length())).send();
 
                 int httpResponseStatusCode = httpResponse.getStatus();
+
+                // Remove credentials from login response content so they are not logged
+                if ("login".equals(getCallingMethod())) {
+                    content = "**credentials removed**";
+                }
 
                 // Login returns 204, all others return 200
                 if (httpResponseStatusCode != 200 && httpResponseStatusCode != 204) {
@@ -538,11 +544,10 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                     return httpResponse.getContentAsString();
                 }
             } catch (ExecutionException | TimeoutException e) {
-                logger.warn("Intellifire {} timeout. Attempt #{}", getCallingMethod(),
-                        (commFailureCount) * 2 + (retry));
-
-                if (retry >= 2) {
-                    return "";
+                logger.info("Intellifire {} timeout. Attempt #{}", getCallingMethod(), attempt);
+                // Small delay before retry
+                if (attempt == 1) {
+                    Thread.sleep(1000);
                 }
             }
         }

@@ -158,7 +158,7 @@ public abstract class IntellifireThingHandler extends BaseThingHandler {
     }
 
     @Override
-    protected void updateStatus(ThingStatus status) {
-        updateStatus(status, ThingStatusDetail.NONE, null);
+    protected void updateStatus(ThingStatus status, ThingStatusDetail statusDetail, @Nullable String description) {
+        super.updateStatus(status, statusDetail, description);
     }
 }

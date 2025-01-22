@@ -1,16 +1,19 @@
 ECM Reset command only resets the WFM and will not solve a ECM Offline error
 
 Fine tune polling restart time after sendCommand. Advanced config?
-Why does the command show, then change back utnil the next poll?
+Why does the command show, then change back until the next poll?
 
 Homekit Fan 0 - 20% goes send ON command.
 
-Fireplace light is grouped with "Living Room Lights"
-Homekit "Turn on living room lights" Fireplace light ON. Changed 0-100. Changed 100-0
+Homekit Fireplace light ON. Changed 0-100. Changed 100-0
 
 JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated string at line 1 column 297 path $.feature_fan
+JsonSyntaxException: java.io.EOFException: End of input at line 1 column 216 path $.prepurge
 Add routine to retreive Json and catch Jsonexception, then print Json
 
-Fixed ticks units
-Things online/offline
-Intialize api keys
+
+Recommended local poll max frequency? 30s (same as above, but assuming this is a continual poll for state since we can’t deliver it proactively, this seems ok) 
+Recommended cloud poll max frequency? 30s
+Recommended local command max frequency? 10s
+Recommended cloud command max frequency? 10s (both these can probably handle faster, but if you are doing rate limiting this is a responsible but usable frequency) 
+
