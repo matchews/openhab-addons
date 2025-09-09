@@ -264,22 +264,22 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             DatagramPacket sendPacket = new DatagramPacket(packedBytes, packedBytes.length, serverAddress, serverPort);
             clientSocket.send(sendPacket);
 
-            System.out.println("XML data sent successfully over UDP.");
+            logger.debug("XML data sent successfully over UDP.");
 
             byte[] receiveData = new byte[1024];
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             clientSocket.receive(receivePacket); // Blocks until a response is received
             String receivedXml = new String(receivePacket.getData(), 0, receivePacket.getLength(), "UTF-8");
-            System.out.println("Received XML: " + receivedXml);
+            logger.debug("Received XML: {}", receivedXml);
 
             byte[] receiveData2 = new byte[1024];
             DatagramPacket receivePacket2 = new DatagramPacket(receiveData2, receiveData2.length);
             clientSocket.receive(receivePacket2); // Blocks until a response is received
             String receivedXml2 = new String(receivePacket2.getData(), 0, receivePacket2.getLength(), "UTF-8");
-            System.out.println("Received XML: " + receivedXml2);
+            logger.debug("Received XML: {}", receivedXml2);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.warn("Exception during UDP communication", e);
         }
 
         // *****Login to Hayward server
