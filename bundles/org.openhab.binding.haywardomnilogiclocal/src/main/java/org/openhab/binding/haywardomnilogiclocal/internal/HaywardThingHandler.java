@@ -144,16 +144,18 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
 
     protected void updateIfPresent(Map<String, ParameterValue> values, String key, String channelID) {
         @Nullable ParameterValue parameter = values.get(key);
-        if (parameter != null && parameter.value() != null) {
-            updateData(channelID, parameter.value());
+        @Nullable String value = parameter != null ? parameter.value() : null;
+        if (value != null) {
+            updateData(channelID, value);
         }
     }
 
     protected void putIfPresent(Map<String, ParameterValue> values, String key, Map<String, String> properties,
             String propertyName) {
         @Nullable ParameterValue parameter = values.get(key);
-        if (parameter != null && parameter.value() != null) {
-            properties.put(propertyName, parameter.value());
+        @Nullable String value = parameter != null ? parameter.value() : null;
+        if (value != null) {
+            properties.put(propertyName, value);
         }
     }
 }
