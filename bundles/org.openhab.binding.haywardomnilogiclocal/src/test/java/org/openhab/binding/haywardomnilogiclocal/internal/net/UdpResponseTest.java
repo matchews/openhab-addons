@@ -22,6 +22,7 @@ public class UdpResponseTest {
     public void fromBytesShouldParseHeaderAndXml() throws Exception {
         int messageId = 0x01020304;
         int messageType = 1004;
+        int messageId = 0x01020304;
         byte[] xmlBytes = RESPONSE_XML.getBytes(StandardCharsets.UTF_8);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (DeflaterOutputStream deflater = new DeflaterOutputStream(baos)) {
