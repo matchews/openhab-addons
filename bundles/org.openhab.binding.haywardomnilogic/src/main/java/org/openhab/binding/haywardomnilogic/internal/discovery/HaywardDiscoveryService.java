@@ -74,7 +74,8 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
 
         for (int i = 0; i < names.size(); i++) {
             backyardProperties.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.BACKYARD);
-            backyardProperties.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, thingHandler.account.mspSystemID);
+            backyardProperties.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID,
+                    thingHandler.getAccount().getMspSystemID());
 
             onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_BACKYARD, names.get(i), backyardProperties);
         }

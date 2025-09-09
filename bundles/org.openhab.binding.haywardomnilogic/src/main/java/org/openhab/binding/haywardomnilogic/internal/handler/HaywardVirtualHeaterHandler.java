@@ -144,7 +144,6 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                                 cmdString = heaterMaxSetTemp;
                             }
                         }
-
                         cmdURL = CommandBuilder.buildSetUIHeaterCmd(HaywardBindingConstants.COMMAND_PARAMETERS,
                                 bridgehandler.account.token, bridgehandler.account.mspSystemID, poolID, systemID,
                                 cmdString);
@@ -163,8 +162,8 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                     return;
                 }
             } catch (HaywardException e) {
-                logger.debug("Unable to send command to Hayward's server {}:{}:{}", bridgehandler.config.endpointUrl,
-                        bridgehandler.config.username, e.getMessage());
+                logger.debug("Unable to send command to Hayward's server {}:{}:{}", bridgehandler.getBridgeConfig().getEndpointUrl(),
+                        bridgehandler.getBridgeConfig().getUsername(), e.getMessage());
             } catch (InterruptedException e) {
                 return;
             }

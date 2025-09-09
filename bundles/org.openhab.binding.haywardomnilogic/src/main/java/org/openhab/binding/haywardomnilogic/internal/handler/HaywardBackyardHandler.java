@@ -81,8 +81,8 @@ public class HaywardBackyardHandler extends HaywardThingHandler {
             String urlParameters = """
                     <?xml version="1.0" encoding="utf-8"?><Request><Name>GetAlarmList</Name><Parameters>\
                     <Parameter name="Token" dataType="String">\
-                    """ + bridgehandler.account.token + "</Parameter>"
-                    + "<Parameter name=\"MspSystemID\" dataType=\"int\">" + bridgehandler.account.mspSystemID
+                    """ + bridgehandler.getAccount().getToken() + "</Parameter>"
+                    + "<Parameter name=\"MspSystemID\" dataType=\"int\">" + bridgehandler.getAccount().getMspSystemID()
                     + "</Parameter>"
                     + "<Parameter name=\"CultureInfoName\" dataType=\"String\">en-us</Parameter></Parameters></Request>";
 

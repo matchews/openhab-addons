@@ -226,9 +226,9 @@ public class HaywardPumpHandler extends HaywardThingHandler {
 
                 String cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS
                         + "<Name>SetUIEquipmentCmd</Name><Parameters>"
-                        + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.account.token
+                        + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.getAccount().getToken()
                         + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                        + bridgehandler.account.mspSystemID + "</Parameter>"
+                        + bridgehandler.getAccount().getMspSystemID() + "</Parameter>"
                         + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
                         + "<Parameter name=\"EquipmentID\" dataType=\"int\">" + systemID + "</Parameter>"
                         + "<Parameter name=\"IsOn\" dataType=\"int\">" + cmdString + "</Parameter>"
@@ -243,8 +243,8 @@ public class HaywardPumpHandler extends HaywardThingHandler {
                     return;
                 }
             } catch (HaywardException e) {
-                logger.debug("Unable to send command to Hayward's server {}:{}:{}", bridgehandler.config.endpointUrl,
-                        bridgehandler.config.username, e.getMessage());
+                logger.debug("Unable to send command to Hayward's server {}:{}:{}", bridgehandler.getBridgeConfig().getEndpointUrl(),
+                        bridgehandler.getBridgeConfig().getUsername(), e.getMessage());
             } catch (InterruptedException e) {
                 return;
             }

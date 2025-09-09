@@ -77,8 +77,16 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
     private @Nullable ScheduledFuture<?> pollTelemetryFuture;
     private @Nullable ScheduledFuture<?> pollAlarmsFuture;
     private int commFailureCount;
-    public HaywardConfig config = getConfig().as(HaywardConfig.class);
-    public HaywardAccount account = getConfig().as(HaywardAccount.class);
+    private HaywardConfig config = getConfig().as(HaywardConfig.class);
+    private final HaywardAccount account = getConfig().as(HaywardAccount.class);
+
+    public HaywardConfig getBridgeConfig() {
+        return config;
+    }
+
+    public HaywardAccount getAccount() {
+        return account;
+    }
 
     @Override
     public Collection<Class<? extends ThingHandlerService>> getServices() {
@@ -116,7 +124,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
 
     public void scheduledInitialize() throws UnknownHostException {
         config = getConfigAs(HaywardConfig.class);
-        udpClient = new UdpClient(config.endpointUrl, UDP_PORT);
+        udpClient = new UdpClient(config.getEndpointUrl(), UDP_PORT);
 
         try {
             clearPolling(pollTelemetryFuture);
@@ -141,7 +149,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             initPolling(0);
             logger.trace("Hayward Telemetry polling scheduled");
 
-            if (config.alarmPollTime > 0) {
+            if (config.getAlarmPollTime() > 0) {
                 initAlarmPolling(1);
             }
         } catch (HaywardException e) {
@@ -154,9 +162,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         }
     }
 
-
     private synchronized boolean handshake() throws HaywardException {
-        String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>Ping</Name><Parameters/></Request>";
 
         String xmlResponse = udpXmlResponse(xmlRequest, MSG_TYPE_REQUEST);
 
@@ -164,8 +170,8 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             logger.debug("Hayward Connection thing: Handshake XML response was null");
             return false;
         }
-        return true;
     }
+
 
     public synchronized boolean getTelemetryData() throws HaywardException {
         String urlParameters = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>GetTelemetryData</Name><Parameters/></Request>";
@@ -238,7 +244,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             } catch (HaywardException e) {
                 logger.debug("Hayward Connection thing: Exception during poll: {}", e.getMessage());
             }
-        }, initalDelay, config.alarmPollTime, TimeUnit.SECONDS);
+        }, initalDelay, config.getAlarmPollTime(), TimeUnit.SECONDS);
     }
 
     private void clearPolling(@Nullable ScheduledFuture<?> pollJob) {

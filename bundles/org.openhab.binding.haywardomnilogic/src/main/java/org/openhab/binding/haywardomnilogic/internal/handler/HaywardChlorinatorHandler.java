@@ -146,9 +146,9 @@ public class HaywardChlorinatorHandler extends HaywardThingHandler {
                 }
 
                 String cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS + "<Name>SetCHLORParams</Name><Parameters>"
-                        + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.account.token
+                        + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.getAccount().getToken()
                         + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                        + bridgehandler.account.mspSystemID + "</Parameter>"
+                        + bridgehandler.getAccount().getMspSystemID() + "</Parameter>"
                         + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
                         + "<Parameter name=\"ChlorID\" dataType=\"int\" alias=\"EquipmentID\">" + systemID
                         + "</Parameter>" + "<Parameter name=\"CfgState\" dataType=\"byte\" alias=\"Data1\">"
@@ -171,8 +171,8 @@ public class HaywardChlorinatorHandler extends HaywardThingHandler {
                     return;
                 }
             } catch (HaywardException e) {
-                logger.debug("Unable to send command to Hayward's server {}:{}:{}", bridgehandler.config.endpointUrl,
-                        bridgehandler.config.username, e.getMessage());
+                logger.debug("Unable to send command to Hayward's server {}:{}:{}", bridgehandler.getBridgeConfig().getEndpointUrl(),
+                        bridgehandler.getBridgeConfig().getUsername(), e.getMessage());
             } catch (InterruptedException e) {
                 return;
             }
