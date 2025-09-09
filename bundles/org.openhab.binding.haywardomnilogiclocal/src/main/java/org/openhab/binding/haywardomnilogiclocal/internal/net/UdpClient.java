@@ -28,6 +28,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  */
 @NonNullByDefault
 public class UdpClient {
+    private static final int MSG_TYPE_ACK = 1002;
+
     private final InetAddress address;
     private final int port;
 
@@ -36,7 +38,7 @@ public class UdpClient {
         this.port = port;
     }
 
-    public String send(UdpRequest request) throws IOException {
+    public UdpResponse send(UdpRequest request) throws IOException {
         byte[] out = request.toBytes();
         try (DatagramSocket socket = new DatagramSocket()) {
             DatagramPacket packet = new DatagramPacket(out, out.length, address, port);
@@ -46,10 +48,21 @@ public class UdpClient {
             DatagramPacket responsePacket = new DatagramPacket(buf, buf.length);
             socket.setSoTimeout(5000);
             socket.receive(responsePacket);
-            UdpResponse response = UdpResponse.fromBytes(responsePacket.getData(), responsePacket.getLength());
-            return response.getXml();
+            return UdpResponse.fromBytes(responsePacket.getData(), responsePacket.getLength());
         } catch (SocketTimeoutException e) {
             throw new IOException("Timeout waiting for UDP response from " + address.getHostAddress() + ":" + port, e);
+        } catch (UnsupportedEncodingException e) {
+            // should never happen as UTF-8 is always supported
+            throw new IOException(e);
+        }
+    }
+
+    public void sendAck() throws IOException {
+        UdpRequest ack = new UdpRequest(MSG_TYPE_ACK, "ACK");
+        byte[] out = ack.toBytes();
+        try (DatagramSocket socket = new DatagramSocket()) {
+            DatagramPacket packet = new DatagramPacket(out, out.length, address, port);
+            socket.send(packet);
         } catch (UnsupportedEncodingException e) {
             // should never happen as UTF-8 is always supported
             throw new IOException(e);
