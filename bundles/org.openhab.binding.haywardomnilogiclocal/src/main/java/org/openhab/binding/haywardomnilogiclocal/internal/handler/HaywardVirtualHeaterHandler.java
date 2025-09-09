@@ -20,6 +20,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Channel;
@@ -130,14 +131,9 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
             try {
                 switch (channelUID.getId()) {
                     case HaywardBindingConstants.CHANNEL_VIRTUALHEATER_ENABLE:
-                        cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS + "<Name>SetHeaterEnable</Name><Parameters>"
-                                + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.account.token
-                                + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                                + bridgehandler.account.mspSystemID + "</Parameter>"
-                                + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
-                                + "<Parameter name=\"HeaterID\" dataType=\"int\">" + systemID + "</Parameter>"
-                                + "<Parameter name=\"Enabled\" dataType=\"bool\">" + cmdString + "</Parameter>"
-                                + "</Parameters></GetTelemetry>";
+                        cmdURL = CommandBuilder.buildSetHeaterEnable(HaywardBindingConstants.COMMAND_PARAMETERS,
+                                bridgehandler.account.token, bridgehandler.account.mspSystemID, poolID, systemID,
+                                cmdString);
                         break;
 
                     case HaywardBindingConstants.CHANNEL_VIRTUALHEATER_CURRENTSETPOINT:
@@ -149,14 +145,9 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                             }
                         }
 
-                        cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS + "<Name>SetUIHeaterCmd</Name><Parameters>"
-                                + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.account.token
-                                + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                                + bridgehandler.account.mspSystemID + "</Parameter>"
-                                + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
-                                + "<Parameter name=\"HeaterID\" dataType=\"int\">" + systemID + "</Parameter>"
-                                + "<Parameter name=\"Temp\" dataType=\"int\">" + cmdString + "</Parameter>"
-                                + "</Parameters></GetTelemetry>";
+                        cmdURL = CommandBuilder.buildSetUIHeaterCmd(HaywardBindingConstants.COMMAND_PARAMETERS,
+                                bridgehandler.account.token, bridgehandler.account.mspSystemID, poolID, systemID,
+                                cmdString);
                         break;
                     default:
                         logger.warn("haywardCommand Unsupported type {}", channelUID);
@@ -164,7 +155,7 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                 }
 
                 // *****Send Command to Hayward server
-                String xmlResponse = bridgehandler.httpXmlResponse(cmdURL);
+                String xmlResponse = bridgehandler.udpXmlResponse(cmdURL, 1);
                 String status = bridgehandler.evaluateXPath("//Parameter[@name='Status']/text()", xmlResponse).get(0);
 
                 if (!("0".equals(status))) {
@@ -172,10 +163,8 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                     return;
                 }
             } catch (HaywardException e) {
-                logger.debug("Unable to send command to Hayward's server {}:{}:{}", bridgehandler.config.endpointUrl,
-                        bridgehandler.config.username, e.getMessage());
-            } catch (InterruptedException e) {
-                return;
+                logger.debug("Unable to send command to Hayward's server {}:{}:{}", bridgehandler.getBridgeConfig().getEndpointUrl(),
+                        bridgehandler.getBridgeConfig().getUsername(), e.getMessage());
             }
             this.updateStatus(ThingStatus.ONLINE);
         } else {

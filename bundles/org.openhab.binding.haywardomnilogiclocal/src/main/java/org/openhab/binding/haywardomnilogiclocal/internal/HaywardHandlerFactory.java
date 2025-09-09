@@ -21,7 +21,6 @@ import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.jetty.client.HttpClient;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardBackyardHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardBowHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardBridgeHandler;
@@ -32,7 +31,6 @@ import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardHeaterH
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardPumpHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardRelayHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardVirtualHeaterHandler;
-import org.openhab.core.io.net.http.HttpClientFactory;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingTypeUID;
@@ -57,7 +55,6 @@ public class HaywardHandlerFactory extends BaseThingHandlerFactory {
     private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.unmodifiableSet(
             Stream.concat(BRIDGE_THING_TYPES_UIDS.stream(), THING_TYPES_UIDS.stream()).collect(Collectors.toSet()));
     private final HaywardDynamicStateDescriptionProvider stateDescriptionProvider;
-    private final HttpClient httpClient;
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -65,10 +62,8 @@ public class HaywardHandlerFactory extends BaseThingHandlerFactory {
     }
 
     @Activate
-    public HaywardHandlerFactory(final @Reference HaywardDynamicStateDescriptionProvider stateDescriptionProvider,
-            @Reference HttpClientFactory httpClientFactory) {
+    public HaywardHandlerFactory(final @Reference HaywardDynamicStateDescriptionProvider stateDescriptionProvider) {
         this.stateDescriptionProvider = stateDescriptionProvider;
-        this.httpClient = httpClientFactory.getCommonHttpClient();
     }
 
     /**
@@ -79,7 +74,7 @@ public class HaywardHandlerFactory extends BaseThingHandlerFactory {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
         if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_BRIDGE)) {
-            return new HaywardBridgeHandler(stateDescriptionProvider, (Bridge) thing, httpClient);
+            return new HaywardBridgeHandler(stateDescriptionProvider, (Bridge) thing);
         }
         if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_BACKYARD)) {
             return new HaywardBackyardHandler(thing);
