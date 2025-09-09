@@ -165,12 +165,23 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
 
     private synchronized boolean handshake() throws HaywardException {
 
+        String xmlRequest =
+                "<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?><Request><Name>Handshake</Name><Parameters/></Request>";
+
         String xmlResponse = udpXmlResponse(xmlRequest, MSG_TYPE_REQUEST);
 
         if (xmlResponse.isEmpty()) {
             logger.debug("Hayward Connection thing: Handshake XML response was null");
             return false;
         }
+
+        if (!evaluateXPath("/Response/Parameters//Parameter[@name='StatusMessage']/text()", xmlResponse).isEmpty()) {
+            logger.debug("Hayward Connection thing: Handshake XML response: {}", xmlResponse);
+            return false;
+        }
+
+        logger.debug("Hayward Connection thing: Handshake successful");
+        return true;
     }
 
     @Deprecated
