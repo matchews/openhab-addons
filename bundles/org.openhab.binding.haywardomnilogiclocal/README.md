@@ -3,7 +3,7 @@
 The Hayward Omnilogic Local binding integrates the OmniLogic pool controller using the local UDP protocol.
 
 Communication occurs directly with the controller on the local network and does not require an Internet connection.
-The controller listens on UDP port 10444 and must be reachable from the openHAB host.
+The local UDP connection requires no authentication, and the controller listens on UDP port 10444 and must be reachable from the openHAB host.
 
 ## Prerequisites
 
@@ -41,8 +41,6 @@ Hayward OmniLogic Controller Parameters:
 | Property             | Default          | Required | Description                                   |
 |----------------------|------------------|----------|-----------------------------------------------|
 | Host Name            | haywardomnilogic | Yes      | Host name or IP address of the controller     |
-| User Name            | None             | Yes      | Your OmniLogic user name (not email address)  |
-| Password             | None             | Yes      | Your OmniLogic user password                  |
 | Telemetry Poll Delay | 3                | Yes      | Telemetry poll delay (2-60 seconds)           |
 | Alarm Poll Delay     | 10               | Yes      | Alarm poll delay (0-120 seconds, 0 disabled)  |
 
@@ -181,6 +179,6 @@ Hayward OmniLogic Controller Parameters:
 
 ## Full Example
 
-After installing the binding, you will need to manually add the Hayward Connection thing and enter your credentials.
+After installing the binding, you will need to manually add the Hayward Connection thing.
 All pool items can be automatically discovered by scanning the bridge.
 Goto the inbox and add the things.
