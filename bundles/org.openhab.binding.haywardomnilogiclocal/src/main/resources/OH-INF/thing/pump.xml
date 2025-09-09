@@ -14,7 +14,7 @@
     <channels>
       <channel id="pumpEnable" typeId="system.power"/>
       <channel id="pumpSpeed" typeId="speed"/>
-      <channel id="pumpState" typeId="pumpState"/>
+      <channel id="pumpState" typeId="state"/>
       <channel id="pumpLastSpeed" typeId="lastSpeed"/>
     </channels>
 
@@ -30,12 +30,6 @@
     <label>Pump Speed</label>
     <description>Dynamic units (% or rpm from config)</description>
     <state readOnly="false"/>
-  </channel-type>
-
-  <channel-type id="pumpState">
-    <item-type>String</item-type>
-    <label>Pump State</label>
-    <state readOnly="true"/>
   </channel-type>
 
   <channel-type id="lastSpeed">
