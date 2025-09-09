@@ -44,4 +44,8 @@ public enum HaywardMessageType {
     private HaywardMessageType(int msgInt) {
         this.msgInt = msgInt;
     }
+
+    public int getMsgInt() {
+        return msgInt;
+    }
 }

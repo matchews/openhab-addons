@@ -16,7 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardBridgeHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.QuantityType;
@@ -56,7 +58,8 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
     public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
-    public abstract void getTelemetry(String xmlResponse) throws HaywardException;
+    public void getTelemetry(String xmlResponse) throws HaywardException {
+    }
 
     public void setStateDescriptions() throws HaywardException {
     }
@@ -97,7 +100,7 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
                 if (bridge != null) {
                     HaywardBridgeHandler bridgehandler = (HaywardBridgeHandler) bridge.getHandler();
                     if (bridgehandler != null) {
-                        if ("Standard".equals(bridgehandler.account.units)) {
+                        if ("Standard".equals(bridgehandler.getAccount().getUnits())) {
                             return new QuantityType<>(Integer.parseInt(value), ImperialUnits.FAHRENHEIT);
                         } else {
                             return new QuantityType<>(Integer.parseInt(value), SIUnits.CELSIUS);
@@ -137,5 +140,22 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
             }
         }
         return channelStates;
+    }
+
+    protected void updateIfPresent(Map<String, ParameterValue> values, String key, String channelID) {
+        @Nullable ParameterValue parameter = values.get(key);
+        @Nullable String value = parameter != null ? parameter.value() : null;
+        if (value != null) {
+            updateData(channelID, value);
+        }
+    }
+
+    protected void putIfPresent(Map<String, ParameterValue> values, String key, Map<String, String> properties,
+            String propertyName) {
+        @Nullable ParameterValue parameter = values.get(key);
+        @Nullable String value = parameter != null ? parameter.value() : null;
+        if (value != null) {
+            properties.put(propertyName, value);
+        }
     }
 }

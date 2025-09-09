@@ -54,7 +54,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
     @Override
     protected void startScan() {
         try {
-            String xmlResults = thingHandler.getMspConfig();
+            String xmlResults = thingHandler.getMspConfigV2();
             mspConfigDiscovery(xmlResults);
         } catch (HaywardException e) {
             logger.warn("Exception during discovery scan: {}", e.getMessage());
@@ -74,7 +74,8 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
 
         for (int i = 0; i < names.size(); i++) {
             backyardProperties.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.BACKYARD);
-            backyardProperties.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, thingHandler.account.mspSystemID);
+            backyardProperties.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID,
+                    thingHandler.getAccount().getMspSystemID());
 
             onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_BACKYARD, names.get(i), backyardProperties);
         }

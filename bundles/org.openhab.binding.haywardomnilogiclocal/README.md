@@ -1,41 +1,48 @@
-# Hayward Omnilogic Binding
+# Hayward Omnilogic Local Binding
 
-The Hayward Omnilogic binding integrates the Omnilogic pool controller using the Hayward API.
+The Hayward Omnilogic Local binding integrates the OmniLogic pool controller using the local UDP protocol.
 
-The Hayward Omnilogic API interacts with Hayward's cloud server requiring a connection with the Internet for sending and receiving information.
+Communication occurs directly with the controller on the local network and does not require an Internet connection.
+The local UDP connection requires no authentication, and the controller listens on UDP port 10444 and must be reachable from the openHAB host.
+
+## Prerequisites
+
+- OmniLogic controller firmware that exposes the local network API.
+- The openHAB system and controller must be on the same IP subnet.
+- Firewall rules must allow outbound and inbound UDP traffic on port 10444.
 
 ## Supported Things
 
 The table below lists the Hayward OmniLogic binding thing types:
 
-| Things                       | Description                                                                     | Thing Type    |
-|------------------------------|---------------------------------------------------------------------------------|---------------|
-| Hayward OmniLogix Connection | Connection to Hayward's Server                                                  | bridge        |
-| Backyard                     | Backyard                                                                        | backyard      |
-| Body of Water                | Body of Water                                                                   | bow           |
-| Chlorinator                  | Chlorinator                                                                     | chlorinator   |
-| Colorlogic Light             | Colorlogic Light                                                                | colorlogic    |
-| Filter                       | Filter control                                                                  | filter        |
-| Heater Equipment             | Actual heater (i.e. gas, solar, electric)                                       | heater        |
-| Pump                         | Auxillary pump control (i.e. spillover)                                         | pump          |
-| Relay                        | Accessory relay control (deck jet sprinklers, lights, etc.)                     | relay         |
-| Virtaul Heater               | A Virtual Heater that can control all of the heater equipment based on priority | virtualHeater |
+| Things                   | Description                                                   | Thing Type     |
+|--------------------------|---------------------------------------------------------------|----------------|
+| Hayward OmniLogix Bridge | Connection to the local OmniLogic controller over UDP        | bridge         |
+| Backyard                 | Backyard                                                      | backyard       |
+| Body of Water            | Body of Water                                                 | bow            |
+| Chlorinator              | Chlorinator                                                   | chlorinator    |
+| Colorlogic Light         | Colorlogic Light                                              | colorlogic     |
+| Filter                   | Filter control                                                | filter         |
+| Heater Equipment         | Actual heater (i.e. gas, solar, electric)                     | heater         |
+| Pump                     | Auxiliary pump control (i.e. spillover)                      | pump           |
+| Relay                    | Accessory relay control (deck jet sprinklers, lights, etc.)   | relay          |
+| Virtual Heater           | A Virtual Heater that can control all of the heater equipment based on priority | virtualHeater |
+
 
 ## Discovery
 
-The binding will automatically discover the Omnilogic pool things from the cloud server using your Hayward Omnilogic credentials.
+Once the bridge is configured, the binding queries the controller over UDP to read its configuration.
+All connected equipment is then discovered and presented as things within openHAB.
 
 ## Thing Configuration
 
-Hayward OmniLogic Connection Parameters:
+Hayward OmniLogic Controller Parameters:
 
-| Property             | Default                                                          | Required | Description                                  |
-|----------------------|------------------------------------------------------------------|----------|----------------------------------------------|
-| Host Name            | <https://app1.haywardomnilogic.com/HAAPI/HomeAutomation/API.ash> | Yes      | Host name of the Hayward API server          |
-| User Name            | None                                                             | Yes      | Your Hayward User Name (not email address)   |
-| Password             | None                                                             | Yes      | Your Hayward User Password                   |
-| Telemetry Poll Delay | 3                                                                | Yes      | Telemetry Poll Delay (2-60 seconds)          |
-| Alarm Poll Delay     | 10                                                               | Yes      | Alarm Poll Delay (0-120 seconds, 0 disabled) |
+| Property             | Default          | Required | Description                                   |
+|----------------------|------------------|----------|-----------------------------------------------|
+| Host Name            | haywardomnilogic | Yes      | Host name or IP address of the controller     |
+| Telemetry Poll Delay | 3                | Yes      | Telemetry poll delay (2-60 seconds)           |
+| Alarm Poll Delay     | 10               | Yes      | Alarm poll delay (0-120 seconds, 0 disabled)  |
 
 ## Channels
 
@@ -172,6 +179,6 @@ Hayward OmniLogic Connection Parameters:
 
 ## Full Example
 
-After installing the binding, you will need to manually add the Hayward Connection thing and enter your credentials.
+After installing the binding, you will need to manually add the Hayward Connection thing.
 All pool items can be automatically discovered by scanning the bridge.
 Goto the inbox and add the things.

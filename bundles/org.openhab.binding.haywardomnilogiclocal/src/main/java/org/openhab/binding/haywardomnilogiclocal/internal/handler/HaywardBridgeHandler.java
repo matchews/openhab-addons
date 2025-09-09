@@ -12,24 +12,16 @@
  */
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
+import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -38,22 +30,17 @@ import javax.xml.xpath.XPathFactory;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.client.api.ContentResponse;
-import org.eclipse.jetty.client.api.Request;
-import org.eclipse.jetty.client.util.StringContentProvider;
-import org.eclipse.jetty.http.HttpHeader;
-import org.eclipse.jetty.http.HttpMethod;
-import org.eclipse.jetty.http.HttpVersion;
-import org.openhab.binding.haywardomnilogiclocal.internal.GetTelemetry;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardAccount;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardDynamicStateDescriptionProvider;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardTypeToRequest;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.HaywardConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.discovery.HaywardDiscoveryService;
+import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpClient;
+import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpRequest;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Channel;
@@ -70,9 +57,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
-
 /**
  * The {@link HaywardBridgeHandler} is responsible for handling commands, which are
  * sent to one of the channels.
@@ -83,26 +67,34 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 @NonNullByDefault
 public class HaywardBridgeHandler extends BaseBridgeHandler {
     private final Logger logger = LoggerFactory.getLogger(HaywardBridgeHandler.class);
+    private static final int MSG_TYPE_REQUEST = 1;
+    private static final int MSG_TYPE_TELEMETRY = HaywardMessageType.MSP_TELEMETRY_UPDATE.getMsgInt();
+    private static final int UDP_PORT = 10444;
+
     private final HaywardDynamicStateDescriptionProvider stateDescriptionProvider;
-    private final HttpClient httpClient;
+    private @Nullable UdpClient udpClient;
     private @Nullable ScheduledFuture<?> initializeFuture;
     private @Nullable ScheduledFuture<?> pollTelemetryFuture;
     private @Nullable ScheduledFuture<?> pollAlarmsFuture;
     private int commFailureCount;
-    public HaywardConfig config = getConfig().as(HaywardConfig.class);
-    public HaywardAccount account = getConfig().as(HaywardAccount.class);
-    private XStream xstream = new XStream(new StaxDriver());
-    // private XStream xstream = new XStream(new DomDriver("UTF-8"));
+    private HaywardConfig config = getConfig().as(HaywardConfig.class);
+    private final HaywardAccount account = getConfig().as(HaywardAccount.class);
+
+    public HaywardConfig getBridgeConfig() {
+        return config;
+    }
+
+    public HaywardAccount getAccount() {
+        return account;
+    }
 
     @Override
     public Collection<Class<? extends ThingHandlerService>> getServices() {
         return Set.of(HaywardDiscoveryService.class);
     }
 
-    public HaywardBridgeHandler(HaywardDynamicStateDescriptionProvider stateDescriptionProvider, Bridge bridge,
-            HttpClient httpClient) {
+    public HaywardBridgeHandler(HaywardDynamicStateDescriptionProvider stateDescriptionProvider, Bridge bridge) {
         super(bridge);
-        this.httpClient = httpClient;
         this.stateDescriptionProvider = stateDescriptionProvider;
     }
 
@@ -125,76 +117,39 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             try {
                 scheduledInitialize();
             } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (UnsupportedEncodingException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                logger.error("Initialization failed", e);
             }
         }, 1, TimeUnit.SECONDS);
-        return;
     }
 
-    public void scheduledInitialize() throws UnknownHostException, UnsupportedEncodingException {
+    public void scheduledInitialize() throws UnknownHostException {
         config = getConfigAs(HaywardConfig.class);
+        udpClient = new UdpClient(config.getEndpointUrl(), UDP_PORT);
 
         try {
             clearPolling(pollTelemetryFuture);
             clearPolling(pollAlarmsFuture);
 
-            if (!(login())) {
+            if (!handshake()) {
                 updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                        "Unable to Login to Hayward's server");
+                        "Unable to complete UDP handshake");
                 clearPolling(pollTelemetryFuture);
                 clearPolling(pollAlarmsFuture);
                 commFailureCount = 50;
                 initPolling(60);
                 return;
-            }
-
-            if (!(getSiteList())) {
-                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                        "Unable to getMSP from Hayward's server");
-                clearPolling(pollTelemetryFuture);
-                clearPolling(pollAlarmsFuture);
-                commFailureCount = 50;
-                initPolling(60);
-                return;
-            }
-
-            if (!(mspConfigUnits())) {
-                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                        "Unable to getMSPConfigUnits from Hayward's server");
-                clearPolling(pollTelemetryFuture);
-                clearPolling(pollAlarmsFuture);
-                commFailureCount = 50;
-                initPolling(60);
-                return;
-            }
-
-            if (logger.isTraceEnabled()) {
-                if (!(getApiDef())) {
-                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                            "Unable to getApiDef from Hayward's server");
-                    clearPolling(pollTelemetryFuture);
-                    clearPolling(pollAlarmsFuture);
-                    commFailureCount = 50;
-                    initPolling(60);
-                    return;
-                }
             }
 
             if (this.thing.getStatus() != ThingStatus.ONLINE) {
                 updateStatus(ThingStatus.ONLINE);
             }
 
-            logger.debug("Succesfully opened connection to Hayward's server: {} Username:{}", config.endpointUrl,
-                    config.username);
+            logger.debug("Successfully opened connection to Hayward controller: {}", config.getEndpointUrl());
 
             initPolling(0);
             logger.trace("Hayward Telemetry polling scheduled");
 
-            if (config.alarmPollTime > 0) {
+            if (config.getAlarmPollTime() > 0) {
                 initAlarmPolling(1);
             }
         } catch (HaywardException e) {
@@ -204,220 +159,47 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             clearPolling(pollAlarmsFuture);
             commFailureCount = 50;
             initPolling(60);
-            return;
-        } catch (InterruptedException e) {
-            return;
         }
     }
 
-    public synchronized boolean login()
-            throws HaywardException, InterruptedException, UnknownHostException, UnsupportedEncodingException {
-        String xmlResponse;
-        String status;
-        Random random = new Random();
-        Instant now = Instant.now();
+    private synchronized boolean handshake() throws HaywardException {
 
-        String header_format = "!LQ4sLBBBB";
-        int msgID = random.nextInt();
-        long timeStamp = System.currentTimeMillis();
-        String version = "1.22";
-        int msgType = 1; // 1004 for telemetry
-        byte clientType = 1;
-        byte reserved = 0;
-
-        // Build Header
-        ByteBuffer header = ByteBuffer.allocate(24);
-        header.putInt(msgID);
-        header.putLong(timeStamp);
-        header.put(version.getBytes("ASCII"));
-        header.putInt(msgType);
-        header.put(clientType);
-        header.put(reserved);
-        header.put(reserved);
-        header.put(reserved);
-        byte[] headerBytes = header.array();
-
-        // Build XML Request
-        GetTelemetry getTelemetry = new GetTelemetry();
-        xstream.alias("Request", GetTelemetry.class);
-        xstream.useAttributeFor(GetTelemetry.class, "xmlns");
-        String xmlToSend = xstream.toXML(getTelemetry);
-        xmlToSend = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n"
-                + "<Request xmlns=\"http://nextgen.hayward.com/api\">\r\n" + "    <Name>RequestTelemetryData</Name>\r\n"
-                + "</Request>";
-        char nullChar = '\0';
-        xmlToSend = xmlToSend + nullChar;
-        byte[] xmlBytes = xmlToSend.getBytes("UTF-8");
-
-        // Assemble final packet to send
-        byte[] packedBytes = new byte[headerBytes.length + xmlBytes.length];
-        System.arraycopy(headerBytes, 0, packedBytes, 0, headerBytes.length);
-        System.arraycopy(xmlBytes, 0, packedBytes, headerBytes.length, xmlBytes.length);
-
-        // 10.0.5.31
-        // haywardomnilogic
-        InetAddress serverAddress = InetAddress.getByName("10.0.5.31"); // "haywardomnilogic";
-        int serverPort = 10444;
-
-        try (DatagramSocket socket = new DatagramSocket()) {
-            DatagramSocket clientSocket = new DatagramSocket();
-            DatagramPacket sendPacket = new DatagramPacket(packedBytes, packedBytes.length, serverAddress, serverPort);
-            clientSocket.send(sendPacket);
-
-            System.out.println("XML data sent successfully over UDP.");
-
-            byte[] receiveData = new byte[1024];
-            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            clientSocket.receive(receivePacket); // Blocks until a response is received
-            String receivedXml = new String(receivePacket.getData(), 0, receivePacket.getLength(), "UTF-8");
-            System.out.println("Received XML: " + receivedXml);
-
-            byte[] receiveData2 = new byte[1024];
-            DatagramPacket receivePacket2 = new DatagramPacket(receiveData2, receiveData2.length);
-            clientSocket.receive(receivePacket2); // Blocks until a response is received
-            String receivedXml2 = new String(receivePacket2.getData(), 0, receivePacket2.getLength(), "UTF-8");
-            System.out.println("Received XML: " + receivedXml2);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // *****Login to Hayward server
-        String urlParameters = """
-                <?xml version="1.0" encoding="utf-8"?><Request>\
-                <Name>Login</Name><Parameters>\
-                <Parameter name="UserName" dataType="String">\
-                """ + config.username + "</Parameter>" + "<Parameter name=\"Password\" dataType=\"String\">"
-                + config.password + "</Parameter>" + "</Parameters></GetTelemetry>";
-
-        xmlResponse = httpXmlResponse(urlParameters);
+        String xmlResponse = udpXmlResponse(xmlRequest, MSG_TYPE_REQUEST);
 
         if (xmlResponse.isEmpty()) {
-            logger.debug("Hayward Connection thing: Login XML response was null");
+            logger.debug("Hayward Connection thing: Handshake XML response was null");
             return false;
         }
-
-        status = evaluateXPath("/Response/Parameters//Parameter[@name='Status']/text()", xmlResponse).get(0);
-
-        if (!("0".equals(status))) {
-            logger.debug("Hayward Connection thing: Login XML response: {}", xmlResponse);
-            return false;
-        }
-
-        account.token = evaluateXPath("/Response/Parameters//Parameter[@name='Token']/text()", xmlResponse).get(0);
-        account.userID = evaluateXPath("/Response/Parameters//Parameter[@name='UserID']/text()", xmlResponse).get(0);
-        return true;
     }
 
-    public synchronized boolean getApiDef() throws HaywardException, InterruptedException {
-        String xmlResponse;
-
-        // *****getApiDef from Hayward server
-        String urlParameters = """
-                <?xml version="1.0" encoding="utf-8"?><Request><Name>GetAPIDef</Name><Parameters>\
-                <Parameter name="Token" dataType="String">\
-                """ + account.token + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                + account.mspSystemID + "</Parameter>;"
-                + "<Parameter name=\"Version\" dataType=\"string\">0.4</Parameter >\r\n"
-                + "<Parameter name=\"Language\" dataType=\"string\">en</Parameter >\r\n"
-                + "</Parameters></GetTelemetry>";
-
-        xmlResponse = httpXmlResponse(urlParameters);
-
-        if (xmlResponse.isEmpty()) {
-            logger.debug("Hayward Connection thing: getApiDef XML response was null");
-            return false;
-        }
-        return true;
-    }
-
-    public synchronized boolean getSiteList() throws HaywardException, InterruptedException {
-        String xmlResponse;
-        String status;
-
-        // *****Get MSP
-        String urlParameters = """
-                <?xml version="1.0" encoding="utf-8"?><Request><Name>GetSiteList</Name><Parameters>\
-                <Parameter name="Token" dataType="String">\
-                """ + account.token + "</Parameter><Parameter name=\"UserID\" dataType=\"String\">" + account.userID
-                + "</Parameter></Parameters></GetTelemetry>";
-
-        xmlResponse = httpXmlResponse(urlParameters);
-
-        if (xmlResponse.isEmpty()) {
-            logger.debug("Hayward Connection thing: getSiteList XML response was null");
-            return false;
-        }
-
-        status = evaluateXPath("/Response/Parameters//Parameter[@name='Status']/text()", xmlResponse).get(0);
-
-        if (!("0".equals(status))) {
-            logger.debug("Hayward Connection thing: getSiteList XML response: {}", xmlResponse);
-            return false;
-        }
-
-        account.mspSystemID = evaluateXPath("/Response/Parameters/Parameter/Item//Property[@name='MspSystemID']/text()",
-                xmlResponse).get(0);
-        account.backyardName = evaluateXPath(
-                "/Response/Parameters/Parameter/Item//Property[@name='BackyardName']/text()", xmlResponse).get(0);
-        account.address = evaluateXPath("/Response/Parameters/Parameter/Item//Property[@name='Address']/text()",
-                xmlResponse).get(0);
-        return true;
-    }
-
+    @Deprecated
     public synchronized String getMspConfig() throws HaywardException, InterruptedException {
-        // *****getMspConfig from Hayward server
-        String urlParameters = """
-                <?xml version="1.0" encoding="utf-8"?><Request><Name>GetMspConfigFile</Name><Parameters>\
-                <Parameter name="Token" dataType="String">\
-                """ + account.token + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                + account.mspSystemID + "</Parameter><Parameter name=\"Version\" dataType=\"string\">0</Parameter>\r\n"
-                + "</Parameters></GetTelemetry>";
+        return getMspConfigV2();
+    }
 
-        String xmlResponse = httpXmlResponse(urlParameters);
+    public synchronized String getMspConfigV2() throws HaywardException, InterruptedException {
+        String urlParameters = "<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?><Request><Name>GetMspConfig</Name><Parameters/></Request>";
+
+        String xmlResponse = udpXmlResponse(urlParameters, MSG_TYPE_REQUEST);
 
         if (xmlResponse.isEmpty()) {
-            logger.debug("Hayward Connection thing: getMSPConfig XML response was null");
+            logger.debug("Hayward Connection thing: MSP config XML response was null");
             return "Fail";
         }
 
-        if (evaluateXPath("//Backyard/Name/text()", xmlResponse).isEmpty()) {
-            logger.debug("Hayward Connection thing: getMSPConfig XML response: {}", xmlResponse);
+        List<String> configs = evaluateXPath("//Parameter[@name='MspConfig']/text()", xmlResponse);
+        if (configs.isEmpty()) {
+            logger.debug("Hayward Connection thing: MSP config XML response: {}", xmlResponse);
             return "Fail";
         }
-        return xmlResponse;
+
+        return configs.get(0);
     }
 
-    public synchronized boolean mspConfigUnits() throws HaywardException, InterruptedException {
-        List<String> property1 = new ArrayList<>();
-        List<String> property2 = new ArrayList<>();
+    public synchronized boolean getTelemetryData() throws HaywardException {
+        String urlParameters = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>GetTelemetryData</Name><Parameters/></Request>";
 
-        String xmlResponse = getMspConfig();
-
-        if (xmlResponse.contentEquals("Fail")) {
-            return false;
-        }
-
-        // Get Units (Standard, Metric)
-        property1 = evaluateXPath("//System/Units/text()", xmlResponse);
-        account.units = property1.get(0);
-
-        // Get Variable Speed Pump Units (percent, RPM)
-        property2 = evaluateXPath("//System/Msp-Vsp-Speed-Format/text()", xmlResponse);
-        account.vspSpeedFormat = property2.get(0);
-
-        return true;
-    }
-
-    public synchronized boolean getTelemetryData() throws HaywardException, InterruptedException {
-        // *****getTelemetry from Hayward server
-        String urlParameters = """
-                <?xml version="1.0" encoding="utf-8"?><Request><Name>GetTelemetryData</Name><Parameters>\
-                <Parameter name="Token" dataType="String">\
-                """ + account.token + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                + account.mspSystemID + "</Parameter></Parameters></GetTelemetry>";
-
-        String xmlResponse = httpXmlResponse(urlParameters);
+        String xmlResponse = udpXmlResponse(urlParameters, MSG_TYPE_TELEMETRY);
 
         if (xmlResponse.isEmpty()) {
             logger.debug("Hayward Connection thing: getTelemetry XML response was null");
@@ -473,11 +255,8 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
                 updateStatus(ThingStatus.ONLINE);
             } catch (HaywardException e) {
                 logger.debug("Hayward Connection thing: Exception during poll: {}", e.getMessage());
-            } catch (InterruptedException e) {
-                return;
             }
-        }, initalDelay, config.telemetryPollTime, TimeUnit.SECONDS);
-        return;
+        }, initalDelay, config.getTelemetryPollTime(), TimeUnit.SECONDS);
     }
 
     private synchronized void initAlarmPolling(int initalDelay) {
@@ -487,7 +266,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             } catch (HaywardException e) {
                 logger.debug("Hayward Connection thing: Exception during poll: {}", e.getMessage());
             }
-        }, initalDelay, config.alarmPollTime, TimeUnit.SECONDS);
+        }, initalDelay, config.getAlarmPollTime(), TimeUnit.SECONDS);
     }
 
     private void clearPolling(@Nullable ScheduledFuture<?> pollJob) {
@@ -525,71 +304,24 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         return values;
     }
 
-    private Request sendRequestBuilder(String url, HttpMethod method) {
-        return this.httpClient.newRequest(url).agent("NextGenForIPhone/16565 CFNetwork/887 Darwin/17.0.0")
-                .method(method).header(HttpHeader.ACCEPT_LANGUAGE, "en-us").header(HttpHeader.ACCEPT, "*/*")
-                .header(HttpHeader.ACCEPT_ENCODING, "gzip, deflate").version(HttpVersion.HTTP_1_1)
-                .header(HttpHeader.CONNECTION, "keep-alive").header(HttpHeader.HOST, "www.haywardomnilogic.com:80")
-                .timeout(10, TimeUnit.SECONDS);
-    }
-
-    public synchronized String httpXmlResponse(String urlParameters) throws HaywardException, InterruptedException {
-        String urlParameterslength = Integer.toString(urlParameters.length());
-        String statusMessage;
-
+    public synchronized String udpXmlResponse(String xmlRequest, int msgType) throws HaywardException {
         if (logger.isTraceEnabled()) {
-            logger.trace("Hayward Connection thing:  {} Hayward http command: {}", getCallingMethod(), urlParameters);
+            logger.trace("Hayward Connection thing:  {} Hayward UDP command: {}", getCallingMethod(), xmlRequest);
         } else if (logger.isDebugEnabled()) {
             logger.debug("Hayward Connection thing:  {}", getCallingMethod());
         }
 
-        for (int retry = 0; retry <= 2; retry++) {
-            try {
-                ContentResponse httpResponse = sendRequestBuilder(config.endpointUrl, HttpMethod.POST)
-                        .content(new StringContentProvider(urlParameters), "text/xml; charset=utf-8")
-                        .header(HttpHeader.CONTENT_LENGTH, urlParameterslength).send();
-
-                int status = httpResponse.getStatus();
-                String xmlResponse = httpResponse.getContentAsString();
-
-                if (status == 200) {
-                    List<String> statusMessages = evaluateXPath(
-                            "/Response/Parameters//Parameter[@name='StatusMessage']/text()", xmlResponse);
-                    if (!(statusMessages.isEmpty())) {
-                        statusMessage = statusMessages.get(0);
-                    } else {
-                        statusMessage = httpResponse.getReason();
-                    }
-
-                    if (logger.isTraceEnabled()) {
-                        logger.trace("Hayward Connection thing:  {} Hayward http response: {} {}", getCallingMethod(),
-                                statusMessage, xmlResponse);
-                    }
-                    return xmlResponse;
-                } else {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Hayward Connection thing:  {} Hayward http response: {} {}", getCallingMethod(),
-                                status, xmlResponse);
-                    }
-                    return "";
-                }
-            } catch (ExecutionException e) {
-                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                        "Unable to resolve host.  Check Hayward hostname and your internet connection. "
-                                + e.getMessage());
-                return "";
-            } catch (TimeoutException e) {
-                if (retry >= 2) {
-                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                            "Connection Timeout.  Check Hayward hostname and your internet connection. "
-                                    + e.getMessage());
-                    return "";
-                } else {
-                    logger.warn("Hayward Connection thing Timeout:  {} Try:  {} ", getCallingMethod(), retry + 1);
-                }
-            }
+        if (udpClient == null) {
+            throw new HaywardException("UDP client not initialised");
         }
-        return "";
+
+        try {
+            return udpClient.send(new UdpRequest(msgType, xmlRequest));
+        } catch (IOException e) {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
+                    "UDP communication error: " + e.getMessage());
+            return "";
+        }
     }
 
     private String getCallingMethod() {
