@@ -97,7 +97,7 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
                 if (bridge != null) {
                     HaywardBridgeHandler bridgehandler = (HaywardBridgeHandler) bridge.getHandler();
                     if (bridgehandler != null) {
-                        if ("Standard".equals(bridgehandler.account.units)) {
+                        if ("Standard".equals(bridgehandler.getAccount().getUnits())) {
                             return new QuantityType<>(Integer.parseInt(value), ImperialUnits.FAHRENHEIT);
                         } else {
                             return new QuantityType<>(Integer.parseInt(value), SIUnits.CELSIUS);

@@ -131,9 +131,9 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                 switch (channelUID.getId()) {
                     case HaywardBindingConstants.CHANNEL_VIRTUALHEATER_ENABLE:
                         cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS + "<Name>SetHeaterEnable</Name><Parameters>"
-                                + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.account.token
+                                + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.getAccount().getToken()
                                 + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                                + bridgehandler.account.mspSystemID + "</Parameter>"
+                                + bridgehandler.getAccount().getMspSystemID() + "</Parameter>"
                                 + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
                                 + "<Parameter name=\"HeaterID\" dataType=\"int\">" + systemID + "</Parameter>"
                                 + "<Parameter name=\"Enabled\" dataType=\"bool\">" + cmdString + "</Parameter>"
@@ -150,9 +150,9 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                         }
 
                         cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS + "<Name>SetUIHeaterCmd</Name><Parameters>"
-                                + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.account.token
+                                + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.getAccount().getToken()
                                 + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                                + bridgehandler.account.mspSystemID + "</Parameter>"
+                                + bridgehandler.getAccount().getMspSystemID() + "</Parameter>"
                                 + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
                                 + "<Parameter name=\"HeaterID\" dataType=\"int\">" + systemID + "</Parameter>"
                                 + "<Parameter name=\"Temp\" dataType=\"int\">" + cmdString + "</Parameter>"
@@ -172,8 +172,8 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                     return;
                 }
             } catch (HaywardException e) {
-                logger.debug("Unable to send command to Hayward's server {}:{}:{}", bridgehandler.config.endpointUrl,
-                        bridgehandler.config.username, e.getMessage());
+                logger.debug("Unable to send command to Hayward's server {}:{}:{}", bridgehandler.getBridgeConfig().getEndpointUrl(),
+                        bridgehandler.getBridgeConfig().getUsername(), e.getMessage());
             }
             this.updateStatus(ThingStatus.ONLINE);
         } else {

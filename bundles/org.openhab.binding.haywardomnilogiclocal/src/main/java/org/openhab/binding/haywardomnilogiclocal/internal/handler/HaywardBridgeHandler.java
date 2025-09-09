@@ -77,8 +77,16 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
     private @Nullable ScheduledFuture<?> pollTelemetryFuture;
     private @Nullable ScheduledFuture<?> pollAlarmsFuture;
     private int commFailureCount;
-    public HaywardConfig config = getConfig().as(HaywardConfig.class);
-    public HaywardAccount account = getConfig().as(HaywardAccount.class);
+    private HaywardConfig config = getConfig().as(HaywardConfig.class);
+    private final HaywardAccount account = getConfig().as(HaywardAccount.class);
+
+    public HaywardConfig getBridgeConfig() {
+        return config;
+    }
+
+    public HaywardAccount getAccount() {
+        return account;
+    }
 
     @Override
     public Collection<Class<? extends ThingHandlerService>> getServices() {
@@ -118,7 +126,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
 
     public void scheduledInitialize() throws UnknownHostException {
         config = getConfigAs(HaywardConfig.class);
-        udpClient = new UdpClient(config.endpointUrl, UDP_PORT);
+        udpClient = new UdpClient(config.getEndpointUrl(), UDP_PORT);
 
         try {
             clearPolling(pollTelemetryFuture);
@@ -170,13 +178,13 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
                 updateStatus(ThingStatus.ONLINE);
             }
 
-            logger.debug("Succesfully opened connection to Hayward's server: {} Username:{}", config.endpointUrl,
-                    config.username);
+            logger.debug("Succesfully opened connection to Hayward's server: {} Username:{}",
+                    config.getEndpointUrl(), config.getUsername());
 
             initPolling(0);
             logger.trace("Hayward Telemetry polling scheduled");
 
-            if (config.alarmPollTime > 0) {
+            if (config.getAlarmPollTime() > 0) {
                 initAlarmPolling(1);
             }
         } catch (HaywardException e) {
@@ -194,8 +202,8 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
 
     public synchronized boolean login() throws HaywardException {
         String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>Login</Name><Parameters>"
-                + "<Parameter name=\"UserName\" dataType=\"String\">" + config.username + "</Parameter>"
-                + "<Parameter name=\"Password\" dataType=\"String\">" + config.password + "</Parameter>"
+                + "<Parameter name=\"UserName\" dataType=\"String\">" + config.getUsername() + "</Parameter>"
+                + "<Parameter name=\"Password\" dataType=\"String\">" + config.getPassword() + "</Parameter>"
                 + "</Parameters></Request>";
 
         String xmlResponse = udpXmlResponse(xmlRequest, MSG_TYPE_REQUEST);
@@ -212,8 +220,8 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             return false;
         }
 
-        account.token = evaluateXPath("/Response/Parameters//Parameter[@name='Token']/text()", xmlResponse).get(0);
-        account.userID = evaluateXPath("/Response/Parameters//Parameter[@name='UserID']/text()", xmlResponse).get(0);
+        account.setToken(evaluateXPath("/Response/Parameters//Parameter[@name='Token']/text()", xmlResponse).get(0));
+        account.setUserID(evaluateXPath("/Response/Parameters//Parameter[@name='UserID']/text()", xmlResponse).get(0));
         return true;
     }
 
@@ -225,8 +233,8 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         String urlParameters = """
                 <?xml version="1.0" encoding="utf-8"?><Request><Name>GetAPIDef</Name><Parameters>\
                 <Parameter name="Token" dataType="String">\
-                """ + account.token + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                + account.mspSystemID + "</Parameter>;"
+                """ + account.getToken() + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
+                + account.getMspSystemID() + "</Parameter>;"
                 + "<Parameter name=\"Version\" dataType=\"string\">0.4</Parameter >\r\n"
                 + "<Parameter name=\"Language\" dataType=\"string\">en</Parameter >\r\n"
                 + "</Parameters></GetTelemetry>";
@@ -248,7 +256,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         String urlParameters = """
                 <?xml version="1.0" encoding="utf-8"?><Request><Name>GetSiteList</Name><Parameters>\
                 <Parameter name="Token" dataType="String">\
-                """ + account.token + "</Parameter><Parameter name=\"UserID\" dataType=\"String\">" + account.userID
+                """ + account.getToken() + "</Parameter><Parameter name=\"UserID\" dataType=\"String\">" + account.getUserID()
                 + "</Parameter></Parameters></GetTelemetry>";
 
         xmlResponse = udpXmlResponse(urlParameters, MSG_TYPE_REQUEST);
@@ -265,12 +273,12 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             return false;
         }
 
-        account.mspSystemID = evaluateXPath("/Response/Parameters/Parameter/Item//Property[@name='MspSystemID']/text()",
-                xmlResponse).get(0);
-        account.backyardName = evaluateXPath(
-                "/Response/Parameters/Parameter/Item//Property[@name='BackyardName']/text()", xmlResponse).get(0);
-        account.address = evaluateXPath("/Response/Parameters/Parameter/Item//Property[@name='Address']/text()",
-                xmlResponse).get(0);
+        account.setMspSystemID(evaluateXPath(
+                "/Response/Parameters/Parameter/Item//Property[@name='MspSystemID']/text()", xmlResponse).get(0));
+        account.setBackyardName(evaluateXPath(
+                "/Response/Parameters/Parameter/Item//Property[@name='BackyardName']/text()", xmlResponse).get(0));
+        account.setAddress(evaluateXPath(
+                "/Response/Parameters/Parameter/Item//Property[@name='Address']/text()", xmlResponse).get(0));
         return true;
     }
 
@@ -279,8 +287,8 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         String urlParameters = """
                 <?xml version="1.0" encoding="utf-8"?><Request><Name>GetMspConfigFile</Name><Parameters>\
                 <Parameter name="Token" dataType="String">\
-                """ + account.token + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                + account.mspSystemID + "</Parameter><Parameter name=\"Version\" dataType=\"string\">0</Parameter>\r\n"
+                """ + account.getToken() + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
+                + account.getMspSystemID() + "</Parameter><Parameter name=\"Version\" dataType=\"string\">0</Parameter>\r\n"
                 + "</Parameters></GetTelemetry>";
 
         String xmlResponse = udpXmlResponse(urlParameters, MSG_TYPE_REQUEST);
@@ -309,11 +317,11 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
 
         // Get Units (Standard, Metric)
         property1 = evaluateXPath("//System/Units/text()", xmlResponse);
-        account.units = property1.get(0);
+        account.setUnits(property1.get(0));
 
         // Get Variable Speed Pump Units (percent, RPM)
         property2 = evaluateXPath("//System/Msp-Vsp-Speed-Format/text()", xmlResponse);
-        account.vspSpeedFormat = property2.get(0);
+        account.setVspSpeedFormat(property2.get(0));
 
         return true;
     }
@@ -323,8 +331,8 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         String urlParameters = """
                 <?xml version="1.0" encoding="utf-8"?><Request><Name>GetTelemetryData</Name><Parameters>\
                 <Parameter name="Token" dataType="String">\
-                """ + account.token + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                + account.mspSystemID + "</Parameter></Parameters></GetTelemetry>";
+                """ + account.getToken() + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
+                + account.getMspSystemID() + "</Parameter></Parameters></GetTelemetry>";
 
         String xmlResponse = udpXmlResponse(urlParameters, MSG_TYPE_TELEMETRY);
 
@@ -385,7 +393,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             } catch (InterruptedException e) {
                 return;
             }
-        }, initalDelay, config.telemetryPollTime, TimeUnit.SECONDS);
+        }, initalDelay, config.getTelemetryPollTime(), TimeUnit.SECONDS);
         return;
     }
 
@@ -396,7 +404,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             } catch (HaywardException e) {
                 logger.debug("Hayward Connection thing: Exception during poll: {}", e.getMessage());
             }
-        }, initalDelay, config.alarmPollTime, TimeUnit.SECONDS);
+        }, initalDelay, config.getAlarmPollTime(), TimeUnit.SECONDS);
     }
 
     private void clearPolling(@Nullable ScheduledFuture<?> pollJob) {
