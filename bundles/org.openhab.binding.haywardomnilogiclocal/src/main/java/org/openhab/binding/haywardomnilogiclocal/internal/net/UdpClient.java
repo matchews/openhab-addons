@@ -120,6 +120,9 @@ public class UdpClient {
         } catch (UnsupportedEncodingException e) {
             throw new IOException(e);
         }
+        if (response == null) {
+            throw new IOException("No UDP response received");
+        }
         return response;
     }
 
