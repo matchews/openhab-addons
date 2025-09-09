@@ -16,7 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardBridgeHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.QuantityType;
@@ -137,5 +139,20 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
             }
         }
         return channelStates;
+    }
+
+    protected void updateIfPresent(Map<String, ParameterValue> values, String key, String channelID) {
+        @Nullable ParameterValue parameter = values.get(key);
+        if (parameter != null && parameter.value() != null) {
+            updateData(channelID, parameter.value());
+        }
+    }
+
+    protected void putIfPresent(Map<String, ParameterValue> values, String key, Map<String, String> properties,
+            String propertyName) {
+        @Nullable ParameterValue parameter = values.get(key);
+        if (parameter != null && parameter.value() != null) {
+            properties.put(propertyName, parameter.value());
+        }
     }
 }
