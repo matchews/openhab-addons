@@ -121,6 +121,7 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
         if (bridge != null && bridge.getHandler() instanceof HaywardBridgeHandler bridgehandler) {
             String cmdString = this.cmdToString(command);
             String cmdURL = null;
+            int mspId = Integer.parseInt(bridgehandler.getAccount().getMspSystemID());
 
             if (command == OnOffType.ON) {
                 cmdString = "True";
@@ -132,8 +133,7 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                 switch (channelUID.getId()) {
                     case HaywardBindingConstants.CHANNEL_VIRTUALHEATER_ENABLE:
                         cmdURL = CommandBuilder.buildSetHeaterEnable(HaywardBindingConstants.COMMAND_PARAMETERS,
-                                bridgehandler.account.token, bridgehandler.account.mspSystemID, poolID, systemID,
-                                cmdString);
+                                bridgehandler.getAccount().getToken(), mspId, poolID, systemID, cmdString);
                         break;
 
                     case HaywardBindingConstants.CHANNEL_VIRTUALHEATER_CURRENTSETPOINT:
@@ -145,8 +145,7 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                             }
                         }
                         cmdURL = CommandBuilder.buildSetUIHeaterCmd(HaywardBindingConstants.COMMAND_PARAMETERS,
-                                bridgehandler.account.token, bridgehandler.account.mspSystemID, poolID, systemID,
-                                cmdString);
+                                bridgehandler.getAccount().getToken(), mspId, poolID, systemID, cmdString);
                         break;
                     default:
                         logger.warn("haywardCommand Unsupported type {}", channelUID);
