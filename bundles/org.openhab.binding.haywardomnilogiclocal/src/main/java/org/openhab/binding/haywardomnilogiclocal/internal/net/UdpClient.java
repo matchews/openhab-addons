@@ -18,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -43,9 +44,12 @@ public class UdpClient {
 
             byte[] buf = new byte[4096];
             DatagramPacket responsePacket = new DatagramPacket(buf, buf.length);
+            socket.setSoTimeout(5000);
             socket.receive(responsePacket);
             UdpResponse response = UdpResponse.fromBytes(responsePacket.getData(), responsePacket.getLength());
             return response.getXml();
+        } catch (SocketTimeoutException e) {
+            throw new IOException("Timeout waiting for UDP response from " + address.getHostAddress() + ":" + port, e);
         } catch (UnsupportedEncodingException e) {
             // should never happen as UTF-8 is always supported
             throw new IOException(e);
