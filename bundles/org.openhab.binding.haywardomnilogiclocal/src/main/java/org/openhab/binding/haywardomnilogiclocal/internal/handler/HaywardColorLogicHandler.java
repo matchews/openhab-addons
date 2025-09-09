@@ -1,0 +1,40 @@
+package org.openhab.binding.haywardomnilogiclocal.internal.handler;
+
+import java.util.Map;
+
+import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
+import org.openhab.core.thing.ChannelUID;
+import org.openhab.core.thing.Thing;
+import org.openhab.core.types.Command;
+
+public class OmniLogicLocalColorLogicHandler extends OmniLogicLocalThingHandler {
+
+    public OmniLogicLocalColorLogicHandler(Thing thing) {
+        super(thing);
+    }
+
+    @Override
+    public void handleCommand(ChannelUID channelUID, Command command) {
+        String sysId = getThing().getProperties().get("systemID");
+        if (sysId == null) {
+            return;
+        }
+
+        if ("colorMode".equals(channelUID.getId())) {
+            sendUdpCommand(CommandBuilder.setColorMode(sysId, command.toString()));
+        } else if ("brightness".equals(channelUID.getId())) {
+            int val = ((Number) command).intValue();
+            sendUdpCommand(CommandBuilder.setBrightness(sysId, val));
+        }
+    }
+
+    public void updateFromConfig(Map<String, ParameterValue> values) {
+        String sysId = getThing().getProperties().get("systemID");
+        if (sysId == null) {
+            return;
+        }
+
+        putIfPresent(values, "colorMode_" + sysId, getThing().getProperties(), "colorMode");
+        updateIfPresent(values, "brightness_" + sysId, "brightness");
+    }
+}

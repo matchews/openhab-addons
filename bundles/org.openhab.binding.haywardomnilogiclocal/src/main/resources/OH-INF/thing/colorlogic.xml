@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="haywardomnilogic"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
+    xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+
+  <thing-type id="colorlogic" listed="false">
+    <supported-bridge-type-refs>
+      <bridge-type-ref id="bridge"/>
+    </supported-bridge-type-refs>
+
+    <label>ColorLogic</label>
+    <channels>
+      <channel id="colorMode" typeId="colorMode"/>
+      <channel id="brightness" typeId="brightness"/>
+    </channels>
+
+    <properties>
+      <property name="vendor">Hayward</property>
+      <property name="thingTypeVersion">2</property>
+    </properties>
+    <representation-property>systemID</representation-property>
+  </thing-type>
+
+  <channel-type id="colorMode">
+    <item-type>String</item-type>
+    <label>Color Mode</label>
+    <state readOnly="false"/>
+  </channel-type>
+
+  <channel-type id="brightness">
+    <item-type>Number</item-type>
+    <label>Brightness</label>
+    <description>Brightness (unit % from config)</description>
+    <state readOnly="false"/>
+  </channel-type>
+
+</thing:thing-descriptions>

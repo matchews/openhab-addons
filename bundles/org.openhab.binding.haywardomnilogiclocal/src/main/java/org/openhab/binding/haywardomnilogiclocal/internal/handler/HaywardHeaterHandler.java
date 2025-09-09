@@ -1,0 +1,23 @@
+package org.openhab.binding.haywardomnilogiclocal.internal.handler;
+
+import java.util.Map;
+
+import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
+import org.openhab.core.thing.Thing;
+
+public class OmniLogicLocalHeaterHandler extends OmniLogicLocalThingHandler {
+
+    public OmniLogicLocalHeaterHandler(Thing thing) {
+        super(thing);
+    }
+
+    public void updateFromConfig(Map<String, ParameterValue> values) {
+        String sysId = getThing().getProperties().get("systemID");
+        if (sysId == null) {
+            return;
+        }
+
+        updateIfPresent(values, "heaterEnable_" + sysId, "heaterEnable");
+        putIfPresent(values, "heaterState_" + sysId, getThing().getProperties(), "heaterState");
+    }
+}
