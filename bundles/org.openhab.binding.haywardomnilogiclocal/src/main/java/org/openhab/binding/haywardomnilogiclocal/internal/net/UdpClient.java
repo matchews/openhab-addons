@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.InflaterInputStream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 
 /**
  * Simple UDP client used to communicate with the OmniLogic controller.
@@ -34,6 +35,9 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @NonNullByDefault
 public class UdpClient {
     private static final int MSG_TYPE_ACK = 1002;
+    private static final int MSG_ACK = 1002;
+    private static final int MSG_LEAD = 1998;
+    private static final int MSG_BLOCK = 1999;
 
     private final InetAddress address;
     private final int port;
@@ -43,34 +47,17 @@ public class UdpClient {
         this.port = port;
     }
 
-
     public UdpResponse send(UdpRequest request) throws IOException {
-    private static final int MSG_ACK = 1002;
-    private static final int MSG_LEAD = 1998;
-    private static final int MSG_BLOCK = 1999;
-
-    public String send(UdpRequest request) throws IOException {
         byte[] out = request.toBytes();
+        UdpResponse response = null;
         try (DatagramSocket socket = new DatagramSocket()) {
             DatagramPacket packet = new DatagramPacket(out, out.length, address, port);
             socket.send(packet);
 
-            byte[] buf = new byte[4096];
-            DatagramPacket responsePacket = new DatagramPacket(buf, buf.length);
-            socket.setSoTimeout(5000);
-            socket.receive(responsePacket);
-
-            UdpResponse response = UdpResponse.fromBytes(responsePacket.getData(), responsePacket.getLength());
-            int rcvType = response.getMessageType();
-            if (rcvType == 1998 || rcvType == 1999 || rcvType == 1004) {
-                sendAck(socket, response.getMessageId());
-            }
-
-            return response;
-
             ByteArrayOutputStream blocks = new ByteArrayOutputStream();
             int expectedBlocks = 0;
             boolean compressed = false;
+            boolean ackSent = false;
 
             while (true) {
                 byte[] buf = new byte[4096];
@@ -91,31 +78,49 @@ public class UdpClient {
                 boolean thisCompressed = buffer.get() != 0;
                 buffer.get();
 
+                if (!ackSent && (msgType == MSG_LEAD || msgType == MSG_BLOCK
+                        || msgType == HaywardMessageType.MSP_TELEMETRY_UPDATE.getMsgInt())) {
+                    sendAck(socket, msgId);
+                    ackSent = true;
+                }
+
                 if (msgType == MSG_LEAD) {
                     expectedBlocks = blockCount;
                     compressed = thisCompressed;
-                    sendAck(socket, msgId);
                 } else if (msgType == MSG_BLOCK) {
                     blocks.write(data, 24, data.length - 24);
                     expectedBlocks--;
-                    sendAck(socket, msgId);
-                    if (expectedBlocks <= 0) {
+                    if (expectedBlocks == 0) {
                         byte[] payload = blocks.toByteArray();
                         if (compressed) {
                             payload = decompress(payload);
                         }
-                        return new String(payload, StandardCharsets.UTF_8).trim();
+                        String xml = new String(payload, StandardCharsets.UTF_8).trim();
+                        ByteBuffer header = ByteBuffer.allocate(24);
+                        header.putInt(msgId);
+                        header.putLong(System.currentTimeMillis());
+                        header.put("1.22".getBytes(StandardCharsets.US_ASCII));
+                        header.putInt(msgType);
+                        header.put((byte) 1);
+                        header.put(new byte[3]);
+                        byte[] xmlBytes = (xml + '\0').getBytes(StandardCharsets.UTF_8);
+                        byte[] packetBytes = new byte[header.position() + xmlBytes.length];
+                        System.arraycopy(header.array(), 0, packetBytes, 0, header.position());
+                        System.arraycopy(xmlBytes, 0, packetBytes, header.position(), xmlBytes.length);
+                        response = UdpResponse.fromBytes(packetBytes, packetBytes.length);
+                        break;
                     }
                 } else {
-                    return new String(data, 24, data.length - 24, StandardCharsets.UTF_8).trim();
+                    response = UdpResponse.fromBytes(data, data.length);
+                    break;
                 }
             }
         } catch (SocketTimeoutException e) {
             throw new IOException("Timeout waiting for UDP response from " + address.getHostAddress() + ":" + port, e);
         } catch (UnsupportedEncodingException e) {
-            // should never happen as UTF-8 is always supported
             throw new IOException(e);
         }
+        return response;
     }
 
     private void sendAck(DatagramSocket socket, int messageId) throws IOException {
