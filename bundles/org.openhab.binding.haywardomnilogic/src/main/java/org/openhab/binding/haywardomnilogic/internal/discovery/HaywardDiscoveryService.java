@@ -54,7 +54,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
     @Override
     protected void startScan() {
         try {
-            String xmlResults = thingHandler.getMspConfig();
+            String xmlResults = thingHandler.getMspConfigV2();
             mspConfigDiscovery(xmlResults);
         } catch (HaywardException e) {
             logger.warn("Exception during discovery scan: {}", e.getMessage());
@@ -69,8 +69,14 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
         Map<String, Object> backyardProperties = new HashMap<>();
         Map<String, Object> bowProperties = new HashMap<>();
 
+        List<String> configNodes = thingHandler.evaluateXPath("//Parameter[@name='MspConfig']/text()", xmlResponse);
+        String configXml = xmlResponse;
+        if (!configNodes.isEmpty()) {
+            configXml = configNodes.get(0);
+        }
+
         // Find Backyard
-        names = thingHandler.evaluateXPath("//Backyard/Name/text()", xmlResponse);
+        names = thingHandler.evaluateXPath("//Backyard/Name/text()", configXml);
 
         for (int i = 0; i < names.size(); i++) {
             backyardProperties.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.BACKYARD);
@@ -81,19 +87,19 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
         }
 
         // Find Bodies of Water
-        systemIDs = thingHandler.evaluateXPath("//Body-of-water/System-Id/text()", xmlResponse);
-        names = thingHandler.evaluateXPath("//Body-of-water/Name/text()", xmlResponse);
+        systemIDs = thingHandler.evaluateXPath("//Body-of-water/System-Id/text()", configXml);
+        names = thingHandler.evaluateXPath("//Body-of-water/Name/text()", configXml);
 
-        final List<String> bowProperty1 = thingHandler.evaluateXPath("//Body-of-water/Type/text()", xmlResponse);
-        final List<String> bowProperty2 = thingHandler.evaluateXPath("//Body-of-water/Shared-Type/text()", xmlResponse);
+        final List<String> bowProperty1 = thingHandler.evaluateXPath("//Body-of-water/Type/text()", configXml);
+        final List<String> bowProperty2 = thingHandler.evaluateXPath("//Body-of-water/Shared-Type/text()", configXml);
         final List<String> bowProperty3 = thingHandler.evaluateXPath("//Body-of-water/Shared-Priority/text()",
-                xmlResponse);
+                configXml);
         final List<String> bowProperty4 = thingHandler
-                .evaluateXPath("//Body-of-water/Shared-Equipment-System-ID/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Shared-Equipment-System-ID/text()", configXml);
         final List<String> bowProperty5 = thingHandler.evaluateXPath("//Body-of-water/Supports-Spillover/text()",
-                xmlResponse);
+                configXml);
         final List<String> bowProperty6 = thingHandler.evaluateXPath("//Body-of-water/Size-In-Gallons/text()",
-                xmlResponse);
+                configXml);
 
         for (int i = 0; i < systemIDs.size(); i++) {
             bowProperties.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.BOW);
@@ -110,15 +116,15 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
 
         // Find Chlorinators
         final List<String> chlorinatorProperty1 = thingHandler
-                .evaluateXPath("//Body-of-water/Chlorinator/Shared-Type/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Chlorinator/Shared-Type/text()", configXml);
         final List<String> chlorinatorProperty2 = thingHandler.evaluateXPath("//Body-of-water/Chlorinator/Mode/text()",
-                xmlResponse);
+                configXml);
         final List<String> chlorinatorProperty3 = thingHandler
-                .evaluateXPath("//Body-of-water/Chlorinator/Cell-Type/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Chlorinator/Cell-Type/text()", configXml);
         final List<String> chlorinatorProperty4 = thingHandler
-                .evaluateXPath("//Body-of-water/Chlorinator/Dispenser-Type/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Chlorinator/Dispenser-Type/text()", configXml);
 
-        discoverDevices(thingHandler, xmlResponse, "Chlorinator", HaywardTypeToRequest.CHLORINATOR,
+        discoverDevices(thingHandler, configXml, "Chlorinator", HaywardTypeToRequest.CHLORINATOR,
                 HaywardBindingConstants.THING_TYPE_CHLORINATOR, (props, i) -> {
                     props.put(HaywardBindingConstants.PROPERTY_CHLORINATOR_SHAREDTYPE, chlorinatorProperty1.get(i));
                     props.put(HaywardBindingConstants.PROPERTY_CHLORINATOR_MODE, chlorinatorProperty2.get(i));
@@ -128,10 +134,10 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
 
         // Find ColorLogic Lights
         final List<String> colorLogicProperty1 = thingHandler.evaluateXPath("//Backyard//ColorLogic-Light/Type/text()",
-                xmlResponse);
+                configXml);
 
         final List<String> colorLogicProperty2 = thingHandler
-                .evaluateXPath("//Backyard//ColorLogic-Light/V2-Active/text()", xmlResponse);
+                .evaluateXPath("//Backyard//ColorLogic-Light/V2-Active/text()", configXml);
 
         for (int i = 0; i < colorLogicProperty2.size(); i++) {
             if (colorLogicProperty1.get(i).equals("COLOR_LOGIC_UCL") && colorLogicProperty2.get(i).equals("yes")) {
@@ -139,38 +145,38 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
             }
         }
 
-        discoverDevices(thingHandler, xmlResponse, "ColorLogic-Light", HaywardTypeToRequest.COLORLOGIC,
+        discoverDevices(thingHandler, configXml, "ColorLogic-Light", HaywardTypeToRequest.COLORLOGIC,
                 HaywardBindingConstants.THING_TYPE_COLORLOGIC, (props, i) -> {
                     props.put(HaywardBindingConstants.PROPERTY_COLORLOGIC_TYPE, colorLogicProperty1.get(i));
                 });
 
         // Find Filters
         final List<String> filterProperty1 = thingHandler.evaluateXPath("//Body-of-water/Filter/Shared-Type/text()",
-                xmlResponse);
+                configXml);
         final List<String> filterProperty2 = thingHandler.evaluateXPath("//Body-of-water/Filter/Filter-Type/text()",
-                xmlResponse);
+                configXml);
         final List<String> filterProperty3 = thingHandler.evaluateXPath("//Body-of-water/Filter/Priming-Enabled/text()",
-                xmlResponse);
+                configXml);
         final List<String> filterProperty4 = thingHandler.evaluateXPath("//Body-of-water/Filter/Min-Pump-Speed/text()",
-                xmlResponse);
+                configXml);
         final List<String> filterProperty5 = thingHandler.evaluateXPath("//Body-of-water/Filter/Max-Pump-Speed/text()",
-                xmlResponse);
+                configXml);
         final List<String> filterProperty6 = thingHandler.evaluateXPath("//Body-of-water/Filter/Min-Pump-RPM/text()",
-                xmlResponse);
+                configXml);
         final List<String> filterProperty7 = thingHandler.evaluateXPath("//Body-of-water/Filter/Max-Pump-RPM/text()",
-                xmlResponse);
+                configXml);
         final List<String> filterProperty8 = thingHandler
-                .evaluateXPath("//Body-of-water/Filter/Vsp-Low-Pump-Speed/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Filter/Vsp-Low-Pump-Speed/text()", configXml);
         final List<String> filterProperty9 = thingHandler
-                .evaluateXPath("//Body-of-water/Filter/Vsp-Medium-Pump-Speed/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Filter/Vsp-Medium-Pump-Speed/text()", configXml);
         final List<String> filterProperty10 = thingHandler
-                .evaluateXPath("//Body-of-water/Filter/Vsp-High-Pump-Speed/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Filter/Vsp-High-Pump-Speed/text()", configXml);
         final List<String> filterProperty11 = thingHandler
-                .evaluateXPath("//Body-of-water/Filter/Vsp-Custom-Pump-Speed/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Filter/Vsp-Custom-Pump-Speed/text()", configXml);
         final List<String> filterProperty12 = thingHandler
-                .evaluateXPath("//Body-of-water/Filter/Freeze-Protect-Override-Interval/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Filter/Freeze-Protect-Override-Interval/text()", configXml);
 
-        discoverDevices(thingHandler, xmlResponse, "Filter", HaywardTypeToRequest.FILTER,
+        discoverDevices(thingHandler, configXml, "Filter", HaywardTypeToRequest.FILTER,
                 HaywardBindingConstants.THING_TYPE_FILTER, (props, i) -> {
                     props.put(HaywardBindingConstants.PROPERTY_FILTER_SHAREDTYPE, filterProperty1.get(i));
                     props.put(HaywardBindingConstants.PROPERTY_FILTER_FILTERTYPE, filterProperty2.get(i));
@@ -189,13 +195,13 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
 
         // Find Heaters
         final List<String> heaterProperty1 = thingHandler
-                .evaluateXPath("//Body-of-water/Heater/Operation/Heater-Equipment/Type/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Heater/Operation/Heater-Equipment/Type/text()", configXml);
         final List<String> heaterProperty2 = thingHandler
-                .evaluateXPath("//Body-of-water/Heater/Operation/Heater-Equipment/Heater-Type/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Heater/Operation/Heater-Equipment/Heater-Type/text()", configXml);
         final List<String> heaterProperty3 = thingHandler.evaluateXPath(
-                "//Body-of-water/Heater/Operation/Heater-Equipment/Shared-Equipment-System-ID/text()", xmlResponse);
+                "//Body-of-water/Heater/Operation/Heater-Equipment/Shared-Equipment-System-ID/text()", configXml);
 
-        discoverDevices(thingHandler, xmlResponse, "Heater-Equipment", HaywardTypeToRequest.HEATER,
+        discoverDevices(thingHandler, configXml, "Heater-Equipment", HaywardTypeToRequest.HEATER,
                 HaywardBindingConstants.THING_TYPE_HEATER, (props, i) -> {
                     props.put(HaywardBindingConstants.PROPERTY_HEATER_TYPE, heaterProperty1.get(i));
                     props.put(HaywardBindingConstants.PROPERTY_HEATER_HEATERTYPE, heaterProperty2.get(i));
@@ -203,29 +209,29 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                 });
 
         // Find Pumps
-        final List<String> pumpProperty1 = thingHandler.evaluateXPath("//Body-of-water/Pump/Type/text()", xmlResponse);
+        final List<String> pumpProperty1 = thingHandler.evaluateXPath("//Body-of-water/Pump/Type/text()", configXml);
         final List<String> pumpProperty2 = thingHandler.evaluateXPath("//Body-of-water/Pump/Function/text()",
-                xmlResponse);
+                configXml);
         final List<String> pumpProperty3 = thingHandler.evaluateXPath("//Body-of-water/Pump/Priming-Enabled/text()",
-                xmlResponse);
+                configXml);
         final List<String> pumpProperty4 = thingHandler.evaluateXPath("//Body-of-water/Pump/Min-Pump-Speed/text()",
-                xmlResponse);
+                configXml);
         final List<String> pumpProperty5 = thingHandler.evaluateXPath("//Body-of-water/Pump/Max-Pump-Speed/text()",
-                xmlResponse);
+                configXml);
         final List<String> pumpProperty6 = thingHandler.evaluateXPath("//Body-of-water/Pump/Min-Pump-RPM/text()",
-                xmlResponse);
+                configXml);
         final List<String> pumpProperty7 = thingHandler.evaluateXPath("//Body-of-water/Pump/Max-Pump-RPM/text()",
-                xmlResponse);
+                configXml);
         final List<String> pumpProperty8 = thingHandler.evaluateXPath("//Body-of-water/Pump/Vsp-Low-Pump-Speed/text()",
-                xmlResponse);
+                configXml);
         final List<String> pumpProperty9 = thingHandler
-                .evaluateXPath("//Body-of-water/Pump/Vsp-Medium-Pump-Speed/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Pump/Vsp-Medium-Pump-Speed/text()", configXml);
         final List<String> pumpProperty10 = thingHandler
-                .evaluateXPath("//Body-of-water/Pump/Vsp-High-Pump-Speed/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Pump/Vsp-High-Pump-Speed/text()", configXml);
         final List<String> pumpProperty11 = thingHandler
-                .evaluateXPath("//Body-of-water/Pump/Vsp-Custom-Pump-Speed/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Pump/Vsp-Custom-Pump-Speed/text()", configXml);
 
-        discoverDevices(thingHandler, xmlResponse, "Pump", HaywardTypeToRequest.PUMP,
+        discoverDevices(thingHandler, configXml, "Pump", HaywardTypeToRequest.PUMP,
                 HaywardBindingConstants.THING_TYPE_PUMP, (props, i) -> {
                     props.put(HaywardBindingConstants.PROPERTY_PUMP_TYPE, pumpProperty1.get(i));
                     props.put(HaywardBindingConstants.PROPERTY_PUMP_FUNCTION, pumpProperty2.get(i));
@@ -241,11 +247,11 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                 });
 
         // Find Relays
-        final List<String> relayProperty1 = thingHandler.evaluateXPath("//Backyard//Relay/Type/text()", xmlResponse);
+        final List<String> relayProperty1 = thingHandler.evaluateXPath("//Backyard//Relay/Type/text()", configXml);
         final List<String> relayProperty2 = thingHandler.evaluateXPath("//Backyard//Relay/Function/text()",
-                xmlResponse);
+                configXml);
 
-        discoverDevices(thingHandler, xmlResponse, "Relay", HaywardTypeToRequest.RELAY,
+        discoverDevices(thingHandler, configXml, "Relay", HaywardTypeToRequest.RELAY,
                 HaywardBindingConstants.THING_TYPE_RELAY, (props, i) -> {
                     props.put(HaywardBindingConstants.PROPERTY_RELAY_TYPE, relayProperty1.get(i));
                     props.put(HaywardBindingConstants.PROPERTY_RELAY_FUNCTION, relayProperty2.get(i));
@@ -253,15 +259,15 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
 
         // Find Virtual Heaters
         final List<String> virtualHeaterProperty1 = thingHandler
-                .evaluateXPath("//Body-of-water/Heater/Shared-Type/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Heater/Shared-Type/text()", configXml);
         final List<String> virtualHeaterProperty2 = thingHandler
-                .evaluateXPath("//Body-of-water/Heater/Min-Settable-Water-Temp/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Heater/Min-Settable-Water-Temp/text()", configXml);
         final List<String> virtualHeaterProperty3 = thingHandler
-                .evaluateXPath("//Body-of-water/Heater/Max-Settable-Water-Temp/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Heater/Max-Settable-Water-Temp/text()", configXml);
         final List<String> virtualHeaterProperty4 = thingHandler
-                .evaluateXPath("//Body-of-water/Heater/Max-Water-Temp/text()", xmlResponse);
+                .evaluateXPath("//Body-of-water/Heater/Max-Water-Temp/text()", configXml);
 
-        discoverDevices(thingHandler, xmlResponse, "Heater", HaywardTypeToRequest.VIRTUALHEATER,
+        discoverDevices(thingHandler, configXml, "Heater", HaywardTypeToRequest.VIRTUALHEATER,
                 HaywardBindingConstants.THING_TYPE_VIRTUALHEATER, (props, i) -> {
                     props.put(HaywardBindingConstants.PROPERTY_VIRTUALHEATER_SHAREDTYPE, virtualHeaterProperty1.get(i));
                     props.put(HaywardBindingConstants.PROPERTY_VIRTUALHEATER_MINSETTABLEWATERTEMP,
