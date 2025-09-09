@@ -14,6 +14,8 @@ package org.openhab.binding.haywardomnilogiclocal.internal;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  *
  * @author Matt Myers - Initial contribution
@@ -22,6 +24,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 public class GetTelemetry {
 
     private final String xmlns;
+
+    @SerializedName("Name")
     private final String name;
 
     public GetTelemetry() {
