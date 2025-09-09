@@ -14,7 +14,7 @@
     <channels>
       <channel id="filterEnable" typeId="system.power"/>
       <channel id="filterSpeed" typeId="speed"/>
-      <channel id="filterState" typeId="filterState"/>
+      <channel id="filterState" typeId="state"/>
       <channel id="filterLastSpeed" typeId="lastSpeed"/>
     </channels>
 
@@ -30,12 +30,6 @@
     <label>Filter Speed</label>
     <description>Dynamic units (% or rpm from config)</description>
     <state readOnly="false"/>
-  </channel-type>
-
-  <channel-type id="filterState">
-    <item-type>String</item-type>
-    <label>Filter State</label>
-    <state readOnly="true"/>
   </channel-type>
 
   <channel-type id="lastSpeed">

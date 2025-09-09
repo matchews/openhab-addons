@@ -25,7 +25,7 @@
 
   <channel-type id="state">
     <item-type>String</item-type>
-    <label>Heater State</label>
+    <label>State</label>
     <state readOnly="true"/>
   </channel-type>
 
