@@ -58,7 +58,8 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
     public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
-    public abstract void getTelemetry(String xmlResponse) throws HaywardException;
+    public void getTelemetry(String xmlResponse) throws HaywardException {
+    }
 
     public void setStateDescriptions() throws HaywardException {
     }
