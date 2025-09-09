@@ -13,10 +13,16 @@
 
 package org.openhab.binding.haywardomnilogiclocal.internal.net;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.zip.InflaterInputStream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 
 /**
  * Represents a UDP response from the OmniLogic controller.
@@ -54,7 +60,28 @@ public class UdpResponse {
         buffer.get();
         buffer.get();
 
-        String xml = new String(data, 24, length - 24, "UTF-8").trim();
+        byte[] payload = new byte[length - 24];
+        System.arraycopy(data, 24, payload, 0, payload.length);
+
+        String xml;
+        if (msgType == HaywardMessageType.MSP_TELEMETRY_UPDATE.getMsgInt()) {
+            try (InflaterInputStream inflater = new InflaterInputStream(new ByteArrayInputStream(payload));
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                byte[] buf = new byte[1024];
+                int read;
+                while ((read = inflater.read(buf)) != -1) {
+                    baos.write(buf, 0, read);
+                }
+                xml = baos.toString(StandardCharsets.UTF_8.name()).trim();
+            } catch (IOException e) {
+                UnsupportedEncodingException ex = new UnsupportedEncodingException(e.getMessage());
+                ex.initCause(e);
+                throw ex;
+            }
+        } else {
+            xml = new String(payload, StandardCharsets.UTF_8).trim();
+        }
+
         return new UdpResponse(msgType, xml);
     }
 }
