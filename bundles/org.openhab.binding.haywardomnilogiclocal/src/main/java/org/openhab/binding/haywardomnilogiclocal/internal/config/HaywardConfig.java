@@ -23,8 +23,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @NonNullByDefault
 public class HaywardConfig {
     private String endpointUrl = "";
-    private String username = "";
-    private String password = "";
     private int alarmPollTime = 60;
     private int telemetryPollTime = 10;
 
@@ -37,22 +35,6 @@ public class HaywardConfig {
 
     public void setEndpointUrl(String endpointUrl) {
         this.endpointUrl = endpointUrl;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public int getAlarmPollTime() {

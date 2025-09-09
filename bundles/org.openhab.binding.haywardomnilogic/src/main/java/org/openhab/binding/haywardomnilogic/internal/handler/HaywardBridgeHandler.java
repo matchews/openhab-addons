@@ -138,7 +138,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
 
             if (!(getSiteList())) {
                 updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                        "Unable to getMSP from Hayward's server");
+                        "Unable to retrieve MSP configuration from Hayward's server");
                 clearPolling(pollTelemetryFuture);
                 clearPolling(pollAlarmsFuture);
                 commFailureCount = 50;
@@ -148,7 +148,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
 
             if (!(mspConfigUnits())) {
                 updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                        "Unable to getMSPConfigUnits from Hayward's server");
+                        "Unable to retrieve MSP configuration units from Hayward's server");
                 clearPolling(pollTelemetryFuture);
                 clearPolling(pollAlarmsFuture);
                 commFailureCount = 50;
@@ -280,34 +280,41 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         return true;
     }
 
+    @Deprecated
     public synchronized String getMspConfig() throws HaywardException, InterruptedException {
-        // *****getMspConfig from Hayward server
+        return getMspConfigV2();
+    }
+
+    public synchronized String getMspConfigV2() throws HaywardException, InterruptedException {
+        // Request MSP configuration from Hayward server using the newer API
         String urlParameters = """
-                <?xml version="1.0" encoding="utf-8"?><Request><Name>GetMspConfigFile</Name><Parameters>\
-                <Parameter name="Token" dataType="String">\
-                """ + account.getToken() + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                + account.getMspSystemID() + "</Parameter><Parameter name=\"Version\" dataType=\"string\">0</Parameter>\r\n"
+                <?xml version="1.0" encoding="utf-8"?><Request><Name>GetMspConfig</Name><Parameters>\
+                <Parameter name=\"Token\" dataType=\"String\">\
+                """ + account.getToken() + "</Parameter>" + "<Parameter name=\\\"MspSystemID\\\" dataType=\\\"int\\\">""
+                + account.getMspSystemID() + "</Parameter><Parameter name=\\\"Version\\\" dataType=\\\"string\\\">0</Parameter>\\r\\n""
                 + "</Parameters></Request>";
 
         String xmlResponse = httpXmlResponse(urlParameters);
 
         if (xmlResponse.isEmpty()) {
-            logger.debug("Hayward Connection thing: getMSPConfig XML response was null");
+            logger.debug("Hayward Connection thing: MSP config XML response was null");
             return "Fail";
         }
 
-        if (evaluateXPath("//Backyard/Name/text()", xmlResponse).isEmpty()) {
-            logger.debug("Hayward Connection thing: getMSPConfig XML response: {}", xmlResponse);
+        List<String> configs = evaluateXPath("//Parameter[@name='MspConfig']/text()", xmlResponse);
+        if (configs.isEmpty()) {
+            logger.debug("Hayward Connection thing: MSP config XML response: {}", xmlResponse);
             return "Fail";
         }
-        return xmlResponse;
+
+        return configs.get(0);
     }
 
     public synchronized boolean mspConfigUnits() throws HaywardException, InterruptedException {
         List<String> property1 = new ArrayList<>();
         List<String> property2 = new ArrayList<>();
 
-        String xmlResponse = getMspConfig();
+        String xmlResponse = getMspConfigV2();
 
         if (xmlResponse.contentEquals("Fail")) {
             return false;

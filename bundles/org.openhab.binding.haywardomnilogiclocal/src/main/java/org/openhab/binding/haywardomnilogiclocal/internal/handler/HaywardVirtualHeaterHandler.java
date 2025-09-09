@@ -132,8 +132,8 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                 switch (channelUID.getId()) {
                     case HaywardBindingConstants.CHANNEL_VIRTUALHEATER_ENABLE:
                         cmdURL = CommandBuilder.buildSetHeaterEnable(HaywardBindingConstants.COMMAND_PARAMETERS,
-                                bridgehandler.account.token, bridgehandler.account.mspSystemID, poolID, systemID,
-                                cmdString);
+                                bridgehandler.getAccount().getToken(), bridgehandler.getAccount().getMspSystemID(),
+                                poolID, systemID, cmdString);
                         break;
 
                     case HaywardBindingConstants.CHANNEL_VIRTUALHEATER_CURRENTSETPOINT:
@@ -146,8 +146,8 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                         }
 
                         cmdURL = CommandBuilder.buildSetUIHeaterCmd(HaywardBindingConstants.COMMAND_PARAMETERS,
-                                bridgehandler.account.token, bridgehandler.account.mspSystemID, poolID, systemID,
-                                cmdString);
+                                bridgehandler.getAccount().getToken(), bridgehandler.getAccount().getMspSystemID(),
+                                poolID, systemID, cmdString);
                         break;
                     default:
                         logger.warn("haywardCommand Unsupported type {}", channelUID);
@@ -163,8 +163,8 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                     return;
                 }
             } catch (HaywardException e) {
-                logger.debug("Unable to send command to Hayward's server {}:{}:{}", bridgehandler.getBridgeConfig().getEndpointUrl(),
-                        bridgehandler.getBridgeConfig().getUsername(), e.getMessage());
+                logger.debug("Unable to send command to Hayward's server {}:{}",
+                        bridgehandler.getBridgeConfig().getEndpointUrl(), e.getMessage());
             }
             this.updateStatus(ThingStatus.ONLINE);
         } else {

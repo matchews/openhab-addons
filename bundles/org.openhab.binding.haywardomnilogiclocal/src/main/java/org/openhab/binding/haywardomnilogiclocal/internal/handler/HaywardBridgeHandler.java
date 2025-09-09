@@ -12,8 +12,8 @@
  */
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
-import java.io.StringReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +34,7 @@ import org.openhab.binding.haywardomnilogiclocal.internal.HaywardAccount;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardDynamicStateDescriptionProvider;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardTypeToRequest;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpClient;
@@ -41,6 +42,8 @@ import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpRequest;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpResponse;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.HaywardConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.discovery.HaywardDiscoveryService;
+import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpClient;
+import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpRequest;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Channel;
@@ -57,7 +60,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-
 /**
  * The {@link HaywardBridgeHandler} is responsible for handling commands, which are
  * sent to one of the channels.
@@ -69,7 +71,7 @@ import org.xml.sax.InputSource;
 public class HaywardBridgeHandler extends BaseBridgeHandler {
     private final Logger logger = LoggerFactory.getLogger(HaywardBridgeHandler.class);
     private static final int MSG_TYPE_REQUEST = 1;
-    private static final int MSG_TYPE_TELEMETRY = 1004;
+    private static final int MSG_TYPE_TELEMETRY = HaywardMessageType.MSP_TELEMETRY_UPDATE.getMsgInt();
     private static final int UDP_PORT = 10444;
 
     private final HaywardDynamicStateDescriptionProvider stateDescriptionProvider;
@@ -145,7 +147,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
                 updateStatus(ThingStatus.ONLINE);
             }
 
-            logger.debug("Successfully opened connection to Hayward controller: {}", config.endpointUrl);
+            logger.debug("Successfully opened connection to Hayward controller: {}", config.getEndpointUrl());
 
             initPolling(0);
             logger.trace("Hayward Telemetry polling scheduled");
@@ -173,6 +175,29 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         }
     }
 
+    @Deprecated
+    public synchronized String getMspConfig() throws HaywardException, InterruptedException {
+        return getMspConfigV2();
+    }
+
+    public synchronized String getMspConfigV2() throws HaywardException, InterruptedException {
+        String urlParameters = "<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?><Request><Name>GetMspConfig</Name><Parameters/></Request>";
+
+        String xmlResponse = udpXmlResponse(urlParameters, MSG_TYPE_REQUEST);
+
+        if (xmlResponse.isEmpty()) {
+            logger.debug("Hayward Connection thing: MSP config XML response was null");
+            return "Fail";
+        }
+
+        List<String> configs = evaluateXPath("//Parameter[@name='MspConfig']/text()", xmlResponse);
+        if (configs.isEmpty()) {
+            logger.debug("Hayward Connection thing: MSP config XML response: {}", xmlResponse);
+            return "Fail";
+        }
+
+        return configs.get(0);
+    }
 
     public synchronized boolean getTelemetryData() throws HaywardException {
         String urlParameters = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>GetTelemetryData</Name><Parameters/></Request>";
@@ -199,7 +224,6 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         }
         return true;
     }
-
 
     public synchronized boolean getAlarmList() throws HaywardException {
         for (Thing thing : getThing().getThings()) {
@@ -235,7 +259,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             } catch (HaywardException e) {
                 logger.debug("Hayward Connection thing: Exception during poll: {}", e.getMessage());
             }
-        }, initalDelay, config.telemetryPollTime, TimeUnit.SECONDS);
+        }, initalDelay, config.getTelemetryPollTime(), TimeUnit.SECONDS);
     }
 
     private synchronized void initAlarmPolling(int initalDelay) {
