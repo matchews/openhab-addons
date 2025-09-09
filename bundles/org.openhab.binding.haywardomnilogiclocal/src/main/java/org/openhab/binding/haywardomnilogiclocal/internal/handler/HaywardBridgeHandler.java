@@ -36,6 +36,7 @@ import org.openhab.binding.haywardomnilogiclocal.internal.HaywardDynamicStateDes
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardTypeToRequest;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpClient;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpRequest;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.HaywardConfig;
@@ -68,7 +69,7 @@ import org.xml.sax.InputSource;
 public class HaywardBridgeHandler extends BaseBridgeHandler {
     private final Logger logger = LoggerFactory.getLogger(HaywardBridgeHandler.class);
     private static final int MSG_TYPE_REQUEST = 1;
-    private static final int MSG_TYPE_TELEMETRY = 1004;
+    private static final int MSG_TYPE_TELEMETRY = HaywardMessageType.MSP_TELEMETRY_UPDATE.getMsgInt();
     private static final int UDP_PORT = 10444;
 
     private final HaywardDynamicStateDescriptionProvider stateDescriptionProvider;
