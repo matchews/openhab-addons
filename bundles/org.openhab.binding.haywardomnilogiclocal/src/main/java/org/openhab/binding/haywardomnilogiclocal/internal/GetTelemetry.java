@@ -14,13 +14,30 @@ package org.openhab.binding.haywardomnilogiclocal.internal;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  *
  * @author Matt Myers - Initial contribution
  */
 @NonNullByDefault
 public class GetTelemetry {
-    // @SerializedName(value = "")
-    public String xmlns = "http://nextgen.hayward.com/api";
-    public String Name = "RequestTelemetryData";
+
+    private final String xmlns;
+
+    @SerializedName("Name")
+    private final String name;
+
+    public GetTelemetry() {
+        this.xmlns = "http://nextgen.hayward.com/api";
+        this.name = "RequestTelemetryData";
+    }
+
+    public String getXmlns() {
+        return xmlns;
+    }
+
+    public String getName() {
+        return name;
+    }
 }
