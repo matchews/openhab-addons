@@ -15,6 +15,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
@@ -121,6 +122,14 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
         if (bridge != null && bridge.getHandler() instanceof HaywardBridgeHandler bridgehandler) {
             String cmdString = this.cmdToString(command);
             String cmdURL = null;
+            String token = bridgehandler.getAccount().getToken();
+
+            if (poolID == null || systemID == null || token == null) {
+                logger.warn("haywardCommand missing configuration (poolID={}, systemID={}, token={})", poolID,
+                        systemID, token);
+                return;
+            }
+
             int mspId = Integer.parseInt(bridgehandler.getAccount().getMspSystemID());
 
             if (command == OnOffType.ON) {
@@ -133,7 +142,8 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                 switch (channelUID.getId()) {
                     case HaywardBindingConstants.CHANNEL_VIRTUALHEATER_ENABLE:
                         cmdURL = CommandBuilder.buildSetHeaterEnable(HaywardBindingConstants.COMMAND_PARAMETERS,
-                                bridgehandler.getAccount().getToken(), mspId, poolID, systemID, cmdString);
+                                Objects.requireNonNull(token), mspId, Objects.requireNonNull(poolID),
+                                Objects.requireNonNull(systemID), cmdString);
                         break;
 
                     case HaywardBindingConstants.CHANNEL_VIRTUALHEATER_CURRENTSETPOINT:
@@ -146,7 +156,8 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                         }
 
                         cmdURL = CommandBuilder.buildSetUIHeaterCmd(HaywardBindingConstants.COMMAND_PARAMETERS,
-                                bridgehandler.getAccount().getToken(), mspId, poolID, systemID, cmdString);
+                                Objects.requireNonNull(token), mspId, Objects.requireNonNull(poolID),
+                                Objects.requireNonNull(systemID), cmdString);
                         break;
                     default:
                         logger.warn("haywardCommand Unsupported type {}", channelUID);
