@@ -2,14 +2,16 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.util.Map;
 
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.types.Command;
 
-public class OmniLogicLocalFilterHandler extends OmniLogicLocalThingHandler {
+public class HaywardFilterHandler extends HaywardThingHandler {
 
-    public OmniLogicLocalFilterHandler(Thing thing) {
+    public HaywardFilterHandler(Thing thing) {
         super(thing);
     }
 

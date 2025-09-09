@@ -2,12 +2,13 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.util.Map;
 
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
 import org.openhab.core.thing.Thing;
 
-public class OmniLogicLocalBackyardHandler extends OmniLogicLocalThingHandler {
+public class HaywardBackyardHandler extends HaywardThingHandler {
 
-    public OmniLogicLocalBackyardHandler(Thing thing) {
+    public HaywardBackyardHandler(Thing thing) {
         super(thing);
     }
 
