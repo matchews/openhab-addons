@@ -19,9 +19,10 @@ public class UdpResponseTest {
     @Test
     public void fromBytesShouldParseHeaderAndXml() throws Exception {
         int messageType = 1004;
+        int messageId = 0x01020304;
         byte[] xmlBytes = (RESPONSE_XML + '\0').getBytes(StandardCharsets.UTF_8);
         ByteBuffer buffer = ByteBuffer.allocate(24 + xmlBytes.length);
-        buffer.putInt(0x01020304);
+        buffer.putInt(messageId);
         buffer.putLong(0x0102030405060708L);
         buffer.put("1.22".getBytes(StandardCharsets.US_ASCII));
         buffer.putInt(messageType);
@@ -31,6 +32,7 @@ public class UdpResponseTest {
 
         UdpResponse response = UdpResponse.fromBytes(buffer.array(), buffer.array().length);
         assertEquals(messageType, response.getMessageType());
+        assertEquals(messageId, response.getMessageId());
         assertEquals(RESPONSE_XML, response.getXml());
     }
 }

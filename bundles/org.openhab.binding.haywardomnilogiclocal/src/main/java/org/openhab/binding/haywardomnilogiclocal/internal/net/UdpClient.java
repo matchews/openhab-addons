@@ -20,6 +20,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
@@ -48,7 +50,14 @@ public class UdpClient {
             DatagramPacket responsePacket = new DatagramPacket(buf, buf.length);
             socket.setSoTimeout(5000);
             socket.receive(responsePacket);
-            return UdpResponse.fromBytes(responsePacket.getData(), responsePacket.getLength());
+
+            UdpResponse response = UdpResponse.fromBytes(responsePacket.getData(), responsePacket.getLength());
+            int rcvType = response.getMessageType();
+            if (rcvType == 1998 || rcvType == 1999 || rcvType == 1004) {
+                sendAck(socket, response.getMessageId());
+            }
+
+            return response;
         } catch (SocketTimeoutException e) {
             throw new IOException("Timeout waiting for UDP response from " + address.getHostAddress() + ":" + port, e);
         } catch (UnsupportedEncodingException e) {
@@ -57,15 +66,21 @@ public class UdpClient {
         }
     }
 
-    public void sendAck() throws IOException {
-        UdpRequest ack = new UdpRequest(MSG_TYPE_ACK, "ACK");
-        byte[] out = ack.toBytes();
-        try (DatagramSocket socket = new DatagramSocket()) {
-            DatagramPacket packet = new DatagramPacket(out, out.length, address, port);
-            socket.send(packet);
-        } catch (UnsupportedEncodingException e) {
-            // should never happen as UTF-8 is always supported
-            throw new IOException(e);
-        }
+    private void sendAck(DatagramSocket socket, int messageId) throws IOException {
+        ByteBuffer header = ByteBuffer.allocate(24);
+        header.putInt(messageId);
+        header.putLong(System.currentTimeMillis());
+        header.put("1.22".getBytes(StandardCharsets.US_ASCII));
+        header.putInt(MSG_TYPE_ACK);
+        header.put((byte) 1);
+        header.put(new byte[3]);
+
+        byte[] xml = "ACK\0".getBytes(StandardCharsets.UTF_8);
+        byte[] out = new byte[header.position() + xml.length];
+        System.arraycopy(header.array(), 0, out, 0, header.position());
+        System.arraycopy(xml, 0, out, header.position(), xml.length);
+
+        DatagramPacket packet = new DatagramPacket(out, out.length, address, port);
+        socket.send(packet);
     }
 }

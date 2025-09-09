@@ -296,12 +296,6 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
 
         try {
             UdpResponse response = udpClient.send(new UdpRequest(msgType, xmlRequest));
-
-            int rcvType = response.getMessageType();
-            if (rcvType == 1998 || rcvType == 1999 || rcvType == 1004) {
-                udpClient.sendAck();
-            }
-
             return response.getXml();
         } catch (IOException e) {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
