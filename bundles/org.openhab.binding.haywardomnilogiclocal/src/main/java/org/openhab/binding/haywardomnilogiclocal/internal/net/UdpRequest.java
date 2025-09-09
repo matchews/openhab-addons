@@ -30,10 +30,16 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 public class UdpRequest {
     private final int messageType;
     private final String xml;
+    private final Integer messageId;
 
     public UdpRequest(int messageType, String xml) {
+        this(messageType, xml, null);
+    }
+
+    public UdpRequest(int messageType, String xml, Integer messageId) {
         this.messageType = messageType;
         this.xml = xml;
+        this.messageId = messageId;
     }
 
     /**
@@ -41,7 +47,7 @@ public class UdpRequest {
      */
     public byte[] toBytes() throws UnsupportedEncodingException {
         Random random = new Random();
-        int msgID = random.nextInt();
+        int msgID = messageId != null ? messageId.intValue() : random.nextInt();
         long timeStamp = System.currentTimeMillis();
         String version = "1.22"; // protocol version
         byte clientType = 1;
