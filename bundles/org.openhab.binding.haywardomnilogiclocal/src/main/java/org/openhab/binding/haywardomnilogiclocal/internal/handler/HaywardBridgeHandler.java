@@ -164,6 +164,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
     }
 
     private synchronized boolean handshake() throws HaywardException {
+        String xmlRequest = "<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?><Request><Name>RequestConfiguration</Name></Request>";
 
         String xmlResponse = udpXmlResponse(xmlRequest, MSG_TYPE_REQUEST);
 
@@ -171,6 +172,8 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             logger.debug("Hayward Connection thing: Handshake XML response was null");
             return false;
         }
+
+        return true;
     }
 
     @Deprecated
