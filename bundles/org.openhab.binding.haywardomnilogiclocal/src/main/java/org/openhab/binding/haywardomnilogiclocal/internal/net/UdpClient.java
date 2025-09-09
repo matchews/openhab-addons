@@ -33,6 +33,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  */
 @NonNullByDefault
 public class UdpClient {
+    private static final int MSG_TYPE_ACK = 1002;
+
     private final InetAddress address;
     private final int port;
 
@@ -41,6 +43,8 @@ public class UdpClient {
         this.port = port;
     }
 
+
+    public UdpResponse send(UdpRequest request) throws IOException {
     private static final int MSG_ACK = 1002;
     private static final int MSG_LEAD = 1998;
     private static final int MSG_BLOCK = 1999;
@@ -50,6 +54,19 @@ public class UdpClient {
         try (DatagramSocket socket = new DatagramSocket()) {
             DatagramPacket packet = new DatagramPacket(out, out.length, address, port);
             socket.send(packet);
+
+            byte[] buf = new byte[4096];
+            DatagramPacket responsePacket = new DatagramPacket(buf, buf.length);
+            socket.setSoTimeout(5000);
+            socket.receive(responsePacket);
+
+            UdpResponse response = UdpResponse.fromBytes(responsePacket.getData(), responsePacket.getLength());
+            int rcvType = response.getMessageType();
+            if (rcvType == 1998 || rcvType == 1999 || rcvType == 1004) {
+                sendAck(socket, response.getMessageId());
+            }
+
+            return response;
 
             ByteArrayOutputStream blocks = new ByteArrayOutputStream();
             int expectedBlocks = 0;
@@ -102,6 +119,22 @@ public class UdpClient {
     }
 
     private void sendAck(DatagramSocket socket, int messageId) throws IOException {
+        ByteBuffer header = ByteBuffer.allocate(24);
+        header.putInt(messageId);
+        header.putLong(System.currentTimeMillis());
+        header.put("1.22".getBytes(StandardCharsets.US_ASCII));
+        header.putInt(MSG_TYPE_ACK);
+        header.put((byte) 1);
+        header.put(new byte[3]);
+
+        byte[] xml = "ACK\0".getBytes(StandardCharsets.UTF_8);
+        byte[] out = new byte[header.position() + xml.length];
+        System.arraycopy(header.array(), 0, out, 0, header.position());
+        System.arraycopy(xml, 0, out, header.position(), xml.length);
+
+        DatagramPacket packet = new DatagramPacket(out, out.length, address, port);
+        socket.send(packet);
+
         UdpRequest ack = new UdpRequest(MSG_ACK, "", messageId);
         byte[] ackBytes = ack.toBytes();
         DatagramPacket ackPacket = new DatagramPacket(ackBytes, ackBytes.length, address, port);

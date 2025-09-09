@@ -30,15 +30,21 @@ import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 @NonNullByDefault
 public class UdpResponse {
     private final int messageType;
+    private final int messageId;
     private final String xml;
 
-    private UdpResponse(int messageType, String xml) {
+    private UdpResponse(int messageId, int messageType, String xml) {
+        this.messageId = messageId;
         this.messageType = messageType;
         this.xml = xml;
     }
 
     public int getMessageType() {
         return messageType;
+    }
+
+    public int getMessageId() {
+        return messageId;
     }
 
     public String getXml() {
@@ -50,7 +56,7 @@ public class UdpResponse {
      */
     public static UdpResponse fromBytes(byte[] data, int length) throws UnsupportedEncodingException {
         ByteBuffer buffer = ByteBuffer.wrap(data, 0, length);
-        buffer.getInt(); // message id
+        int msgId = buffer.getInt();
         buffer.getLong(); // timestamp
         byte[] version = new byte[4];
         buffer.get(version);
@@ -59,6 +65,7 @@ public class UdpResponse {
         buffer.get();
         buffer.get();
         buffer.get();
+
 
         byte[] payload = new byte[length - 24];
         System.arraycopy(data, 24, payload, 0, payload.length);

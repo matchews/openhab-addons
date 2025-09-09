@@ -29,6 +29,7 @@ public class UdpResponseTest {
         byte[] compressed = baos.toByteArray();
         ByteBuffer buffer = ByteBuffer.allocate(24 + compressed.length);
         buffer.putInt(0x01020304);
+
         buffer.putLong(0x0102030405060708L);
         buffer.put("1.22".getBytes(StandardCharsets.US_ASCII));
         buffer.putInt(messageType);
@@ -38,6 +39,7 @@ public class UdpResponseTest {
 
         UdpResponse response = UdpResponse.fromBytes(buffer.array(), buffer.array().length);
         assertEquals(messageType, response.getMessageType());
+        assertEquals(messageId, response.getMessageId());
         assertEquals(RESPONSE_XML, response.getXml());
     }
 }
