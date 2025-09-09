@@ -19,6 +19,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.haywardomnilogic.internal.HaywardBindingConstants;
 import org.openhab.binding.haywardomnilogic.internal.HaywardException;
 import org.openhab.binding.haywardomnilogic.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogic.internal.api.HaywardCommandBuilder;
+import org.openhab.binding.haywardomnilogic.internal.api.HaywardCommandBuilder.HaywardCommand;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
@@ -79,15 +81,11 @@ public class HaywardRelayHandler extends HaywardThingHandler {
             try {
                 switch (channelUID.getId()) {
                     case HaywardBindingConstants.CHANNEL_RELAY_STATE:
-                        cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS
-                                + "<Name>SetUIEquipmentCmd</Name><Parameters>"
-                                + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.account.token
-                                + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                                + bridgehandler.account.mspSystemID + "</Parameter>"
-                                + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
-                                + "<Parameter name=\"EquipmentID\" dataType=\"int\">" + systemID + "</Parameter>"
-                                + "<Parameter name=\"IsOn\" dataType=\"int\">" + cmdString + "</Parameter>"
-                                + HaywardBindingConstants.COMMAND_SCHEDULE + "</Parameters></Request>";
+                        cmdURL = HaywardCommandBuilder.command(HaywardCommand.SET_UI_EQUIPMENT_CMD)
+                                .withToken(bridgehandler.account.token)
+                                .withMspSystemId(bridgehandler.account.mspSystemID)
+                                .withPoolId(poolID).withEquipmentId(systemID)
+                                .withParameter("IsOn", "int", cmdString).includeSchedule().build();
                         break;
                     default:
                         logger.warn("haywardCommand Unsupported type {}", channelUID);

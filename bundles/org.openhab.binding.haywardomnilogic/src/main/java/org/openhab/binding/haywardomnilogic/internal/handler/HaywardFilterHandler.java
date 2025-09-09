@@ -22,6 +22,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.haywardomnilogic.internal.HaywardBindingConstants;
 import org.openhab.binding.haywardomnilogic.internal.HaywardException;
 import org.openhab.binding.haywardomnilogic.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogic.internal.api.HaywardCommandBuilder;
+import org.openhab.binding.haywardomnilogic.internal.api.HaywardCommandBuilder.HaywardCommand;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Channel;
@@ -232,15 +234,11 @@ public class HaywardFilterHandler extends HaywardThingHandler {
                             return;
                     }
 
-                    String cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS
-                            + "<Name>SetUIEquipmentCmd</Name><Parameters>"
-                            + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.account.token
-                            + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                            + bridgehandler.account.mspSystemID + "</Parameter>"
-                            + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
-                            + "<Parameter name=\"EquipmentID\" dataType=\"int\">" + systemID + "</Parameter>"
-                            + "<Parameter name=\"IsOn\" dataType=\"int\">" + cmdString + "</Parameter>"
-                            + HaywardBindingConstants.COMMAND_SCHEDULE + "</Parameters></Request>";
+                    String cmdURL = HaywardCommandBuilder.command(HaywardCommand.SET_UI_EQUIPMENT_CMD)
+                            .withToken(bridgehandler.account.token)
+                            .withMspSystemId(bridgehandler.account.mspSystemID)
+                            .withPoolId(poolID).withEquipmentId(systemID)
+                            .withParameter("IsOn", "int", cmdString).includeSchedule().build();
 
                     // *****Send Command to Hayward server
                     String xmlResponse = bridgehandler.httpXmlResponse(cmdURL);

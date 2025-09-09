@@ -21,6 +21,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.haywardomnilogic.internal.HaywardBindingConstants;
 import org.openhab.binding.haywardomnilogic.internal.HaywardException;
 import org.openhab.binding.haywardomnilogic.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogic.internal.api.HaywardCommandBuilder;
+import org.openhab.binding.haywardomnilogic.internal.api.HaywardCommandBuilder.HaywardCommand;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
@@ -145,22 +147,17 @@ public class HaywardChlorinatorHandler extends HaywardThingHandler {
                         return;
                 }
 
-                String cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS + "<Name>SetCHLORParams</Name><Parameters>"
-                        + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.account.token
-                        + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                        + bridgehandler.account.mspSystemID + "</Parameter>"
-                        + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
-                        + "<Parameter name=\"ChlorID\" dataType=\"int\" alias=\"EquipmentID\">" + systemID
-                        + "</Parameter>" + "<Parameter name=\"CfgState\" dataType=\"byte\" alias=\"Data1\">"
-                        + chlorCfgState + "</Parameter>"
-                        + "<Parameter name=\"OpMode\" dataType=\"byte\" alias=\"Data2\">1</Parameter>"
-                        + "<Parameter name=\"BOWType\" dataType=\"byte\" alias=\"Data3\">1</Parameter>"
-                        + "<Parameter name=\"CellType\" dataType=\"byte\" alias=\"Data4\">4</Parameter>"
-                        + "<Parameter name=\"TimedPercent\" dataType=\"byte\" alias=\"Data5\">" + chlorTimedPercent
-                        + "</Parameter>"
-                        + "<Parameter name=\"SCTimeout\" dataType=\"byte\" unit=\"hour\" alias=\"Data6\">24</Parameter>"
-                        + "<Parameter name=\"ORPTimout\" dataType=\"byte\" unit=\"hour\" alias=\"Data7\">24</Parameter>"
-                        + "</Parameters></Request>";
+                String cmdURL = HaywardCommandBuilder.command(HaywardCommand.SET_CHLOR_PARAMS)
+                        .withToken(bridgehandler.account.token)
+                        .withMspSystemId(bridgehandler.account.mspSystemID)
+                        .withPoolId(poolID).withChlorId(systemID)
+                        .withParameter("CfgState", "byte", chlorCfgState, "Data1")
+                        .withParameter("OpMode", "byte", "1", "Data2")
+                        .withParameter("BOWType", "byte", "1", "Data3")
+                        .withParameter("CellType", "byte", "4", "Data4")
+                        .withParameter("TimedPercent", "byte", chlorTimedPercent, "Data5")
+                        .withParameter("SCTimeout", "byte", "24", "Data6", "hour")
+                        .withParameter("ORPTimout", "byte", "24", "Data7", "hour").build();
 
                 // *****Send Command to Hayward server
                 String xmlResponse = bridgehandler.httpXmlResponse(cmdURL);

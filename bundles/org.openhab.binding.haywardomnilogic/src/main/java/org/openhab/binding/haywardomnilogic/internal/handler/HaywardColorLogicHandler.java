@@ -21,6 +21,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.haywardomnilogic.internal.HaywardBindingConstants;
 import org.openhab.binding.haywardomnilogic.internal.HaywardException;
 import org.openhab.binding.haywardomnilogic.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogic.internal.api.HaywardCommandBuilder;
+import org.openhab.binding.haywardomnilogic.internal.api.HaywardCommandBuilder.HaywardCommand;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Channel;
@@ -239,50 +241,35 @@ public class HaywardColorLogicHandler extends HaywardThingHandler {
                             } else {
                                 cmdString = "0";
                             }
-                            cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS
-                                    + "<Name>SetUIEquipmentCmd</Name><Parameters>"
-                                    + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.account.token
-                                    + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                                    + bridgehandler.account.mspSystemID + "</Parameter>"
-                                    + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
-                                    + "<Parameter name=\"EquipmentID\" dataType=\"int\">" + systemID + "</Parameter>"
-                                    + "<Parameter name=\"IsOn\" dataType=\"int\">" + cmdString + "</Parameter>"
-                                    + HaywardBindingConstants.COMMAND_SCHEDULE + "</Parameters></Request>";
+                            cmdURL = HaywardCommandBuilder.command(HaywardCommand.SET_UI_EQUIPMENT_CMD)
+                                    .withToken(bridgehandler.account.token)
+                                    .withMspSystemId(bridgehandler.account.mspSystemID)
+                                    .withPoolId(poolID).withEquipmentId(systemID)
+                                    .withParameter("IsOn", "int", cmdString).includeSchedule().build();
                             break;
                         case HaywardBindingConstants.CHANNEL_COLORLOGIC_CURRENTSHOW:
                             String lightType = getThing().getProperties()
                                     .get(HaywardBindingConstants.PROPERTY_COLORLOGIC_TYPE);
                             if (lightType != null) {
                                 if (!"COLOR_LOGIC_UCL_V2".equals(lightType)) {
-                                    cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS
-                                            + "<Name>SetStandAloneLightShow</Name><Parameters>"
-                                            + "<Parameter name=\"Token\" dataType=\"String\">"
-                                            + bridgehandler.account.token + "</Parameter>"
-                                            + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                                            + bridgehandler.account.mspSystemID + "</Parameter>"
-                                            + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
-                                            + "<Parameter name=\"LightID\" dataType=\"int\">" + systemID
-                                            + "</Parameter>" + "<Parameter name=\"Show\" dataType=\"int\">" + cmdString
-                                            + "</Parameter>" + HaywardBindingConstants.COMMAND_SCHEDULE
-                                            + "</Parameters></Request>";
+                                    cmdURL = HaywardCommandBuilder.command(HaywardCommand.SET_STAND_ALONE_LIGHT_SHOW)
+                                            .withToken(bridgehandler.account.token)
+                                            .withMspSystemId(bridgehandler.account.mspSystemID)
+                                            .withPoolId(poolID).withLightId(systemID)
+                                            .withParameter("Show", "int", cmdString).includeSchedule().build();
                                 } else {
                                     brightness = channelStates
                                             .get(HaywardBindingConstants.CHANNEL_COLORLOGIC_BRIGHTNESS).toString();
                                     speed = channelStates.get(HaywardBindingConstants.CHANNEL_COLORLOGIC_SPEED)
                                             .toString();
-                                    cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS
-                                            + "<Name>SetStandAloneLightShowV2</Name><Parameters>"
-                                            + "<Parameter name=\"Token\" dataType=\"String\">"
-                                            + bridgehandler.account.token + "</Parameter>"
-                                            + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                                            + bridgehandler.account.mspSystemID + "</Parameter>"
-                                            + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
-                                            + "<Parameter name=\"LightID\" dataType=\"int\">" + systemID
-                                            + "</Parameter>" + "<Parameter name=\"Show\" dataType=\"int\">" + cmdString
-                                            + "</Parameter>" + "<Parameter name=\"Speed\" dataType=\"byte\">" + speed
-                                            + "</Parameter>" + "<Parameter name=\"Brightness\" dataType=\"byte\">"
-                                            + brightness + "</Parameter>" + HaywardBindingConstants.COMMAND_SCHEDULE
-                                            + "</Parameters></Request>";
+                                    cmdURL = HaywardCommandBuilder.command(
+                                            HaywardCommand.SET_STAND_ALONE_LIGHT_SHOW_V2)
+                                            .withToken(bridgehandler.account.token)
+                                            .withMspSystemId(bridgehandler.account.mspSystemID)
+                                            .withPoolId(poolID).withLightId(systemID)
+                                            .withParameter("Show", "int", cmdString)
+                                            .withParameter("Speed", "byte", speed)
+                                            .withParameter("Brightness", "byte", brightness).includeSchedule().build();
 
                                 }
                             }
@@ -293,17 +280,13 @@ public class HaywardColorLogicHandler extends HaywardThingHandler {
                             if (Integer.parseInt(cmdString) > 4) {
                                 cmdString = "4";
                             }
-                            cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS
-                                    + "<Name>SetStandAloneLightShowV2</Name><Parameters>"
-                                    + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.account.token
-                                    + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                                    + bridgehandler.account.mspSystemID + "</Parameter>"
-                                    + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
-                                    + "<Parameter name=\"LightID\" dataType=\"int\">" + systemID + "</Parameter>"
-                                    + "<Parameter name=\"Show\" dataType=\"int\">" + show + "</Parameter>"
-                                    + "<Parameter name=\"Speed\" dataType=\"byte\">" + speed + "</Parameter>"
-                                    + "<Parameter name=\"Brightness\" dataType=\"byte\">" + cmdString + "</Parameter>"
-                                    + HaywardBindingConstants.COMMAND_SCHEDULE + "</Parameters></Request>";
+                            cmdURL = HaywardCommandBuilder.command(HaywardCommand.SET_STAND_ALONE_LIGHT_SHOW_V2)
+                                    .withToken(bridgehandler.account.token)
+                                    .withMspSystemId(bridgehandler.account.mspSystemID)
+                                    .withPoolId(poolID).withLightId(systemID)
+                                    .withParameter("Show", "int", show)
+                                    .withParameter("Speed", "byte", speed)
+                                    .withParameter("Brightness", "byte", cmdString).includeSchedule().build();
                             break;
                         case HaywardBindingConstants.CHANNEL_COLORLOGIC_SPEED:
                             brightness = channelStates.get(HaywardBindingConstants.CHANNEL_COLORLOGIC_BRIGHTNESS)
@@ -312,17 +295,13 @@ public class HaywardColorLogicHandler extends HaywardThingHandler {
                             if (Integer.parseInt(cmdString) > 8) {
                                 cmdString = "8";
                             }
-                            cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS
-                                    + "<Name>SetStandAloneLightShowV2</Name><Parameters>"
-                                    + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.account.token
-                                    + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                                    + bridgehandler.account.mspSystemID + "</Parameter>"
-                                    + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
-                                    + "<Parameter name=\"LightID\" dataType=\"int\">" + systemID + "</Parameter>"
-                                    + "<Parameter name=\"Show\" dataType=\"int\">" + show + "</Parameter>"
-                                    + "<Parameter name=\"Speed\" dataType=\"byte\">" + cmdString + "</Parameter>"
-                                    + "<Parameter name=\"Brightness\" dataType=\"byte\">" + brightness + "</Parameter>"
-                                    + HaywardBindingConstants.COMMAND_SCHEDULE + "</Parameters></Request>";
+                            cmdURL = HaywardCommandBuilder.command(HaywardCommand.SET_STAND_ALONE_LIGHT_SHOW_V2)
+                                    .withToken(bridgehandler.account.token)
+                                    .withMspSystemId(bridgehandler.account.mspSystemID)
+                                    .withPoolId(poolID).withLightId(systemID)
+                                    .withParameter("Show", "int", show)
+                                    .withParameter("Speed", "byte", cmdString)
+                                    .withParameter("Brightness", "byte", brightness).includeSchedule().build();
                             break;
                         default:
                             logger.warn("haywardCommand Unsupported type {}", channelUID);

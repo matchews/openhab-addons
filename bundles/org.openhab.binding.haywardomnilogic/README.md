@@ -4,6 +4,21 @@ The Hayward Omnilogic binding integrates the Omnilogic pool controller using the
 
 The Hayward Omnilogic API interacts with Hayward's cloud server requiring a connection with the Internet for sending and receiving information.
 
+## Command Builder
+
+The binding constructs XML requests through a `HaywardCommandBuilder` that exposes a
+`HaywardCommand` enum for the supported API operations:
+
+* `SetUIEquipmentCmd`
+* `SetStandAloneLightShow`
+* `SetStandAloneLightShowV2`
+* `SetCHLORParams`
+* `SetHeaterEnable`
+* `SetUIHeaterCmd`
+
+The builder provides fluent methods to supply the authentication token, system and pool identifiers,
+equipment identifiers and command specific parameters before producing the final XML payload.
+
 ## Supported Things
 
 The table below lists the Hayward OmniLogic binding thing types:

@@ -20,6 +20,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.haywardomnilogic.internal.HaywardBindingConstants;
 import org.openhab.binding.haywardomnilogic.internal.HaywardException;
 import org.openhab.binding.haywardomnilogic.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogic.internal.api.HaywardCommandBuilder;
+import org.openhab.binding.haywardomnilogic.internal.api.HaywardCommandBuilder.HaywardCommand;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Channel;
@@ -130,14 +132,11 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
             try {
                 switch (channelUID.getId()) {
                     case HaywardBindingConstants.CHANNEL_VIRTUALHEATER_ENABLE:
-                        cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS + "<Name>SetHeaterEnable</Name><Parameters>"
-                                + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.account.token
-                                + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                                + bridgehandler.account.mspSystemID + "</Parameter>"
-                                + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
-                                + "<Parameter name=\"HeaterID\" dataType=\"int\">" + systemID + "</Parameter>"
-                                + "<Parameter name=\"Enabled\" dataType=\"bool\">" + cmdString + "</Parameter>"
-                                + "</Parameters></Request>";
+                        cmdURL = HaywardCommandBuilder.command(HaywardCommand.SET_HEATER_ENABLE)
+                                .withToken(bridgehandler.account.token)
+                                .withMspSystemId(bridgehandler.account.mspSystemID)
+                                .withPoolId(poolID).withHeaterId(systemID)
+                                .withParameter("Enabled", "bool", cmdString).build();
                         break;
 
                     case HaywardBindingConstants.CHANNEL_VIRTUALHEATER_CURRENTSETPOINT:
@@ -149,14 +148,11 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                             }
                         }
 
-                        cmdURL = HaywardBindingConstants.COMMAND_PARAMETERS + "<Name>SetUIHeaterCmd</Name><Parameters>"
-                                + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.account.token
-                                + "</Parameter>" + "<Parameter name=\"MspSystemID\" dataType=\"int\">"
-                                + bridgehandler.account.mspSystemID + "</Parameter>"
-                                + "<Parameter name=\"PoolID\" dataType=\"int\">" + poolID + "</Parameter>"
-                                + "<Parameter name=\"HeaterID\" dataType=\"int\">" + systemID + "</Parameter>"
-                                + "<Parameter name=\"Temp\" dataType=\"int\">" + cmdString + "</Parameter>"
-                                + "</Parameters></Request>";
+                        cmdURL = HaywardCommandBuilder.command(HaywardCommand.SET_UI_HEATER_CMD)
+                                .withToken(bridgehandler.account.token)
+                                .withMspSystemId(bridgehandler.account.mspSystemID)
+                                .withPoolId(poolID).withHeaterId(systemID)
+                                .withParameter("Temp", "int", cmdString).build();
                         break;
                     default:
                         logger.warn("haywardCommand Unsupported type {}", channelUID);
