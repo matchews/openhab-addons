@@ -89,6 +89,6 @@ public class UdpResponse {
             xml = new String(payload, StandardCharsets.UTF_8).trim();
         }
 
-        return new UdpResponse(msgType, xml);
+        return new UdpResponse(msgId, msgType, xml);
     }
 }
