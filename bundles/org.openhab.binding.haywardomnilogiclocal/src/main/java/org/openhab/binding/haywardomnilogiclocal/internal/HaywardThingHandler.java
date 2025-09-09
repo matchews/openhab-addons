@@ -34,6 +34,8 @@ import org.openhab.core.thing.ThingStatus;
 import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link HaywardThingHandler} is a subclass of the BaseThingHandler and a Super
@@ -44,6 +46,8 @@ import org.openhab.core.types.State;
 
 @NonNullByDefault
 public abstract class HaywardThingHandler extends BaseThingHandler {
+
+    private final Logger logger = LoggerFactory.getLogger(HaywardThingHandler.class);
 
     public HaywardThingHandler(Thing thing) {
         super(thing);
@@ -156,6 +160,22 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
         @Nullable String value = parameter != null ? parameter.value() : null;
         if (value != null) {
             properties.put(propertyName, value);
+        }
+    }
+
+    protected void sendUdpCommand(String xml) {
+        Bridge bridge = getBridge();
+        if (bridge != null && bridge.getHandler() instanceof HaywardBridgeHandler bridgehandler) {
+            try {
+                String response = bridgehandler.udpXmlResponse(xml, 1);
+                if (logger.isTraceEnabled()) {
+                    logger.trace("UDP response: {}", response);
+                }
+            } catch (HaywardException e) {
+                logger.debug("Error sending UDP command: {}", e.getMessage());
+            }
+        } else {
+            logger.debug("Hayward bridge not available, command not sent");
         }
     }
 }
