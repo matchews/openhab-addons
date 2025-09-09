@@ -18,6 +18,7 @@ import java.nio.ByteBuffer;
 import java.util.Random;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * Represents a UDP request to the OmniLogic controller.
@@ -30,13 +31,13 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 public class UdpRequest {
     private final int messageType;
     private final String xml;
-    private final Integer messageId;
+    private final @Nullable Integer messageId;
 
     public UdpRequest(int messageType, String xml) {
         this(messageType, xml, null);
     }
 
-    public UdpRequest(int messageType, String xml, Integer messageId) {
+    public UdpRequest(int messageType, String xml, @Nullable Integer messageId) {
         this.messageType = messageType;
         this.xml = xml;
         this.messageId = messageId;
