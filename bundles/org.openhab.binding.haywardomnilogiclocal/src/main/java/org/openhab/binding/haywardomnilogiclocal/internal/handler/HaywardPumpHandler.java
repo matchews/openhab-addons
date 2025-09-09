@@ -5,6 +5,7 @@ import java.util.Map;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
+import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.types.Command;
@@ -18,17 +19,21 @@ public class HaywardPumpHandler extends HaywardThingHandler {
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         String sysId = getThing().getProperties().get("systemID");
-        if (sysId == null) {
+        Bridge bridge = getBridge();
+        if (sysId == null || bridge == null || !(bridge.getHandler() instanceof HaywardBridgeHandler bridgehandler)) {
             return;
         }
 
         switch (channelUID.getId()) {
             case "pumpEnable":
-                sendUdpCommand(CommandBuilder.setEquipmentEnable(sysId, "ON".equalsIgnoreCase(command.toString())));
+                sendUdpCommand(CommandBuilder.setEquipmentEnable(bridgehandler.getAccount().getToken(),
+                        bridgehandler.getAccount().getMspSystemID(), sysId,
+                        "ON".equalsIgnoreCase(command.toString())));
                 break;
             case "pumpSpeed":
                 int speedVal = ((Number) command).intValue();
-                sendUdpCommand(CommandBuilder.setPumpSpeed(sysId, speedVal));
+                sendUdpCommand(CommandBuilder.setPumpSpeed(bridgehandler.getAccount().getToken(),
+                        bridgehandler.getAccount().getMspSystemID(), sysId, speedVal));
                 break;
             default:
                 break;

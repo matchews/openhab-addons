@@ -5,6 +5,7 @@ import java.util.Map;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
+import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.types.Command;
@@ -18,17 +19,21 @@ public class HaywardChlorinatorHandler extends HaywardThingHandler {
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         String sysId = getThing().getProperties().get("systemID");
-        if (sysId == null) {
+        Bridge bridge = getBridge();
+        if (sysId == null || bridge == null || !(bridge.getHandler() instanceof HaywardBridgeHandler bridgehandler)) {
             return;
         }
 
         switch (channelUID.getId()) {
             case "chlorEnable":
-                sendUdpCommand(CommandBuilder.setEquipmentEnable(sysId, "ON".equalsIgnoreCase(command.toString())));
+                sendUdpCommand(CommandBuilder.setEquipmentEnable(bridgehandler.getAccount().getToken(),
+                        bridgehandler.getAccount().getMspSystemID(), sysId,
+                        "ON".equalsIgnoreCase(command.toString())));
                 break;
             case "chlorSaltOutput":
                 int val = ((Number) command).intValue();
-                sendUdpCommand(CommandBuilder.setChlorinatorOutput(sysId, val));
+                sendUdpCommand(CommandBuilder.setChlorinatorOutput(bridgehandler.getAccount().getToken(),
+                        bridgehandler.getAccount().getMspSystemID(), sysId, val));
                 break;
             default:
                 break;

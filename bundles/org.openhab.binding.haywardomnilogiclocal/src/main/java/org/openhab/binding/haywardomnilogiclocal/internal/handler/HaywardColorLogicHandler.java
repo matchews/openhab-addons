@@ -5,6 +5,7 @@ import java.util.Map;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
+import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.types.Command;
@@ -18,15 +19,18 @@ public class HaywardColorLogicHandler extends HaywardThingHandler {
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         String sysId = getThing().getProperties().get("systemID");
-        if (sysId == null) {
+        Bridge bridge = getBridge();
+        if (sysId == null || bridge == null || !(bridge.getHandler() instanceof HaywardBridgeHandler bridgehandler)) {
             return;
         }
 
         if ("colorMode".equals(channelUID.getId())) {
-            sendUdpCommand(CommandBuilder.setColorMode(sysId, command.toString()));
+            sendUdpCommand(CommandBuilder.setColorMode(bridgehandler.getAccount().getToken(),
+                    bridgehandler.getAccount().getMspSystemID(), sysId, command.toString()));
         } else if ("brightness".equals(channelUID.getId())) {
             int val = ((Number) command).intValue();
-            sendUdpCommand(CommandBuilder.setBrightness(sysId, val));
+            sendUdpCommand(CommandBuilder.setBrightness(bridgehandler.getAccount().getToken(),
+                    bridgehandler.getAccount().getMspSystemID(), sysId, val));
         }
     }
 
