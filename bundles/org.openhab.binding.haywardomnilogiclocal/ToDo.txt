@@ -5,3 +5,6 @@ Discovery
 Retrieve units from requestConfig
 CSAD
 ISON speeds for different pump types
+
+SetLight Show OmmiDirect vs NOT
+

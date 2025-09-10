@@ -163,7 +163,11 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         }
     }
 
-    private synchronized boolean requestConfiguration() throws HaywardException {
+    public String getMspConfig() throws HaywardException, InterruptedException {
+        return "ToDo";
+    }
+
+    public synchronized boolean requestConfiguration() throws HaywardException {
         String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>RequestConfiguration</Name></Request>";
 
         String xmlResponse = udpXmlResponse(xmlRequest, MSG_TYPE_REQUEST);
