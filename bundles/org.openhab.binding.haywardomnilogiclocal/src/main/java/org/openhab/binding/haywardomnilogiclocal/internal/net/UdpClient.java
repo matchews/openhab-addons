@@ -24,10 +24,18 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.zip.InflaterInputStream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.annotations.XStreamValue;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 /**
  * Simple UDP client used to communicate with the OmniLogic controller.
@@ -38,6 +46,30 @@ public class UdpClient {
     private static final int MSG_ACK = 1002;
     private static final int MSG_LEAD = 1998;
     private static final int MSG_BLOCK = 1999;
+
+    private static final XStream XSTREAM = new XStream(new StaxDriver());
+
+    static {
+        XSTREAM.allowTypes(new Class[] { Message.class, Parameter.class });
+        XSTREAM.setClassLoader(UdpClient.class.getClassLoader());
+        XSTREAM.ignoreUnknownElements();
+        XSTREAM.processAnnotations(Message.class);
+    }
+
+    @XStreamAlias("Message")
+    private static class Message {
+        @XStreamImplicit(itemFieldName = "Parameter")
+        private @Nullable List<Parameter> parameters;
+    }
+
+    @XStreamAlias("Parameter")
+    private static class Parameter {
+        @XStreamAsAttribute
+        private @Nullable String name;
+
+        @XStreamValue
+        private @Nullable String value;
+    }
 
     private final InetAddress address;
     private final int port;
@@ -131,21 +163,24 @@ public class UdpClient {
     }
 
     private static int parseIntParameter(String xml, String name) {
-        String search = "<Parameter name=\"" + name + "\">";
-        int start = xml.indexOf(search);
-        if (start == -1) {
-            return 0;
-        }
-        start += search.length();
-        int end = xml.indexOf("</Parameter>", start);
-        if (end == -1) {
-            return 0;
-        }
+        Object obj;
         try {
-            return Integer.parseInt(xml.substring(start, end));
-        } catch (NumberFormatException e) {
+            obj = XSTREAM.fromXML(xml);
+        } catch (RuntimeException e) {
             return 0;
         }
+        if (obj instanceof Message msg && msg.parameters != null) {
+            for (Parameter p : msg.parameters) {
+                if (name.equals(p.name) && p.value != null) {
+                    try {
+                        return Integer.parseInt(p.value);
+                    } catch (NumberFormatException e) {
+                        return 0;
+                    }
+                }
+            }
+        }
+        return 0;
     }
 
     private void sendAck(DatagramSocket socket, int messageId) throws IOException {
