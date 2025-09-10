@@ -54,7 +54,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
     @Override
     protected void startScan() {
         try {
-            String xmlResults = thingHandler.getMspConfigV2();
+            String xmlResults = thingHandler.getMspConfig();
             mspConfigDiscovery(xmlResults);
         } catch (HaywardException e) {
             logger.warn("Exception during discovery scan: {}", e.getMessage());

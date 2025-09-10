@@ -131,7 +131,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             clearPolling(pollTelemetryFuture);
             clearPolling(pollAlarmsFuture);
 
-            if (!handshake()) {
+            if (!requestConfiguration()) {
                 updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
                         "Unable to complete UDP handshake");
                 clearPolling(pollTelemetryFuture);
@@ -163,8 +163,8 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         }
     }
 
-    private synchronized boolean handshake() throws HaywardException {
-        String xmlRequest = "<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?><Request><Name>RequestConfiguration</Name></Request>";
+    private synchronized boolean requestConfiguration() throws HaywardException {
+        String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>RequestConfiguration</Name></Request>";
 
         String xmlResponse = udpXmlResponse(xmlRequest, MSG_TYPE_REQUEST);
 
@@ -182,12 +182,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         return true;
     }
 
-    @Deprecated
     public synchronized String getMspConfig() throws HaywardException, InterruptedException {
-        return getMspConfigV2();
-    }
-
-    public synchronized String getMspConfigV2() throws HaywardException, InterruptedException {
         String urlParameters = "<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?><Request><Name>GetMspConfig</Name><Parameters/></Request>";
 
         String xmlResponse = udpXmlResponse(urlParameters, MSG_TYPE_REQUEST);
