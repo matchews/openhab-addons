@@ -33,9 +33,10 @@ import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
+import com.thoughtworks.xstream.io.xml.QNameMap;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 /**
@@ -48,9 +49,13 @@ public class UdpClient {
     private static final int MSG_LEAD = 1998;
     private static final int MSG_BLOCK = 1999;
 
-    private static final XStream XSTREAM = new XStream(new StaxDriver());
+    private static final QNameMap QNAME_MAP;
+    private static final XStream XSTREAM;
 
     static {
+        QNAME_MAP = new QNameMap();
+        QNAME_MAP.setDefaultNamespace("http://nextgen.hayward.com/api");
+        XSTREAM = new XStream(new StaxDriver(QNAME_MAP));
         XSTREAM.allowTypes(new Class[] { Message.class, Parameter.class });
         XSTREAM.alias("Response", Message.class);
         XSTREAM.setClassLoader(UdpClient.class.getClassLoader());
