@@ -1,5 +1,7 @@
 
 
 Enumerate all message types
-How are we handling rx'd ack messages?
 Discovery
+Retrieve units from requestConfig
+CSAD
+ISON speeds for different pump types
