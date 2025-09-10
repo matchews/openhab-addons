@@ -34,7 +34,8 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import com.thoughtworks.xstream.annotations.XStreamValue;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
+import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 /**
@@ -63,11 +64,11 @@ public class UdpClient {
     }
 
     @XStreamAlias("Parameter")
+    @XStreamConverter(value = ToAttributedValueConverter.class, strings = { "value" })
     private static class Parameter {
         @XStreamAsAttribute
         private @Nullable String name;
 
-        @XStreamValue
         private @Nullable String value;
     }
 
