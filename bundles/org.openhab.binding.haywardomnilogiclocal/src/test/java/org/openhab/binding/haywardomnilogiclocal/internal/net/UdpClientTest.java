@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.DeflaterOutputStream;
+import java.lang.reflect.Method;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.jupiter.api.Test;
@@ -103,6 +104,15 @@ public class UdpClientTest {
         assertEquals(responseXml, response.getXml());
         assertFalse(ackBeforeLead.get());
         assertTrue(ackAfterLead.get());
+    }
+
+    @Test
+    public void parseIntParameterShouldHandleResponseRoot() throws Exception {
+        Method method = UdpClient.class.getDeclaredMethod("parseIntParameter", String.class, String.class);
+        method.setAccessible(true);
+        String xml = "<Response><Parameter name=\"Test\">42</Parameter></Response>";
+        int value = (int) method.invoke(null, xml, "Test");
+        assertEquals(42, value);
     }
 
     @Test

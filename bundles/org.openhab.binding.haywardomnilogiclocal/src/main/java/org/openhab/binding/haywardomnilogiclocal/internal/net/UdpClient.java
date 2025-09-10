@@ -52,6 +52,7 @@ public class UdpClient {
 
     static {
         XSTREAM.allowTypes(new Class[] { Message.class, Parameter.class });
+        XSTREAM.alias("Response", Message.class);
         XSTREAM.setClassLoader(UdpClient.class.getClassLoader());
         XSTREAM.ignoreUnknownElements();
         XSTREAM.processAnnotations(Message.class);
