@@ -182,25 +182,6 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         return true;
     }
 
-    public synchronized String getMspConfig() throws HaywardException, InterruptedException {
-        String urlParameters = "<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?><Request><Name>GetMspConfig</Name><Parameters/></Request>";
-
-        String xmlResponse = udpXmlResponse(urlParameters, MSG_TYPE_REQUEST);
-
-        if (xmlResponse.isEmpty()) {
-            logger.debug("Hayward Connection thing: MSP config XML response was null");
-            return "Fail";
-        }
-
-        List<String> configs = evaluateXPath("//Parameter[@name='MspConfig']/text()", xmlResponse);
-        if (configs.isEmpty()) {
-            logger.debug("Hayward Connection thing: MSP config XML response: {}", xmlResponse);
-            return "Fail";
-        }
-
-        return configs.get(0);
-    }
-
     public synchronized boolean getTelemetryData() throws HaywardException {
         String urlParameters = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>GetTelemetryData</Name><Parameters/></Request>";
 
