@@ -112,7 +112,7 @@ public class UdpClientTest {
         Method method = UdpClient.class.getDeclaredMethod("parseIntParameter", String.class, String.class);
         method.setAccessible(true);
         String xml = "<Response><Parameter name=\"Test\">42</Parameter></Response>";
-        int value = (Integer) Objects.requireNonNull(method.invoke(null, xml, "Test"));
+        int value = (Integer) Objects.requireNonNull(method.invoke(UdpClient.class, xml, "Test"));
         assertEquals(42, value);
     }
 
