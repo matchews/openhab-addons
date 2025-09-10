@@ -12,6 +12,7 @@ import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.DeflaterOutputStream;
 import java.lang.reflect.Method;
@@ -111,7 +112,7 @@ public class UdpClientTest {
         Method method = UdpClient.class.getDeclaredMethod("parseIntParameter", String.class, String.class);
         method.setAccessible(true);
         String xml = "<Response><Parameter name=\"Test\">42</Parameter></Response>";
-        int value = (int) method.invoke(null, xml, "Test");
+        int value = (Integer) Objects.requireNonNull(method.invoke(null, xml, "Test"));
         assertEquals(42, value);
     }
 
