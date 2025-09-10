@@ -73,10 +73,7 @@ public class UdpClient {
                 buffer.getLong();
                 buffer.position(16);
                 int msgType = buffer.getInt();
-                buffer.get();
-                int blockCount = Byte.toUnsignedInt(buffer.get());
-                boolean thisCompressed = buffer.get() != 0;
-                buffer.get();
+                buffer.position(24);
 
                 if (!ackSent && (msgType == MSG_LEAD || msgType == MSG_BLOCK
                         || msgType == HaywardMessageType.MSP_TELEMETRY_UPDATE.getMsgInt())) {
@@ -85,8 +82,9 @@ public class UdpClient {
                 }
 
                 if (msgType == MSG_LEAD) {
-                    expectedBlocks = blockCount;
-                    compressed = thisCompressed;
+                    String xml = new String(data, 24, data.length - 24, StandardCharsets.UTF_8).trim();
+                    expectedBlocks = parseIntParameter(xml, "MsgBlockCount");
+                    compressed = parseIntParameter(xml, "Type") == 1;
                 } else if (msgType == MSG_BLOCK) {
                     blocks.write(data, 24, data.length - 24);
                     expectedBlocks--;
@@ -126,6 +124,24 @@ public class UdpClient {
             throw new IOException("No UDP response received");
         }
         return response;
+    }
+
+    private static int parseIntParameter(String xml, String name) {
+        String search = "<Parameter name=\"" + name + "\">";
+        int start = xml.indexOf(search);
+        if (start == -1) {
+            return 0;
+        }
+        start += search.length();
+        int end = xml.indexOf("</Parameter>", start);
+        if (end == -1) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(xml.substring(start, end));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     private void sendAck(DatagramSocket socket, int messageId) throws IOException {

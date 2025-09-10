@@ -108,16 +108,20 @@ public class UdpClientTest {
     }
 
     private static byte[] createLeadPacket(int messageId, int blocks, boolean compressed) {
-        ByteBuffer buffer = ByteBuffer.allocate(24);
-        buffer.putInt(messageId);
-        buffer.putLong(System.currentTimeMillis());
-        buffer.put("1.22".getBytes(StandardCharsets.US_ASCII));
-        buffer.putInt(HaywardMessageType.MSP_LEADMESSAGE.getMsgInt());
-        buffer.put((byte) 1);
-        buffer.put((byte) blocks);
-        buffer.put((byte) (compressed ? 1 : 0));
-        buffer.put((byte) 0);
-        return buffer.array();
+        String xml = "<Message><Parameter name=\"MsgBlockCount\">" + blocks
+                + "</Parameter><Parameter name=\"Type\">" + (compressed ? 1 : 0) + "</Parameter></Message>";
+        byte[] xmlBytes = (xml + '\0').getBytes(StandardCharsets.UTF_8);
+        ByteBuffer header = ByteBuffer.allocate(24);
+        header.putInt(messageId);
+        header.putLong(System.currentTimeMillis());
+        header.put("1.22".getBytes(StandardCharsets.US_ASCII));
+        header.putInt(HaywardMessageType.MSP_LEADMESSAGE.getMsgInt());
+        header.put((byte) 1);
+        header.put(new byte[3]);
+        byte[] packet = new byte[24 + xmlBytes.length];
+        System.arraycopy(header.array(), 0, packet, 0, 24);
+        System.arraycopy(xmlBytes, 0, packet, 24, xmlBytes.length);
+        return packet;
     }
 
     private static byte[] createBlockPacket(int messageId, String xml) {
@@ -128,9 +132,7 @@ public class UdpClientTest {
         header.put("1.22".getBytes(StandardCharsets.US_ASCII));
         header.putInt(HaywardMessageType.MSP_BLOCKMESSAGE.getMsgInt());
         header.put((byte) 1);
-        header.put((byte) 0);
-        header.put((byte) 0);
-        header.put((byte) 0);
+        header.put(new byte[3]);
         byte[] packet = new byte[24 + xmlBytes.length];
         System.arraycopy(header.array(), 0, packet, 0, 24);
         System.arraycopy(xmlBytes, 0, packet, 24, xmlBytes.length);
