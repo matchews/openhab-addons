@@ -73,7 +73,10 @@ public class UdpClient {
                 buffer.getLong();
                 buffer.position(16);
                 int msgType = buffer.getInt();
-                buffer.position(24);
+              
+               int blockCount = Byte.toUnsignedInt(data[21]);
+                boolean thisCompressed = data[22] == 1;
+
 
                 if (!ackSent && (msgType == MSG_LEAD || msgType == MSG_BLOCK
                         || msgType == HaywardMessageType.MSP_TELEMETRY_UPDATE.getMsgInt())) {
@@ -86,6 +89,7 @@ public class UdpClient {
                     expectedBlocks = parseIntParameter(xml, "MsgBlockCount");
                     compressed = parseIntParameter(xml, "Type") == 1;
                 } else if (msgType == MSG_BLOCK) {
+                    compressed |= thisCompressed;
                     blocks.write(data, 24, data.length - 24);
                     expectedBlocks--;
                     if (expectedBlocks == 0) {
