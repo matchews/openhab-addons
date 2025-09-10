@@ -110,6 +110,8 @@ public class UdpClient {
                         response = UdpResponse.fromBytes(packetBytes, packetBytes.length);
                         break;
                     }
+                } else if (msgType == HaywardMessageType.ACK.getMsgInt()) {
+                    continue;
                 } else {
                     response = UdpResponse.fromBytes(data, data.length);
                     break;
