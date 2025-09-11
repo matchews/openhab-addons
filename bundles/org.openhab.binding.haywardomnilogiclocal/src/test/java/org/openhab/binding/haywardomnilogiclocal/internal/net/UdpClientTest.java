@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.openhab.binding.haywardomnilogiclocal.internal.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -97,7 +109,7 @@ public class UdpClientTest {
         serverThread.start();
 
         UdpClient client = new UdpClient("127.0.0.1", port);
-        UdpRequest request = new UdpRequest(HaywardMessageType.GET_TELEMETRY.getMsgInt(), "<Request/>");
+        UdpRequest request = new UdpRequest(HaywardMessageType.GET_TELEMETRY, "<Request/>");
         UdpResponse response = client.send(request);
 
         serverThread.join();
@@ -179,7 +191,7 @@ public class UdpClientTest {
         serverThread.start();
 
         UdpClient client = new UdpClient("127.0.0.1", port);
-        UdpRequest request = new UdpRequest(HaywardMessageType.GET_TELEMETRY.getMsgInt(), "<Request/>");
+        UdpRequest request = new UdpRequest(HaywardMessageType.GET_TELEMETRY, "<Request/>");
         UdpResponse response = client.send(request);
 
         serverThread.join();
@@ -221,7 +233,7 @@ public class UdpClientTest {
         serverThread.start();
 
         UdpClient client = new UdpClient("127.0.0.1", port);
-        UdpRequest request = new UdpRequest(HaywardMessageType.GET_TELEMETRY.getMsgInt(), "<Request/>");
+        UdpRequest request = new UdpRequest(HaywardMessageType.GET_TELEMETRY, "<Request/>");
         UdpResponse response = client.send(request);
 
         serverThread.join();
@@ -231,7 +243,7 @@ public class UdpClientTest {
     }
 
     private static byte[] createAckPacket(int messageId) throws Exception {
-        UdpRequest ack = new UdpRequest(HaywardMessageType.ACK.getMsgInt(), "ACK", messageId);
+        UdpRequest ack = new UdpRequest(HaywardMessageType.ACK, "ACK", messageId);
         return ack.toBytes();
     }
 

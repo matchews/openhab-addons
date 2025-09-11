@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.openhab.binding.haywardomnilogiclocal.internal.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -7,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.jupiter.api.Test;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 
 /**
  * Tests for {@link UdpRequest}.
@@ -18,7 +31,7 @@ public class UdpRequestTest {
 
     @Test
     public void toBytesShouldCreateHeaderAndPayload() throws Exception {
-        int messageType = 1004;
+        HaywardMessageType messageType = HaywardMessageType.MSP_TELEMETRY_UPDATE;
         UdpRequest request = new UdpRequest(messageType, REQUEST_XML);
 
         byte[] bytes = request.toBytes();
@@ -30,7 +43,7 @@ public class UdpRequestTest {
         assertEquals("1.22", version);
 
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        assertEquals(messageType, buffer.getInt(16));
+        assertEquals(messageType.getMsgInt(), buffer.getInt(16));
 
         assertEquals(1, bytes[20]);
         assertEquals(0, bytes[21]);
