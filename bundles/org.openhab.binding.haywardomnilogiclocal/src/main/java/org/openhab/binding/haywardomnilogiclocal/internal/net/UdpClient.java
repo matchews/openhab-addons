@@ -27,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.InflaterInputStream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 
 import com.thoughtworks.xstream.XStream;
@@ -84,10 +83,21 @@ public class UdpClient {
                 System.arraycopy(responsePacket.getData(), 0, data, 0, responsePacket.getLength());
                 ByteBuffer buffer = ByteBuffer.wrap(data);
                 int msgId = buffer.getInt();
-                buffer.getLong();
+                long timeStamp = buffer.getLong();
+
+                // Get Version
+                byte[] charBytes = new byte[4];
+                buffer.get(charBytes);
+                String version = new String(charBytes, StandardCharsets.US_ASCII);
                 buffer.position(16);
-                @Nullable
+
+                // Get Message Type
                 HaywardMessageType msgType = HaywardMessageType.fromMsgInt(buffer.getInt());
+
+                // Get Client Type
+                int clientType = buffer.get();
+
+                // Get Compression Bit
                 compressed = data[22] == 1;
 
                 if (msgType != HaywardMessageType.ACK) {
