@@ -17,7 +17,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.InflaterInputStream;
 
@@ -29,22 +28,20 @@ import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
  */
 @NonNullByDefault
 public class UdpResponse {
-    private final int messageType;
-    private final int messageId;
+    private final UdpHeader header;
     private final String xml;
 
-    private UdpResponse(int messageId, int messageType, String xml) {
-        this.messageId = messageId;
-        this.messageType = messageType;
+    private UdpResponse(UdpHeader header, String xml) {
+        this.header = header;
         this.xml = xml;
     }
 
     public int getMessageType() {
-        return messageType;
+        return header.getMessageType().getMsgInt();
     }
 
     public int getMessageId() {
-        return messageId;
+        return header.getMessageId();
     }
 
     public String getXml() {
@@ -55,23 +52,12 @@ public class UdpResponse {
      * Decodes the raw packet received from the controller.
      */
     public static UdpResponse fromBytes(byte[] data, int length) throws UnsupportedEncodingException {
-        ByteBuffer buffer = ByteBuffer.wrap(data, 0, length);
-        int msgId = buffer.getInt();
-        buffer.getLong(); // timestamp
-        byte[] version = new byte[4];
-        buffer.get(version);
-        int msgType = buffer.getInt();
-        buffer.get();
-        buffer.get();
-        buffer.get();
-        buffer.get();
-
-
-        byte[] payload = new byte[length - 24];
-        System.arraycopy(data, 24, payload, 0, payload.length);
+        UdpHeader header = UdpHeader.fromBytes(data);
+        byte[] payload = new byte[length - UdpHeader.HEADER_LENGTH];
+        System.arraycopy(data, UdpHeader.HEADER_LENGTH, payload, 0, payload.length);
 
         String xml;
-        if (msgType == HaywardMessageType.MSP_TELEMETRY_UPDATE.getMsgInt()) {
+        if (header.getMessageType() == HaywardMessageType.MSP_TELEMETRY_UPDATE) {
             try (InflaterInputStream inflater = new InflaterInputStream(new ByteArrayInputStream(payload));
                     ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                 byte[] buf = new byte[1024];
@@ -89,6 +75,6 @@ public class UdpResponse {
             xml = new String(payload, StandardCharsets.UTF_8).trim();
         }
 
-        return new UdpResponse(msgId, msgType, xml);
+        return new UdpResponse(header, xml);
     }
 }
