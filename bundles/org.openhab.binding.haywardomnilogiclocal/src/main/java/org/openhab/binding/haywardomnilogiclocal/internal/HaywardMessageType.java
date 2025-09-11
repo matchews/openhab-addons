@@ -47,7 +47,7 @@ public enum HaywardMessageType {
     }
 
     public int getMsgInt() {
-        return msgInt;
+        return this.msgInt;
     }
 
     public static @Nullable HaywardMessageType fromMsgInt(int msgInt) {

@@ -68,8 +68,6 @@ import org.xml.sax.InputSource;
 @NonNullByDefault
 public class HaywardBridgeHandler extends BaseBridgeHandler {
     private final Logger logger = LoggerFactory.getLogger(HaywardBridgeHandler.class);
-    private static final int MSG_TYPE_REQUEST = 1;
-    private static final int MSG_TYPE_TELEMETRY = HaywardMessageType.MSP_TELEMETRY_UPDATE.getMsgInt();
     private static final int UDP_PORT = 10444;
 
     private final HaywardDynamicStateDescriptionProvider stateDescriptionProvider;
@@ -170,7 +168,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
     public synchronized boolean requestConfiguration() throws HaywardException {
         String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>RequestConfiguration</Name></Request>";
 
-        String xmlResponse = udpXmlResponse(xmlRequest, MSG_TYPE_REQUEST);
+        String xmlResponse = udpXmlResponse(xmlRequest, HaywardMessageType.REQUEST_CONFIGURATION);
 
         if (xmlResponse.isEmpty()) {
             logger.debug("Hayward Connection thing: Handshake XML response was null");
@@ -189,7 +187,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
     public synchronized boolean getTelemetryData() throws HaywardException {
         String urlParameters = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>GetTelemetryData</Name><Parameters/></Request>";
 
-        String xmlResponse = udpXmlResponse(urlParameters, MSG_TYPE_TELEMETRY);
+        String xmlResponse = udpXmlResponse(urlParameters, HaywardMessageType.GET_TELEMETRY);
 
         if (xmlResponse.isEmpty()) {
             logger.debug("Hayward Connection thing: getTelemetry XML response was null");
@@ -294,7 +292,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         return values;
     }
 
-    public synchronized String udpXmlResponse(String xmlRequest, int msgType) throws HaywardException {
+    public synchronized String udpXmlResponse(String xmlRequest, HaywardMessageType msgType) throws HaywardException {
         if (logger.isTraceEnabled()) {
             logger.trace("Hayward Connection thing:  {} Hayward UDP command: {}", getCallingMethod(), xmlRequest);
         } else if (logger.isDebugEnabled()) {

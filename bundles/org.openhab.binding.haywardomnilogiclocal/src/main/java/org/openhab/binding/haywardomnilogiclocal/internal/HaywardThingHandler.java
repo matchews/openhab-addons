@@ -147,8 +147,10 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
     }
 
     protected void updateIfPresent(Map<String, ParameterValue> values, String key, String channelID) {
-        @Nullable ParameterValue parameter = values.get(key);
-        @Nullable String value = parameter != null ? parameter.value() : null;
+        @Nullable
+        ParameterValue parameter = values.get(key);
+        @Nullable
+        String value = parameter != null ? parameter.value() : null;
         if (value != null) {
             updateData(channelID, value);
         }
@@ -156,18 +158,20 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
 
     protected void putIfPresent(Map<String, ParameterValue> values, String key, Map<String, String> properties,
             String propertyName) {
-        @Nullable ParameterValue parameter = values.get(key);
-        @Nullable String value = parameter != null ? parameter.value() : null;
+        @Nullable
+        ParameterValue parameter = values.get(key);
+        @Nullable
+        String value = parameter != null ? parameter.value() : null;
         if (value != null) {
             properties.put(propertyName, value);
         }
     }
 
-    protected void sendUdpCommand(String xml) {
+    protected void sendUdpCommand(String xml, HaywardMessageType msgType) {
         Bridge bridge = getBridge();
         if (bridge != null && bridge.getHandler() instanceof HaywardBridgeHandler bridgehandler) {
             try {
-                String response = bridgehandler.udpXmlResponse(xml, 1);
+                String response = bridgehandler.udpXmlResponse(xml, msgType);
                 if (logger.isTraceEnabled()) {
                     logger.trace("UDP response: {}", response);
                 }

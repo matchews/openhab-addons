@@ -20,6 +20,7 @@ import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.core.library.types.OnOffType;
@@ -125,8 +126,8 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
             String token = bridgehandler.getAccount().getToken();
 
             if (poolID == null || systemID == null || token == null) {
-                logger.warn("haywardCommand missing configuration (poolID={}, systemID={}, token={})", poolID,
-                        systemID, token);
+                logger.warn("haywardCommand missing configuration (poolID={}, systemID={}, token={})", poolID, systemID,
+                        token);
                 return;
             }
 
@@ -165,7 +166,7 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
                 }
 
                 // *****Send Command to Hayward server
-                String xmlResponse = bridgehandler.udpXmlResponse(cmdURL, 1);
+                String xmlResponse = bridgehandler.udpXmlResponse(cmdURL, HaywardMessageType.SET_HEATER_COMMAND);
                 String status = bridgehandler.evaluateXPath("//Parameter[@name='Status']/text()", xmlResponse).get(0);
 
                 if (!("0".equals(status))) {

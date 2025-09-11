@@ -2,6 +2,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.util.Map;
 
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
@@ -25,12 +26,16 @@ public class HaywardColorLogicHandler extends HaywardThingHandler {
         }
 
         if ("colorMode".equals(channelUID.getId())) {
-            sendUdpCommand(CommandBuilder.setColorMode(bridgehandler.getAccount().getToken(),
-                    bridgehandler.getAccount().getMspSystemID(), sysId, command.toString()));
+            sendUdpCommand(
+                    CommandBuilder.setColorMode(bridgehandler.getAccount().getToken(),
+                            bridgehandler.getAccount().getMspSystemID(), sysId, command.toString()),
+                    HaywardMessageType.SET_CHLOR_ENABLED);
         } else if ("brightness".equals(channelUID.getId())) {
             int val = ((Number) command).intValue();
-            sendUdpCommand(CommandBuilder.setBrightness(bridgehandler.getAccount().getToken(),
-                    bridgehandler.getAccount().getMspSystemID(), sysId, val));
+            sendUdpCommand(
+                    CommandBuilder.setBrightness(bridgehandler.getAccount().getToken(),
+                            bridgehandler.getAccount().getMspSystemID(), sysId, val),
+                    HaywardMessageType.SET_CHLOR_ENABLED);
         }
     }
 

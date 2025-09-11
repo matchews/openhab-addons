@@ -2,6 +2,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.util.Map;
 
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
@@ -27,13 +28,15 @@ public class HaywardPumpHandler extends HaywardThingHandler {
         switch (channelUID.getId()) {
             case "pumpEnable":
                 sendUdpCommand(CommandBuilder.setEquipmentEnable(bridgehandler.getAccount().getToken(),
-                        bridgehandler.getAccount().getMspSystemID(), sysId,
-                        "ON".equalsIgnoreCase(command.toString())));
+                        bridgehandler.getAccount().getMspSystemID(), sysId, "ON".equalsIgnoreCase(command.toString())),
+                        HaywardMessageType.SET_EQUIPMENT);
                 break;
             case "pumpSpeed":
                 int speedVal = ((Number) command).intValue();
-                sendUdpCommand(CommandBuilder.setPumpSpeed(bridgehandler.getAccount().getToken(),
-                        bridgehandler.getAccount().getMspSystemID(), sysId, speedVal));
+                sendUdpCommand(
+                        CommandBuilder.setPumpSpeed(bridgehandler.getAccount().getToken(),
+                                bridgehandler.getAccount().getMspSystemID(), sysId, speedVal),
+                        HaywardMessageType.SET_EQUIPMENT);
                 break;
             default:
                 break;

@@ -2,6 +2,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.util.Map;
 
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
@@ -27,13 +28,15 @@ public class HaywardChlorinatorHandler extends HaywardThingHandler {
         switch (channelUID.getId()) {
             case "chlorEnable":
                 sendUdpCommand(CommandBuilder.setEquipmentEnable(bridgehandler.getAccount().getToken(),
-                        bridgehandler.getAccount().getMspSystemID(), sysId,
-                        "ON".equalsIgnoreCase(command.toString())));
+                        bridgehandler.getAccount().getMspSystemID(), sysId, "ON".equalsIgnoreCase(command.toString())),
+                        HaywardMessageType.SET_CHLOR_ENABLED);
                 break;
             case "chlorSaltOutput":
                 int val = ((Number) command).intValue();
-                sendUdpCommand(CommandBuilder.setChlorinatorOutput(bridgehandler.getAccount().getToken(),
-                        bridgehandler.getAccount().getMspSystemID(), sysId, val));
+                sendUdpCommand(
+                        CommandBuilder.setChlorinatorOutput(bridgehandler.getAccount().getToken(),
+                                bridgehandler.getAccount().getMspSystemID(), sysId, val),
+                        HaywardMessageType.SET_CHLOR_PARAMS);
                 break;
             default:
                 break;

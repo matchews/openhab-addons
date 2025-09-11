@@ -19,26 +19,27 @@ import java.util.Random;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 
 /**
  * Represents a UDP request to the OmniLogic controller.
  *
  * The OmniLogic protocol is comprised of a 24 byte header followed by an XML
- * document terminated with a null character.  Only the fields required for the
+ * document terminated with a null character. Only the fields required for the
  * binding are modelled here.
  */
 @NonNullByDefault
 public class UdpRequest {
-    private final int messageType;
+    private final HaywardMessageType messageType;
     private final String xml;
     private final @Nullable Integer messageId;
 
-    public UdpRequest(int messageType, String xml) {
-        this(messageType, xml, null);
+    public UdpRequest(HaywardMessageType msgType, String xml) {
+        this(msgType, xml, null);
     }
 
-    public UdpRequest(int messageType, String xml, @Nullable Integer messageId) {
-        this.messageType = messageType;
+    public UdpRequest(HaywardMessageType msgType, String xml, @Nullable Integer messageId) {
+        this.messageType = msgType;
         this.xml = xml;
         this.messageId = messageId;
     }
@@ -58,7 +59,7 @@ public class UdpRequest {
         header.putInt(msgID);
         header.putLong(timeStamp);
         header.put(version.getBytes("ASCII"));
-        header.putInt(messageType);
+        header.putInt(messageType.getMsgInt());
         header.put(clientType);
         header.put(reserved);
         header.put(reserved);

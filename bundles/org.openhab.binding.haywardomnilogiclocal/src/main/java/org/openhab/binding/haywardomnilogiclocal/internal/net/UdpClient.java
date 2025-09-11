@@ -73,14 +73,15 @@ public class UdpClient {
             boolean compressed = false;
 
             while (true) {
+                // Prepare to receive response
                 byte[] buf = new byte[4096];
                 DatagramPacket responsePacket = new DatagramPacket(buf, buf.length);
                 socket.setSoTimeout(5000);
                 socket.receive(responsePacket);
 
+                // Response received, unpack
                 byte[] data = new byte[responsePacket.getLength()];
                 System.arraycopy(responsePacket.getData(), 0, data, 0, responsePacket.getLength());
-
                 ByteBuffer buffer = ByteBuffer.wrap(data);
                 int msgId = buffer.getInt();
                 buffer.getLong();
@@ -101,9 +102,14 @@ public class UdpClient {
                     if (obj instanceof LeadMessageResponse lead) {
                         expectedBlocks = lead.getMsgBlockCount();
                     }
+                } else if (msgType == HaywardMessageType.MSP_CONFIGURATIONUPDATE) {
+                    // TODO MSP Sends it all in one packet
+                    msgType = msgType;
                 } else if (msgType == HaywardMessageType.MSP_BLOCKMESSAGE) {
                     blocks.write(data, 24, data.length - 24);
                     expectedBlocks--;
+
+                    // ToDo Not sure what is going on here
                     if (expectedBlocks == 0) {
                         byte[] payload = blocks.toByteArray();
                         if (compressed) {
@@ -157,7 +163,7 @@ public class UdpClient {
         DatagramPacket packet = new DatagramPacket(out, out.length, address, port);
         socket.send(packet);
 
-        UdpRequest ack = new UdpRequest(HaywardMessageType.ACK.getMsgInt(), "", messageId);
+        UdpRequest ack = new UdpRequest(HaywardMessageType.ACK, "", messageId);
         byte[] ackBytes = ack.toBytes();
         DatagramPacket ackPacket = new DatagramPacket(ackBytes, ackBytes.length, address, port);
         socket.send(ackPacket);

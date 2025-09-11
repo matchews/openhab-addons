@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
 import org.openhab.core.thing.Bridge;
@@ -50,7 +51,7 @@ public class HaywardBackyardHandler extends HaywardThingHandler {
                     + "</Parameter><Parameter name=\"CultureInfoName\" dataType=\"String\">en-us</Parameter></Parameters></Request>";
 
             try {
-                String xmlResponse = bridgehandler.udpXmlResponse(urlParameters, 1);
+                String xmlResponse = bridgehandler.udpXmlResponse(urlParameters, HaywardMessageType.MSP_ALARM_LIST);
 
                 if (xmlResponse.isEmpty()) {
                     logger.debug("Hayward getAlarmList XML response was empty");
@@ -89,4 +90,3 @@ public class HaywardBackyardHandler extends HaywardThingHandler {
         }
     }
 }
-
