@@ -74,7 +74,6 @@ public class UdpClient {
             ByteArrayOutputStream blocks = new ByteArrayOutputStream();
             int expectedBlocks = 0;
             boolean compressed = false;
-            boolean ackSent = false;
 
             while (true) {
                 byte[] buf = new byte[4096];
@@ -93,11 +92,9 @@ public class UdpClient {
               
                 boolean thisCompressed = data[22] == 1;
 
-
-                if (!ackSent && (msgType == MSG_LEAD || msgType == MSG_BLOCK
-                        || msgType == HaywardMessageType.MSP_TELEMETRY_UPDATE.getMsgInt())) {
+                if (msgType == MSG_LEAD || msgType == MSG_BLOCK
+                        || msgType == HaywardMessageType.MSP_TELEMETRY_UPDATE.getMsgInt()) {
                     sendAck(socket, msgId);
-                    ackSent = true;
                 }
 
                 if (msgType == MSG_LEAD) {
