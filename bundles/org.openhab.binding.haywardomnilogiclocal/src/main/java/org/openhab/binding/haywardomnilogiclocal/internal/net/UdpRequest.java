@@ -14,7 +14,6 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.net;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.util.Random;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -50,22 +49,8 @@ public class UdpRequest {
     public byte[] toBytes() throws UnsupportedEncodingException {
         Random random = new Random();
         int msgID = messageId != null ? messageId.intValue() : random.nextInt();
-        long timeStamp = System.currentTimeMillis();
-        String version = "1.22"; // protocol version
-        byte clientType = 1;
-        byte reserved = 0;
-
-        ByteBuffer header = ByteBuffer.allocate(24);
-        header.putInt(msgID);
-        header.putLong(timeStamp);
-        header.put(version.getBytes("ASCII"));
-        header.putInt(messageType.getMsgInt());
-        header.put(clientType);
-        header.put(reserved);
-        header.put(reserved);
-        header.put(reserved);
-
-        byte[] headerBytes = header.array();
+        UdpHeader header = new UdpHeader(messageType, msgID);
+        byte[] headerBytes = header.toBytes();
         byte[] xmlBytes = (xml + '\0').getBytes("UTF-8");
 
         byte[] packet = new byte[headerBytes.length + xmlBytes.length];

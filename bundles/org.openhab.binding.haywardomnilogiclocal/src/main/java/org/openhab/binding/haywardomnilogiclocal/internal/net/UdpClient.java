@@ -22,7 +22,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.InflaterInputStream;
 
@@ -81,24 +80,10 @@ public class UdpClient {
                 // Response received, unpack
                 byte[] data = new byte[responsePacket.getLength()];
                 System.arraycopy(responsePacket.getData(), 0, data, 0, responsePacket.getLength());
-                ByteBuffer buffer = ByteBuffer.wrap(data);
-                int msgId = buffer.getInt();
-                long timeStamp = buffer.getLong();
-
-                // Get Version
-                byte[] charBytes = new byte[4];
-                buffer.get(charBytes);
-                String version = new String(charBytes, StandardCharsets.US_ASCII);
-                buffer.position(16);
-
-                // Get Message Type
-                HaywardMessageType msgType = HaywardMessageType.fromMsgInt(buffer.getInt());
-
-                // Get Client Type
-                int clientType = buffer.get();
-
-                // Get Compression Bit
-                compressed = data[22] == 1;
+                UdpHeader hdr = UdpHeader.fromBytes(data);
+                int msgId = hdr.getMessageId();
+                HaywardMessageType msgType = hdr.getMessageType();
+                compressed = hdr.isCompressed();
 
                 if (msgType != HaywardMessageType.ACK) {
                     sendAck(socket, msgId);
@@ -107,7 +92,8 @@ public class UdpClient {
                 if (msgType == HaywardMessageType.ACK) {
                     continue;
                 } else if (msgType == HaywardMessageType.MSP_LEADMESSAGE) {
-                    String xml = new String(data, 24, data.length - 24, StandardCharsets.UTF_8).trim();
+                    String xml = new String(data, UdpHeader.HEADER_LENGTH, data.length - UdpHeader.HEADER_LENGTH,
+                            StandardCharsets.UTF_8).trim();
                     Object obj = XSTREAM.fromXML(xml);
                     if (obj instanceof LeadMessageResponse lead) {
                         expectedBlocks = lead.getMsgBlockCount();
@@ -116,7 +102,7 @@ public class UdpClient {
                     // TODO MSP Sends it all in one packet
                     msgType = msgType;
                 } else if (msgType == HaywardMessageType.MSP_BLOCKMESSAGE) {
-                    blocks.write(data, 24, data.length - 24);
+                    blocks.write(data, UdpHeader.HEADER_LENGTH, data.length - UdpHeader.HEADER_LENGTH);
                     expectedBlocks--;
 
                     // ToDo Not sure what is going on here
@@ -126,17 +112,12 @@ public class UdpClient {
                             payload = decompress(payload);
                         }
                         String xml = new String(payload, StandardCharsets.UTF_8).trim();
-                        ByteBuffer header = ByteBuffer.allocate(24);
-                        header.putInt(msgId);
-                        header.putLong(System.currentTimeMillis());
-                        header.put("1.22".getBytes(StandardCharsets.US_ASCII));
-                        header.putInt(msgType.getMsgInt());
-                        header.put((byte) 1);
-                        header.put(new byte[3]);
+                        UdpHeader header = new UdpHeader(msgType, msgId);
+                        byte[] headerBytes = header.toBytes();
                         byte[] xmlBytes = (xml + '\0').getBytes(StandardCharsets.UTF_8);
-                        byte[] packetBytes = new byte[header.position() + xmlBytes.length];
-                        System.arraycopy(header.array(), 0, packetBytes, 0, header.position());
-                        System.arraycopy(xmlBytes, 0, packetBytes, header.position(), xmlBytes.length);
+                        byte[] packetBytes = new byte[headerBytes.length + xmlBytes.length];
+                        System.arraycopy(headerBytes, 0, packetBytes, 0, headerBytes.length);
+                        System.arraycopy(xmlBytes, 0, packetBytes, headerBytes.length, xmlBytes.length);
                         response = UdpResponse.fromBytes(packetBytes, packetBytes.length);
                         break;
                     }
@@ -157,18 +138,12 @@ public class UdpClient {
     }
 
     private void sendAck(DatagramSocket socket, int messageId) throws IOException {
-        ByteBuffer header = ByteBuffer.allocate(24);
-        header.putInt(messageId);
-        header.putLong(System.currentTimeMillis());
-        header.put("1.22".getBytes(StandardCharsets.US_ASCII));
-        header.putInt(HaywardMessageType.ACK.getMsgInt());
-        header.put((byte) 1);
-        header.put(new byte[3]);
-
+        UdpHeader header = new UdpHeader(HaywardMessageType.ACK, messageId);
+        byte[] headerBytes = header.toBytes();
         byte[] xml = "ACK\0".getBytes(StandardCharsets.UTF_8);
-        byte[] out = new byte[header.position() + xml.length];
-        System.arraycopy(header.array(), 0, out, 0, header.position());
-        System.arraycopy(xml, 0, out, header.position(), xml.length);
+        byte[] out = new byte[headerBytes.length + xml.length];
+        System.arraycopy(headerBytes, 0, out, 0, headerBytes.length);
+        System.arraycopy(xml, 0, out, headerBytes.length, xml.length);
 
         DatagramPacket packet = new DatagramPacket(out, out.length, address, port);
         socket.send(packet);
