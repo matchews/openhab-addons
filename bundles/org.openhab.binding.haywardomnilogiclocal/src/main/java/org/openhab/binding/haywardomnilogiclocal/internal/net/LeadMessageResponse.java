@@ -3,6 +3,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.net;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -46,7 +47,7 @@ public class LeadMessageResponse {
     @XStreamAlias("Parameters")
     public static class Parameters {
         @XStreamImplicit(itemFieldName = "Parameter")
-        private List<Parameter> parameters;
+        private @Nullable List<Parameter> parameters;
 
         int getInt(String name) {
             if (parameters != null) {
@@ -68,7 +69,7 @@ public class LeadMessageResponse {
     @XStreamConverter(value = ToAttributedValueConverter.class, strings = { "value" })
     public static class Parameter {
         @XStreamAsAttribute
-        private String name;
-        private String value;
+        private @Nullable String name;
+        private @Nullable String value;
     }
 }
