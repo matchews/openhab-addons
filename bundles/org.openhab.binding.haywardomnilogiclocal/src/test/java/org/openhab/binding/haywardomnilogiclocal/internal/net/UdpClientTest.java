@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.DeflaterOutputStream;
 import java.lang.reflect.Field;
 
@@ -131,6 +132,8 @@ public class UdpClientTest {
         int mid = xmlBytes.length / 2;
         byte[] part1 = Arrays.copyOfRange(xmlBytes, 0, mid);
         byte[] part2 = Arrays.copyOfRange(xmlBytes, mid, xmlBytes.length);
+        final AtomicInteger block1Acks = new AtomicInteger();
+        final AtomicInteger block2Acks = new AtomicInteger();
 
         Thread serverThread = new Thread(() -> {
             try {
@@ -142,10 +145,33 @@ public class UdpClientTest {
                 int clientPort = requestPacket.getPort();
                 byte[] lead = createLeadPacket(msgId, 2, false);
                 server.send(new DatagramPacket(lead, lead.length, clientAddress, clientPort));
+                // consume ACKs for lead
+                for (int i = 0; i < 2; i++) {
+                    server.setSoTimeout(2000);
+                    server.receive(new DatagramPacket(new byte[4096], 4096));
+                }
                 byte[] block1 = createBlockPacket(msgId, part1, false);
                 server.send(new DatagramPacket(block1, block1.length, clientAddress, clientPort));
+                for (int i = 0; i < 2; i++) {
+                    DatagramPacket ack = new DatagramPacket(new byte[4096], 4096);
+                    server.setSoTimeout(2000);
+                    server.receive(ack);
+                    if (ByteBuffer.wrap(ack.getData(), 0, ack.getLength()).getInt(16) ==
+                            HaywardMessageType.ACK.getMsgInt()) {
+                        block1Acks.incrementAndGet();
+                    }
+                }
                 byte[] block2 = createBlockPacket(msgId, part2, false);
                 server.send(new DatagramPacket(block2, block2.length, clientAddress, clientPort));
+                for (int i = 0; i < 2; i++) {
+                    DatagramPacket ack = new DatagramPacket(new byte[4096], 4096);
+                    server.setSoTimeout(2000);
+                    server.receive(ack);
+                    if (ByteBuffer.wrap(ack.getData(), 0, ack.getLength()).getInt(16) ==
+                            HaywardMessageType.ACK.getMsgInt()) {
+                        block2Acks.incrementAndGet();
+                    }
+                }
             } catch (Exception e) {
                 // ignore for test
             }
@@ -160,6 +186,8 @@ public class UdpClientTest {
         server.close();
 
         assertEquals(responseXml, response.getXml());
+        assertEquals(2, block1Acks.get());
+        assertEquals(2, block2Acks.get());
     }
 
     @Test
