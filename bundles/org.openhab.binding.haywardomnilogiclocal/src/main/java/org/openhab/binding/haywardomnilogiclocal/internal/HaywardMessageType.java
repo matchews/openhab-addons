@@ -1,6 +1,7 @@
 package org.openhab.binding.haywardomnilogiclocal.internal;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * The type to request.
@@ -47,5 +48,14 @@ public enum HaywardMessageType {
 
     public int getMsgInt() {
         return msgInt;
+    }
+
+    public static @Nullable HaywardMessageType fromMsgInt(int msgInt) {
+        for (HaywardMessageType type : values()) {
+            if (type.msgInt == msgInt) {
+                return type;
+            }
+        }
+        return null;
     }
 }

@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.InflaterInputStream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.QNameMap;
@@ -37,10 +38,9 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
  */
 @NonNullByDefault
 public class UdpClient {
-    private static final int MSG_TYPE_ACK = 1002;
-    private static final int MSG_ACK = 1002;
-    private static final int MSG_LEAD = 1998;
-    private static final int MSG_BLOCK = 1999;
+    private static final HaywardMessageType MSG_ACK = HaywardMessageType.ACK;
+    private static final HaywardMessageType MSG_LEAD = HaywardMessageType.MSP_LEADMESSAGE;
+    private static final HaywardMessageType MSG_BLOCK = HaywardMessageType.MSP_BLOCKMESSAGE;
 
     private static final QNameMap QNAME_MAP;
     private static final XStream XSTREAM;
@@ -88,12 +88,11 @@ public class UdpClient {
                 int msgId = buffer.getInt();
                 buffer.getLong();
                 buffer.position(16);
-                int msgType = buffer.getInt();
+                @Nullable HaywardMessageType msgType = HaywardMessageType.fromMsgInt(buffer.getInt());
               
                 boolean thisCompressed = data[22] == 1;
 
-                if (msgType == MSG_LEAD || msgType == MSG_BLOCK
-                        || msgType == HaywardMessageType.MSP_TELEMETRY_UPDATE.getMsgInt()) {
+                if (msgType == MSG_LEAD || msgType == MSG_BLOCK || msgType == HaywardMessageType.MSP_TELEMETRY_UPDATE) {
                     sendAck(socket, msgId);
                 }
 
@@ -118,7 +117,7 @@ public class UdpClient {
                         header.putInt(msgId);
                         header.putLong(System.currentTimeMillis());
                         header.put("1.22".getBytes(StandardCharsets.US_ASCII));
-                        header.putInt(msgType);
+                        header.putInt(msgType.getMsgInt());
                         header.put((byte) 1);
                         header.put(new byte[3]);
                         byte[] xmlBytes = (xml + '\0').getBytes(StandardCharsets.UTF_8);
@@ -128,7 +127,7 @@ public class UdpClient {
                         response = UdpResponse.fromBytes(packetBytes, packetBytes.length);
                         break;
                     }
-                } else if (msgType == HaywardMessageType.ACK.getMsgInt()) {
+                } else if (msgType == HaywardMessageType.ACK) {
                     continue;
                 } else {
                     response = UdpResponse.fromBytes(data, data.length);
@@ -151,7 +150,7 @@ public class UdpClient {
         header.putInt(messageId);
         header.putLong(System.currentTimeMillis());
         header.put("1.22".getBytes(StandardCharsets.US_ASCII));
-        header.putInt(MSG_TYPE_ACK);
+        header.putInt(MSG_ACK.getMsgInt());
         header.put((byte) 1);
         header.put(new byte[3]);
 
@@ -163,7 +162,7 @@ public class UdpClient {
         DatagramPacket packet = new DatagramPacket(out, out.length, address, port);
         socket.send(packet);
 
-        UdpRequest ack = new UdpRequest(MSG_ACK, "", messageId);
+        UdpRequest ack = new UdpRequest(MSG_ACK.getMsgInt(), "", messageId);
         byte[] ackBytes = ack.toBytes();
         DatagramPacket ackPacket = new DatagramPacket(ackBytes, ackBytes.length, address, port);
         socket.send(ackPacket);
