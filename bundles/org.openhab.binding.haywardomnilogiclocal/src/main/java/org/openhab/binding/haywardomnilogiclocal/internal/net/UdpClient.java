@@ -24,18 +24,11 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.zip.InflaterInputStream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 import com.thoughtworks.xstream.io.xml.QNameMap;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 
@@ -56,26 +49,11 @@ public class UdpClient {
         QNAME_MAP = new QNameMap();
         QNAME_MAP.setDefaultNamespace("http://nextgen.hayward.com/api");
         XSTREAM = new XStream(new StaxDriver(QNAME_MAP));
-        XSTREAM.allowTypes(new Class[] { Message.class, Parameter.class });
-        XSTREAM.alias("Response", Message.class);
+        XSTREAM.allowTypes(new Class[] { LeadMessageResponse.class, LeadMessageResponse.Parameters.class,
+                LeadMessageResponse.Parameter.class });
         XSTREAM.setClassLoader(UdpClient.class.getClassLoader());
         XSTREAM.ignoreUnknownElements();
-        XSTREAM.processAnnotations(Message.class);
-    }
-
-    @XStreamAlias("Message")
-    private static class Message {
-        @XStreamImplicit(itemFieldName = "Parameter")
-        private @Nullable List<Parameter> parameters;
-    }
-
-    @XStreamAlias("Parameter")
-    @XStreamConverter(value = ToAttributedValueConverter.class, strings = { "value" })
-    private static class Parameter {
-        @XStreamAsAttribute
-        private @Nullable String name;
-
-        private @Nullable String value;
+        XSTREAM.processAnnotations(LeadMessageResponse.class);
     }
 
     private final InetAddress address;
@@ -113,7 +91,6 @@ public class UdpClient {
                 buffer.position(16);
                 int msgType = buffer.getInt();
               
-               int blockCount = Byte.toUnsignedInt(data[21]);
                 boolean thisCompressed = data[22] == 1;
 
 
@@ -125,8 +102,11 @@ public class UdpClient {
 
                 if (msgType == MSG_LEAD) {
                     String xml = new String(data, 24, data.length - 24, StandardCharsets.UTF_8).trim();
-                    expectedBlocks = parseIntParameter(xml, "MsgBlockCount");
-                    compressed = parseIntParameter(xml, "Type") == 1;
+                    Object obj = XSTREAM.fromXML(xml);
+                    if (obj instanceof LeadMessageResponse lead) {
+                        expectedBlocks = lead.getMsgBlockCount();
+                    compressed = lead.getType() == 1;
+                    }
                 } else if (msgType == MSG_BLOCK) {
                     compressed |= thisCompressed;
                     blocks.write(data, 24, data.length - 24);
@@ -167,27 +147,6 @@ public class UdpClient {
             throw new IOException("No UDP response received");
         }
         return response;
-    }
-
-    private static int parseIntParameter(String xml, String name) {
-        Object obj;
-        try {
-            obj = XSTREAM.fromXML(xml);
-        } catch (RuntimeException e) {
-            return 0;
-        }
-        if (obj instanceof Message msg && msg.parameters != null) {
-            for (Parameter p : msg.parameters) {
-                if (name.equals(p.name) && p.value != null) {
-                    try {
-                        return Integer.parseInt(p.value);
-                    } catch (NumberFormatException e) {
-                        return 0;
-                    }
-                }
-            }
-        }
-        return 0;
     }
 
     private void sendAck(DatagramSocket socket, int messageId) throws IOException {

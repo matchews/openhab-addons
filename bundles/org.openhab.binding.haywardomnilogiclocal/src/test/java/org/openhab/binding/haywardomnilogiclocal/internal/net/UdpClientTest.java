@@ -12,10 +12,11 @@ import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.DeflaterOutputStream;
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
+
+import com.thoughtworks.xstream.XStream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.jupiter.api.Test;
@@ -108,12 +109,17 @@ public class UdpClientTest {
     }
 
     @Test
-    public void parseIntParameterShouldHandleResponseRoot() throws Exception {
-        Method method = UdpClient.class.getDeclaredMethod("parseIntParameter", String.class, String.class);
-        method.setAccessible(true);
-        String xml = "<Response><Parameter name=\"Test\">42</Parameter></Response>";
-        int value = (Integer) Objects.requireNonNull(method.invoke(null, xml, "Test"));
-        assertEquals(42, value);
+    public void leadMessageResponseShouldParseAllFields() throws Exception {
+        String xml =
+                "<Response><Name>LeadMessage</Name><Parameters><Parameter name=\"SourceOpId\">7</Parameter><Parameter name=\"MsgSize\">100</Parameter><Parameter name=\"MsgBlockCount\">3</Parameter><Parameter name=\"Type\">1</Parameter></Parameters></Response>";
+        Field field = UdpClient.class.getDeclaredField("XSTREAM");
+        field.setAccessible(true);
+        XStream xstream = (XStream) field.get(null);
+        LeadMessageResponse resp = (LeadMessageResponse) xstream.fromXML(xml);
+        assertEquals(7, resp.getSourceOpId());
+        assertEquals(100, resp.getMsgSize());
+        assertEquals(3, resp.getMsgBlockCount());
+        assertEquals(1, resp.getType());
     }
 
     @Test
@@ -202,8 +208,10 @@ public class UdpClientTest {
     }
 
     private static byte[] createLeadPacket(int messageId, int blocks, boolean compressed) {
-        String xml = "<Message><Parameter name=\"MsgBlockCount\">" + blocks
-                + "</Parameter><Parameter name=\"Type\">" + (compressed ? 1 : 0) + "</Parameter></Message>";
+        String xml = "<Response><Name>LeadMessage</Name><Parameters><Parameter name=\"SourceOpId\">0" +
+                "</Parameter><Parameter name=\"MsgSize\">0</Parameter><Parameter name=\"MsgBlockCount\">" + blocks
+                + "</Parameter><Parameter name=\"Type\">" + (compressed ? 1 : 0)
+                + "</Parameter></Parameters></Response>";
         byte[] xmlBytes = (xml + '\0').getBytes(StandardCharsets.UTF_8);
         ByteBuffer header = ByteBuffer.allocate(24);
         header.putInt(messageId);
