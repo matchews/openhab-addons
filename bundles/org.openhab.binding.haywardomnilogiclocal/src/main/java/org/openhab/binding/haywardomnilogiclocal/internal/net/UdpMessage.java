@@ -12,13 +12,10 @@
  */
 package org.openhab.binding.haywardomnilogiclocal.internal.net;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
-import java.util.zip.InflaterInputStream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -88,25 +85,17 @@ public class UdpMessage {
         byte[] payload = new byte[length - UdpHeader.HEADER_LENGTH];
         System.arraycopy(data, UdpHeader.HEADER_LENGTH, payload, 0, payload.length);
 
-        String xml;
-        if (header.getMessageType() == HaywardMessageType.MSP_TELEMETRY_UPDATE) {
-            try (InflaterInputStream inflater = new InflaterInputStream(new ByteArrayInputStream(payload));
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                byte[] buf = new byte[1024];
-                int read;
-                while ((read = inflater.read(buf)) != -1) {
-                    baos.write(buf, 0, read);
-                }
-                xml = baos.toString(StandardCharsets.UTF_8.name()).trim();
+        if (header.isCompressed()) {
+            try {
+                payload = PayloadCodec.decompress(payload);
             } catch (IOException e) {
                 UnsupportedEncodingException ex = new UnsupportedEncodingException(e.getMessage());
                 ex.initCause(e);
                 throw ex;
             }
-        } else {
-            xml = new String(payload, StandardCharsets.UTF_8).trim();
         }
 
+        String xml = new String(payload, StandardCharsets.UTF_8).trim();
         return new UdpMessage(header, xml);
     }
 }

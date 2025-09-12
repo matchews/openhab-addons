@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.ByteArrayOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -26,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.zip.DeflaterOutputStream;
 import java.lang.reflect.Field;
 
 import com.thoughtworks.xstream.XStream;
@@ -205,7 +203,7 @@ public class UdpClientTest {
         final DatagramSocket server = new DatagramSocket(0);
         final int port = server.getLocalPort();
         final String responseXml = "<Response>OK</Response>";
-        byte[] compressed = compress(responseXml);
+        byte[] compressed = PayloadCodec.compress(responseXml.getBytes(StandardCharsets.UTF_8));
         int mid = compressed.length / 2;
         byte[] part1 = Arrays.copyOfRange(compressed, 0, mid);
         byte[] part2 = Arrays.copyOfRange(compressed, mid, compressed.length);
@@ -255,7 +253,9 @@ public class UdpClientTest {
         header.put("1.22".getBytes(StandardCharsets.US_ASCII));
         header.putInt(HaywardMessageType.MSP_LEADMESSAGE.getMsgInt());
         header.put((byte) 1);
-        header.put(new byte[3]);
+        header.put((byte) 0);
+        header.put((byte) (compressed ? 1 : 0));
+        header.put((byte) 0);
         byte[] packet = new byte[24 + xmlBytes.length];
         System.arraycopy(header.array(), 0, packet, 0, 24);
         System.arraycopy(xmlBytes, 0, packet, 24, xmlBytes.length);
@@ -283,12 +283,5 @@ public class UdpClientTest {
         return packet;
     }
 
-    private static byte[] compress(String xml) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (DeflaterOutputStream dos = new DeflaterOutputStream(baos)) {
-            dos.write(xml.getBytes(StandardCharsets.UTF_8));
-        }
-        return baos.toByteArray();
-    }
 }
 
