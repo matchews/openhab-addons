@@ -65,9 +65,12 @@ public class MessageAssembler {
      * Append a block to the current assembly.
      *
      * @return {@code true} when all blocks have been received
+     *
+     *         There are 8 unexplained bits between the header and start of xml
+     *         null, null, stx, 108(l), 0, 0, 0, 0
      */
     public boolean handleBlock(byte[] data) throws IOException {
-        blocks.write(data, UdpHeader.HEADER_LENGTH, data.length - UdpHeader.HEADER_LENGTH);
+        blocks.write(data, UdpHeader.HEADER_LENGTH + 8, data.length - UdpHeader.HEADER_LENGTH - 8);
         remainingBlocks--;
         return remainingBlocks == 0;
     }
