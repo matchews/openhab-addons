@@ -105,7 +105,11 @@ public class UdpHeader {
         byte[] versionBytes = new byte[4];
         buffer.get(versionBytes);
         String ver = new String(versionBytes, StandardCharsets.US_ASCII);
-        HaywardMessageType msgType = HaywardMessageType.fromMsgInt(buffer.getInt());
+        int msgTypeInt = buffer.getInt();
+        HaywardMessageType msgType = HaywardMessageType.fromMsgInt(msgTypeInt);
+        if (msgType == null) {
+            throw new IllegalArgumentException("Unknown message type: " + msgTypeInt);
+        }
         byte client = buffer.get();
         buffer.get(); // reserved
         boolean comp = buffer.get() == 1;
