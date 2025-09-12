@@ -78,6 +78,13 @@ public class UdpMessage {
     }
 
     /**
+     * Builds a single ACK packet for the given message id.
+     */
+    public static byte[] buildAck(int messageId) throws UnsupportedEncodingException {
+        return encodeRequest(HaywardMessageType.ACK, "ACK", Integer.valueOf(messageId));
+    }
+
+    /**
      * Decodes a response message received from the controller.
      */
     public static UdpMessage decodeResponse(byte[] data, int length) throws UnsupportedEncodingException {
