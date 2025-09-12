@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
@@ -36,18 +35,11 @@ public class AckHandler {
     }
 
     public void sendAck(DatagramSocket socket, int messageId) throws IOException {
-        UdpHeader header = new UdpHeader(HaywardMessageType.ACK, messageId);
-        byte[] headerBytes = header.toBytes();
-        byte[] xml = "ACK\0".getBytes(StandardCharsets.UTF_8);
-        byte[] out = new byte[headerBytes.length + xml.length];
-        System.arraycopy(headerBytes, 0, out, 0, headerBytes.length);
-        System.arraycopy(xml, 0, out, headerBytes.length, xml.length);
-
+        byte[] out = UdpMessage.encodeRequest(HaywardMessageType.ACK, "ACK", messageId);
         DatagramPacket packet = new DatagramPacket(out, out.length, address, port);
         socket.send(packet);
 
-        UdpRequest ack = new UdpRequest(HaywardMessageType.ACK, "", messageId);
-        byte[] ackBytes = ack.toBytes();
+        byte[] ackBytes = UdpMessage.encodeRequest(HaywardMessageType.ACK, "", messageId);
         DatagramPacket ackPacket = new DatagramPacket(ackBytes, ackBytes.length, address, port);
         socket.send(ackPacket);
     }

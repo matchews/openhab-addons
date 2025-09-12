@@ -27,6 +27,7 @@ import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
  * document terminated with a null character. Only the fields required for the
  * binding are modelled here.
  */
+@Deprecated(forRemoval = true)
 @NonNullByDefault
 public class UdpRequest {
     private final HaywardMessageType messageType;
@@ -45,17 +46,11 @@ public class UdpRequest {
 
     /**
      * Serialises the request to the binary format expected by the controller.
+     *
+     * @deprecated Use {@link UdpMessage#encodeRequest(HaywardMessageType, String, Integer)} instead.
      */
+    @Deprecated(forRemoval = true)
     public byte[] toBytes() throws UnsupportedEncodingException {
-        Random random = new Random();
-        int msgID = messageId != null ? messageId.intValue() : random.nextInt();
-        UdpHeader header = new UdpHeader(messageType, msgID);
-        byte[] headerBytes = header.toBytes();
-        byte[] xmlBytes = (xml + '\0').getBytes("UTF-8");
-
-        byte[] packet = new byte[headerBytes.length + xmlBytes.length];
-        System.arraycopy(headerBytes, 0, packet, 0, headerBytes.length);
-        System.arraycopy(xmlBytes, 0, packet, headerBytes.length, xmlBytes.length);
-        return packet;
+        return UdpMessage.encodeRequest(messageType, xml, messageId);
     }
 }

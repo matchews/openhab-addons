@@ -23,10 +23,10 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link UdpResponse}.
+ * Tests for {@link UdpMessage} response decoding.
  */
 @NonNullByDefault
-public class UdpResponseTest {
+public class UdpMessageDecodeTest {
 
     private static final String RESPONSE_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><STATUS version=\"1.8\"></STATUS>";
 
@@ -50,8 +50,8 @@ public class UdpResponseTest {
         buffer.put(new byte[3]);
         buffer.put(compressed);
 
-        UdpResponse response = UdpResponse.fromBytes(buffer.array(), buffer.array().length);
-        assertEquals(messageType, response.getMessageType());
+        UdpMessage response = UdpMessage.decodeResponse(buffer.array(), buffer.array().length);
+        assertEquals(messageType, response.getMessageType().getMsgInt());
         assertEquals(messageId, response.getMessageId());
         assertEquals(RESPONSE_XML, response.getXml());
     }

@@ -22,19 +22,17 @@ import org.junit.jupiter.api.Test;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 
 /**
- * Tests for {@link UdpRequest}.
+ * Tests for {@link UdpMessage} request encoding.
  */
 @NonNullByDefault
-public class UdpRequestTest {
+public class UdpMessageTest {
 
     private static final String REQUEST_XML = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>RequestTelemetryData</Name></Request>";
 
     @Test
     public void toBytesShouldCreateHeaderAndPayload() throws Exception {
         HaywardMessageType messageType = HaywardMessageType.MSP_TELEMETRY_UPDATE;
-        UdpRequest request = new UdpRequest(messageType, REQUEST_XML);
-
-        byte[] bytes = request.toBytes();
+        byte[] bytes = UdpMessage.encodeRequest(messageType, REQUEST_XML);
 
         byte[] xmlBytes = (REQUEST_XML + '\0').getBytes(StandardCharsets.UTF_8);
         assertEquals(24 + xmlBytes.length, bytes.length);

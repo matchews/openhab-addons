@@ -40,8 +40,7 @@ import org.openhab.binding.haywardomnilogiclocal.internal.HaywardTypeToRequest;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.HaywardConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.discovery.HaywardDiscoveryService;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpClient;
-import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpRequest;
-import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpResponse;
+import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpMessage;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Channel;
@@ -304,7 +303,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         }
 
         try {
-            UdpResponse response = udpClient.send(new UdpRequest(msgType, xmlRequest));
+            UdpMessage response = udpClient.send(msgType, xmlRequest);
             return response.getXml();
         } catch (IOException e) {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
