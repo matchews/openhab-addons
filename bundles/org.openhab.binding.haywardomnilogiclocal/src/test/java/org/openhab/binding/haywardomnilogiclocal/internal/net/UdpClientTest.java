@@ -109,13 +109,12 @@ public class UdpClientTest {
         serverThread.start();
 
         UdpClient client = new UdpClient("127.0.0.1", port);
-        UdpRequest request = new UdpRequest(HaywardMessageType.GET_TELEMETRY, "<Request/>");
-        UdpResponse response = client.send(request);
+        UdpMessage response = client.send(HaywardMessageType.GET_TELEMETRY, "<Request/>");
 
         serverThread.join();
         server.close();
 
-        assertEquals(HaywardMessageType.MSP_BLOCKMESSAGE.getMsgInt(), response.getMessageType());
+        assertEquals(HaywardMessageType.MSP_BLOCKMESSAGE.getMsgInt(), response.getMessageType().getMsgInt());
         assertEquals(responseXml, response.getXml());
         assertFalse(ackBeforeLead.get());
         assertTrue(ackAfterLead.get());
@@ -191,8 +190,7 @@ public class UdpClientTest {
         serverThread.start();
 
         UdpClient client = new UdpClient("127.0.0.1", port);
-        UdpRequest request = new UdpRequest(HaywardMessageType.GET_TELEMETRY, "<Request/>");
-        UdpResponse response = client.send(request);
+        UdpMessage response = client.send(HaywardMessageType.GET_TELEMETRY, "<Request/>");
 
         serverThread.join();
         server.close();
@@ -233,8 +231,7 @@ public class UdpClientTest {
         serverThread.start();
 
         UdpClient client = new UdpClient("127.0.0.1", port);
-        UdpRequest request = new UdpRequest(HaywardMessageType.GET_TELEMETRY, "<Request/>");
-        UdpResponse response = client.send(request);
+        UdpMessage response = client.send(HaywardMessageType.GET_TELEMETRY, "<Request/>");
 
         serverThread.join();
         server.close();
@@ -243,8 +240,7 @@ public class UdpClientTest {
     }
 
     private static byte[] createAckPacket(int messageId) throws Exception {
-        UdpRequest ack = new UdpRequest(HaywardMessageType.ACK, "ACK", messageId);
-        return ack.toBytes();
+        return UdpMessage.encodeRequest(HaywardMessageType.ACK, "ACK", messageId);
     }
 
     private static byte[] createLeadPacket(int messageId, int blocks, boolean compressed) {

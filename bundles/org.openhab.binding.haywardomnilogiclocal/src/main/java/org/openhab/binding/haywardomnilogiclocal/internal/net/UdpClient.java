@@ -38,9 +38,9 @@ public class UdpClient {
         this.port = port;
     }
 
-    public UdpResponse send(UdpRequest request) throws IOException {
-        byte[] out = request.toBytes();
-        UdpResponse response = null;
+    public UdpMessage send(HaywardMessageType requestType, String xml) throws IOException {
+        byte[] out = UdpMessage.encodeRequest(requestType, xml);
+        UdpMessage response = null;
         try (DatagramSocket socket = new DatagramSocket()) {
             AckHandler ackHandler = new AckHandler(address, port);
             MessageAssembler assembler = new MessageAssembler();
@@ -122,21 +122,16 @@ public class UdpClient {
         return assembler.handleBlock(data);
     }
 
-    private UdpResponse finishResponse(HaywardMessageType msgType, int msgId, MessageAssembler assembler)
+    private UdpMessage finishResponse(HaywardMessageType msgType, int msgId, MessageAssembler assembler)
             throws IOException {
         byte[] payload = assembler.assemblePayload();
         String xml = new String(payload, StandardCharsets.UTF_8).trim();
         UdpHeader header = new UdpHeader(msgType, msgId);
-        byte[] headerBytes = header.toBytes();
-        byte[] xmlBytes = (xml + '\0').getBytes(StandardCharsets.UTF_8);
-        byte[] packetBytes = new byte[headerBytes.length + xmlBytes.length];
-        System.arraycopy(headerBytes, 0, packetBytes, 0, headerBytes.length);
-        System.arraycopy(xmlBytes, 0, packetBytes, headerBytes.length, xmlBytes.length);
-        return UdpResponse.fromBytes(packetBytes, packetBytes.length);
+        return new UdpMessage(header, xml);
     }
 
-    private UdpResponse finishResponse(byte[] data) throws UnsupportedEncodingException {
-        return UdpResponse.fromBytes(data, data.length);
+    private UdpMessage finishResponse(byte[] data) throws UnsupportedEncodingException {
+        return UdpMessage.decodeResponse(data, data.length);
     }
 
     private enum State {
