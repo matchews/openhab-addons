@@ -19,7 +19,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 
 /**
  * Handles sending ACK responses back to the OmniLogic controller.
@@ -35,12 +34,6 @@ public class AckHandler {
     }
 
     public void sendAck(DatagramSocket socket, int messageId) throws IOException {
-        byte[] out = UdpMessage.encodeRequest(HaywardMessageType.ACK, "ACK", messageId);
-        DatagramPacket packet = new DatagramPacket(out, out.length, address, port);
-        socket.send(packet);
-
-        byte[] ackBytes = UdpMessage.encodeRequest(HaywardMessageType.ACK, "", messageId);
-        DatagramPacket ackPacket = new DatagramPacket(ackBytes, ackBytes.length, address, port);
-        socket.send(ackPacket);
+        socket.send(new DatagramPacket(UdpMessage.buildAck(messageId), UdpMessage.buildAck(messageId).length, address, port));
     }
 }
