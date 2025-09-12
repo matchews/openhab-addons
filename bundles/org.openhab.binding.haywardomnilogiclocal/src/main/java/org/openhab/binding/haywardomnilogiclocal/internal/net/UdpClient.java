@@ -13,8 +13,6 @@
 
 package org.openhab.binding.haywardomnilogiclocal.internal.net;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
@@ -23,34 +21,15 @@ import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.util.zip.InflaterInputStream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.QNameMap;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 /**
  * Simple UDP client used to communicate with the OmniLogic controller.
  */
 @NonNullByDefault
 public class UdpClient {
-    private static final QNameMap QNAME_MAP;
-    private static final XStream XSTREAM;
-
-    static {
-        QNAME_MAP = new QNameMap();
-        QNAME_MAP.setDefaultNamespace("http://nextgen.hayward.com/api");
-        XSTREAM = new XStream(new StaxDriver(QNAME_MAP));
-        XSTREAM.allowTypes(new Class[] { LeadMessageResponse.class, LeadMessageResponse.Parameters.class,
-                LeadMessageResponse.Parameter.class });
-        XSTREAM.setClassLoader(UdpClient.class.getClassLoader());
-        XSTREAM.ignoreUnknownElements();
-        XSTREAM.processAnnotations(LeadMessageResponse.class);
-    }
-
     private final InetAddress address;
     private final int port;
 
@@ -63,67 +42,52 @@ public class UdpClient {
         byte[] out = request.toBytes();
         UdpResponse response = null;
         try (DatagramSocket socket = new DatagramSocket()) {
-            DatagramPacket packet = new DatagramPacket(out, out.length, address, port);
-            socket.send(packet);
+            AckHandler ackHandler = new AckHandler(address, port);
+            MessageAssembler assembler = new MessageAssembler();
 
-            ByteArrayOutputStream blocks = new ByteArrayOutputStream();
-            int expectedBlocks = 0;
-            boolean compressed = false;
+            State state = State.SEND;
+            DatagramPacket responsePacket = null;
+            HaywardMessageType msgType = HaywardMessageType.ACK;
+            int msgId = 0;
 
-            while (true) {
-                // Prepare to receive response
-                byte[] buf = new byte[4096];
-                DatagramPacket responsePacket = new DatagramPacket(buf, buf.length);
-                socket.setSoTimeout(5000);
-                socket.receive(responsePacket);
-
-                // Response received, unpack
-                byte[] data = new byte[responsePacket.getLength()];
-                System.arraycopy(responsePacket.getData(), 0, data, 0, responsePacket.getLength());
-                UdpHeader hdr = UdpHeader.fromBytes(data);
-                int msgId = hdr.getMessageId();
-                HaywardMessageType msgType = hdr.getMessageType();
-                compressed = hdr.isCompressed();
-
-                if (msgType != HaywardMessageType.ACK) {
-                    sendAck(socket, msgId);
-                }
-
-                if (msgType == HaywardMessageType.ACK) {
-                    continue;
-                } else if (msgType == HaywardMessageType.MSP_LEADMESSAGE) {
-                    String xml = new String(data, UdpHeader.HEADER_LENGTH, data.length - UdpHeader.HEADER_LENGTH,
-                            StandardCharsets.UTF_8).trim();
-                    Object obj = XSTREAM.fromXML(xml);
-                    if (obj instanceof LeadMessageResponse lead) {
-                        expectedBlocks = lead.getMsgBlockCount();
-                    }
-                } else if (msgType == HaywardMessageType.MSP_CONFIGURATIONUPDATE) {
-                    // TODO MSP Sends it all in one packet
-                    msgType = msgType;
-                } else if (msgType == HaywardMessageType.MSP_BLOCKMESSAGE) {
-                    blocks.write(data, UdpHeader.HEADER_LENGTH, data.length - UdpHeader.HEADER_LENGTH);
-                    expectedBlocks--;
-
-                    // ToDo Not sure what is going on here
-                    if (expectedBlocks == 0) {
-                        byte[] payload = blocks.toByteArray();
-                        if (compressed) {
-                            payload = decompress(payload);
-                        }
-                        String xml = new String(payload, StandardCharsets.UTF_8).trim();
-                        UdpHeader header = new UdpHeader(msgType, msgId);
-                        byte[] headerBytes = header.toBytes();
-                        byte[] xmlBytes = (xml + '\0').getBytes(StandardCharsets.UTF_8);
-                        byte[] packetBytes = new byte[headerBytes.length + xmlBytes.length];
-                        System.arraycopy(headerBytes, 0, packetBytes, 0, headerBytes.length);
-                        System.arraycopy(xmlBytes, 0, packetBytes, headerBytes.length, xmlBytes.length);
-                        response = UdpResponse.fromBytes(packetBytes, packetBytes.length);
+            while (state != State.DONE) {
+                switch (state) {
+                    case SEND:
+                        sendPacket(socket, out);
+                        state = State.RECEIVE;
                         break;
-                    }
-                } else {
-                    response = UdpResponse.fromBytes(data, data.length);
-                    break;
+                    case RECEIVE:
+                        responsePacket = receivePacket(socket);
+                        byte[] data = new byte[responsePacket.getLength()];
+                        System.arraycopy(responsePacket.getData(), 0, data, 0, responsePacket.getLength());
+                        UdpHeader hdr = UdpHeader.fromBytes(data);
+                        msgId = hdr.getMessageId();
+                        msgType = hdr.getMessageType();
+
+                        if (msgType != HaywardMessageType.ACK) {
+                            ackHandler.sendAck(socket, msgId);
+                        }
+
+                        if (msgType == HaywardMessageType.ACK) {
+                            state = State.RECEIVE;
+                        } else if (msgType == HaywardMessageType.MSP_LEADMESSAGE) {
+                            handleLead(data, assembler, hdr.isCompressed());
+                            state = State.RECEIVE;
+                        } else if (msgType == HaywardMessageType.MSP_BLOCKMESSAGE) {
+                            if (handleBlock(data, assembler)) {
+                                response = finishResponse(msgType, msgId, assembler);
+                                state = State.DONE;
+                            } else {
+                                state = State.RECEIVE;
+                            }
+                        } else {
+                            response = finishResponse(data);
+                            state = State.DONE;
+                        }
+                        break;
+                    case DONE:
+                    default:
+                        break;
                 }
             }
         } catch (SocketTimeoutException e) {
@@ -137,33 +101,47 @@ public class UdpClient {
         return response;
     }
 
-    private void sendAck(DatagramSocket socket, int messageId) throws IOException {
-        UdpHeader header = new UdpHeader(HaywardMessageType.ACK, messageId);
-        byte[] headerBytes = header.toBytes();
-        byte[] xml = "ACK\0".getBytes(StandardCharsets.UTF_8);
-        byte[] out = new byte[headerBytes.length + xml.length];
-        System.arraycopy(headerBytes, 0, out, 0, headerBytes.length);
-        System.arraycopy(xml, 0, out, headerBytes.length, xml.length);
-
+    private void sendPacket(DatagramSocket socket, byte[] out) throws IOException {
         DatagramPacket packet = new DatagramPacket(out, out.length, address, port);
         socket.send(packet);
-
-        UdpRequest ack = new UdpRequest(HaywardMessageType.ACK, "", messageId);
-        byte[] ackBytes = ack.toBytes();
-        DatagramPacket ackPacket = new DatagramPacket(ackBytes, ackBytes.length, address, port);
-        socket.send(ackPacket);
     }
 
-    private static byte[] decompress(byte[] data) throws IOException {
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(data);
-                InflaterInputStream iis = new InflaterInputStream(bais);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = iis.read(buffer)) != -1) {
-                baos.write(buffer, 0, len);
-            }
-            return baos.toByteArray();
-        }
+    private DatagramPacket receivePacket(DatagramSocket socket) throws IOException {
+        byte[] buf = new byte[4096];
+        DatagramPacket responsePacket = new DatagramPacket(buf, buf.length);
+        socket.setSoTimeout(5000);
+        socket.receive(responsePacket);
+        return responsePacket;
+    }
+
+    private void handleLead(byte[] data, MessageAssembler assembler, boolean compressed) {
+        assembler.handleLead(data, compressed);
+    }
+
+    private boolean handleBlock(byte[] data, MessageAssembler assembler) throws IOException {
+        return assembler.handleBlock(data);
+    }
+
+    private UdpResponse finishResponse(HaywardMessageType msgType, int msgId, MessageAssembler assembler)
+            throws IOException {
+        byte[] payload = assembler.assemblePayload();
+        String xml = new String(payload, StandardCharsets.UTF_8).trim();
+        UdpHeader header = new UdpHeader(msgType, msgId);
+        byte[] headerBytes = header.toBytes();
+        byte[] xmlBytes = (xml + '\0').getBytes(StandardCharsets.UTF_8);
+        byte[] packetBytes = new byte[headerBytes.length + xmlBytes.length];
+        System.arraycopy(headerBytes, 0, packetBytes, 0, headerBytes.length);
+        System.arraycopy(xmlBytes, 0, packetBytes, headerBytes.length, xmlBytes.length);
+        return UdpResponse.fromBytes(packetBytes, packetBytes.length);
+    }
+
+    private UdpResponse finishResponse(byte[] data) throws UnsupportedEncodingException {
+        return UdpResponse.fromBytes(data, data.length);
+    }
+
+    private enum State {
+        SEND,
+        RECEIVE,
+        DONE
     }
 }
