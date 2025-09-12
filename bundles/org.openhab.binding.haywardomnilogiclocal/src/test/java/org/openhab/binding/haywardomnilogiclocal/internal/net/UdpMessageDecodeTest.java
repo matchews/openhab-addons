@@ -14,10 +14,8 @@ package org.openhab.binding.haywardomnilogiclocal.internal.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.zip.DeflaterOutputStream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.jupiter.api.Test;
@@ -35,11 +33,7 @@ public class UdpMessageDecodeTest {
         int messageId = 0x01020304;
         int messageType = 1004;
         byte[] xmlBytes = RESPONSE_XML.getBytes(StandardCharsets.UTF_8);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (DeflaterOutputStream deflater = new DeflaterOutputStream(baos)) {
-            deflater.write(xmlBytes);
-        }
-        byte[] compressed = baos.toByteArray();
+        byte[] compressed = PayloadCodec.compress(xmlBytes);
         ByteBuffer buffer = ByteBuffer.allocate(24 + compressed.length);
         buffer.putInt(messageId);
 
@@ -47,7 +41,9 @@ public class UdpMessageDecodeTest {
         buffer.put("1.22".getBytes(StandardCharsets.US_ASCII));
         buffer.putInt(messageType);
         buffer.put((byte) 1);
-        buffer.put(new byte[3]);
+        buffer.put((byte) 0);
+        buffer.put((byte) 1);
+        buffer.put((byte) 0);
         buffer.put(compressed);
 
         UdpMessage response = UdpMessage.decodeResponse(buffer.array(), buffer.array().length);

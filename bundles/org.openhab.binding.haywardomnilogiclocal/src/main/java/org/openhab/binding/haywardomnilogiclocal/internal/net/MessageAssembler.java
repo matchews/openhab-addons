@@ -13,11 +13,9 @@
 
 package org.openhab.binding.haywardomnilogiclocal.internal.net;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.zip.InflaterInputStream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
@@ -80,21 +78,8 @@ public class MessageAssembler {
     public byte[] assemblePayload() throws IOException {
         byte[] payload = blocks.toByteArray();
         if (compressed) {
-            payload = decompress(payload);
+            payload = PayloadCodec.decompress(payload);
         }
         return payload;
-    }
-
-    private static byte[] decompress(byte[] data) throws IOException {
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(data);
-                InflaterInputStream iis = new InflaterInputStream(bais);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = iis.read(buffer)) != -1) {
-                baos.write(buffer, 0, len);
-            }
-            return baos.toByteArray();
-        }
     }
 }
