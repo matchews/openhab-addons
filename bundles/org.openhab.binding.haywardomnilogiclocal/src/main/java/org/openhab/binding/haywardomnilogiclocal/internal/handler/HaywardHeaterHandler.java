@@ -2,6 +2,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Heater;
@@ -35,9 +36,15 @@ public class HaywardHeaterHandler extends HaywardThingHandler {
         }
         for (Heater h : status.getHeaters()) {
             if (sysId.equals(h.getSystemId())) {
-                updateData("heaterState", h.getHeaterState());
-                String enable = "yes".equals(h.getEnable()) ? "1" : "0";
-                updateData("heaterEnable", enable);
+                @Nullable String heaterState = h.getHeaterState();
+                if (heaterState != null) {
+                    updateData("heaterState", heaterState);
+                }
+                @Nullable String enableStr = h.getEnable();
+                if (enableStr != null) {
+                    String enable = "yes".equals(enableStr) ? "1" : "0";
+                    updateData("heaterEnable", enable);
+                }
             }
         }
     }

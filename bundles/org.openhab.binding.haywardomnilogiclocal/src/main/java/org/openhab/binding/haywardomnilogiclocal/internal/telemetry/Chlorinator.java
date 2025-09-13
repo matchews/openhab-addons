@@ -1,6 +1,7 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.telemetry;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -10,57 +11,57 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 public class Chlorinator {
     @XStreamAsAttribute
     @XStreamAlias("systemId")
-    private String systemId;
+    private @Nullable String systemId;
 
     @XStreamAsAttribute
     @XStreamAlias("status")
-    private String status;
+    private @Nullable String status;
 
     @XStreamAsAttribute
     @XStreamAlias("instantSaltLevel")
-    private String instantSaltLevel;
+    private @Nullable String instantSaltLevel;
 
     @XStreamAsAttribute
     @XStreamAlias("avgSaltLevel")
-    private String avgSaltLevel;
+    private @Nullable String avgSaltLevel;
 
     @XStreamAsAttribute
     @XStreamAlias("Timed-Percent")
-    private String timedPercent;
+    private @Nullable String timedPercent;
 
     @XStreamAsAttribute
     @XStreamAlias("operatingMode")
-    private String operatingMode;
+    private @Nullable String operatingMode;
 
     @XStreamAsAttribute
     @XStreamAlias("operatingState")
-    private String operatingState;
+    private @Nullable String operatingState;
 
-    public String getSystemId() {
+    public @Nullable String getSystemId() {
         return systemId;
     }
 
-    public String getStatus() {
+    public @Nullable String getStatus() {
         return status;
     }
 
-    public String getInstantSaltLevel() {
+    public @Nullable String getInstantSaltLevel() {
         return instantSaltLevel;
     }
 
-    public String getAvgSaltLevel() {
+    public @Nullable String getAvgSaltLevel() {
         return avgSaltLevel;
     }
 
-    public String getTimedPercent() {
+    public @Nullable String getTimedPercent() {
         return timedPercent;
     }
 
-    public String getOperatingMode() {
+    public @Nullable String getOperatingMode() {
         return operatingMode;
     }
 
-    public String getOperatingState() {
+    public @Nullable String getOperatingState() {
         return operatingState;
     }
 }

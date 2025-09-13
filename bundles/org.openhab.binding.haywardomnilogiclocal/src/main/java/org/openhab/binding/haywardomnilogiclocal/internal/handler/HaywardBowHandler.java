@@ -13,6 +13,7 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
@@ -40,8 +41,14 @@ public class HaywardBowHandler extends HaywardThingHandler {
         String sysId = getThing().getUID().getId();
         for (BodyOfWater bow : status.getBodiesOfWater()) {
             if (sysId.equals(bow.getSystemId())) {
-                updateData(HaywardBindingConstants.CHANNEL_BOW_FLOW, bow.getFlow());
-                updateData(HaywardBindingConstants.CHANNEL_BOW_WATERTEMP, bow.getWaterTemp());
+                @Nullable String flow = bow.getFlow();
+                if (flow != null) {
+                    updateData(HaywardBindingConstants.CHANNEL_BOW_FLOW, flow);
+                }
+                @Nullable String waterTemp = bow.getWaterTemp();
+                if (waterTemp != null) {
+                    updateData(HaywardBindingConstants.CHANNEL_BOW_WATERTEMP, waterTemp);
+                }
             }
         }
         updateStatus(ThingStatus.ONLINE);

@@ -2,6 +2,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
@@ -68,12 +69,35 @@ public class HaywardChlorinatorHandler extends HaywardThingHandler {
         }
         for (Chlorinator c : status.getChlorinators()) {
             if (sysId.equals(c.getSystemId())) {
-                updateData("chlorEnable", c.getOperatingState());
-                updateData("chlorOperatingMode", c.getOperatingMode());
-                updateData("chlorSaltOutput", c.getTimedPercent());
-                updateData("chlorAvgSaltLevel", c.getAvgSaltLevel());
-                updateData("chlorInstantSaltLevel", c.getInstantSaltLevel());
-                updateData("chlorStatus", c.getStatus());
+                @Nullable String operatingState = c.getOperatingState();
+                if (operatingState != null) {
+                    updateData("chlorEnable", operatingState);
+                }
+
+                @Nullable String operatingMode = c.getOperatingMode();
+                if (operatingMode != null) {
+                    updateData("chlorOperatingMode", operatingMode);
+                }
+
+                @Nullable String timedPercent = c.getTimedPercent();
+                if (timedPercent != null) {
+                    updateData("chlorSaltOutput", timedPercent);
+                }
+
+                @Nullable String avgSaltLevel = c.getAvgSaltLevel();
+                if (avgSaltLevel != null) {
+                    updateData("chlorAvgSaltLevel", avgSaltLevel);
+                }
+
+                @Nullable String instantSaltLevel = c.getInstantSaltLevel();
+                if (instantSaltLevel != null) {
+                    updateData("chlorInstantSaltLevel", instantSaltLevel);
+                }
+
+                @Nullable String statusVal = c.getStatus();
+                if (statusVal != null) {
+                    updateData("chlorStatus", statusVal);
+                }
             }
         }
     }

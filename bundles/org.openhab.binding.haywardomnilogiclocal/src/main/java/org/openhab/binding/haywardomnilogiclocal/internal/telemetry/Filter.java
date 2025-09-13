@@ -1,6 +1,7 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.telemetry;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -10,33 +11,33 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 public class Filter {
     @XStreamAsAttribute
     @XStreamAlias("systemId")
-    private String systemId;
+    private @Nullable String systemId;
 
     @XStreamAsAttribute
     @XStreamAlias("filterSpeed")
-    private String filterSpeed;
+    private @Nullable String filterSpeed;
 
     @XStreamAsAttribute
     @XStreamAlias("filterState")
-    private String filterState;
+    private @Nullable String filterState;
 
     @XStreamAsAttribute
     @XStreamAlias("lastSpeed")
-    private String lastSpeed;
+    private @Nullable String lastSpeed;
 
-    public String getSystemId() {
+    public @Nullable String getSystemId() {
         return systemId;
     }
 
-    public String getFilterSpeed() {
+    public @Nullable String getFilterSpeed() {
         return filterSpeed;
     }
 
-    public String getFilterState() {
+    public @Nullable String getFilterState() {
         return filterState;
     }
 
-    public String getLastSpeed() {
+    public @Nullable String getLastSpeed() {
         return lastSpeed;
     }
 }

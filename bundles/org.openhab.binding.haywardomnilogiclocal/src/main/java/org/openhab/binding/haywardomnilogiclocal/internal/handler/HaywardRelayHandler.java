@@ -2,6 +2,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
@@ -34,7 +35,10 @@ public class HaywardRelayHandler extends HaywardThingHandler {
         }
         for (Relay r : status.getRelays()) {
             if (sysId.equals(r.getSystemId())) {
-                updateData("relayState", r.getRelayState());
+                @Nullable String relayState = r.getRelayState();
+                if (relayState != null) {
+                    updateData("relayState", relayState);
+                }
             }
         }
     }

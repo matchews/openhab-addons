@@ -2,6 +2,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
@@ -62,8 +63,14 @@ public class HaywardColorLogicHandler extends HaywardThingHandler {
         }
         for (ColorLogicLight cl : status.getColorLogicLights()) {
             if (sysId.equals(cl.getSystemId())) {
-                updateData("colorMode", cl.getCurrentShow());
-                updateData("brightness", cl.getBrightness());
+                @Nullable String currentShow = cl.getCurrentShow();
+                if (currentShow != null) {
+                    updateData("colorMode", currentShow);
+                }
+                @Nullable String brightness = cl.getBrightness();
+                if (brightness != null) {
+                    updateData("brightness", brightness);
+                }
             }
         }
     }

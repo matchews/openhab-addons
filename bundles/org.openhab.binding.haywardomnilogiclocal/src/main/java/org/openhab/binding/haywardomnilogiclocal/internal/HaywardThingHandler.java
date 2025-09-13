@@ -132,8 +132,11 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
         }
     }
 
-    public Map<String, State> updateData(String channelID, String data) {
+    public Map<String, State> updateData(String channelID, @Nullable String data) {
         Map<String, State> channelStates = new HashMap<>();
+        if (data == null) {
+            return channelStates;
+        }
         Channel chan = getThing().getChannel(channelID);
         if (chan != null) {
             String acceptedItemType = chan.getAcceptedItemType();

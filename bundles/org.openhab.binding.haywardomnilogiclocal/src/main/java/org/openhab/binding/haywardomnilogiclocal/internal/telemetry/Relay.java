@@ -1,6 +1,7 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.telemetry;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -10,17 +11,17 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 public class Relay {
     @XStreamAsAttribute
     @XStreamAlias("systemId")
-    private String systemId;
+    private @Nullable String systemId;
 
     @XStreamAsAttribute
     @XStreamAlias("relayState")
-    private String relayState;
+    private @Nullable String relayState;
 
-    public String getSystemId() {
+    public @Nullable String getSystemId() {
         return systemId;
     }
 
-    public String getRelayState() {
+    public @Nullable String getRelayState() {
         return relayState;
     }
 }
