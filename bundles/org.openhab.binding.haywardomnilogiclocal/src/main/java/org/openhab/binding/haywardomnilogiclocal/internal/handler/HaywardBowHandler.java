@@ -12,17 +12,15 @@
  */
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
-import org.openhab.core.thing.Bridge;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.BodyOfWater;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
-import org.openhab.core.thing.ThingStatusDetail;
 
 /**
  * The Body of Water Handler
@@ -38,28 +36,14 @@ public class HaywardBowHandler extends HaywardThingHandler {
 
     @Override
     public void getTelemetry(String xmlResponse) throws HaywardException {
-        List<String> systemIDs = new ArrayList<>();
-        List<String> data = new ArrayList<>();
-
-        Bridge bridge = getBridge();
-        if (bridge != null && bridge.getHandler() instanceof HaywardBridgeHandler bridgehandler) {
-            systemIDs = bridgehandler.evaluateXPath("//BodyOfWater/@systemId", xmlResponse);
-
-            String thingSystemID = getThing().getUID().getId();
-            for (int i = 0; i < systemIDs.size(); i++) {
-                if (systemIDs.get(i).equals(thingSystemID)) {
-                    // Flow
-                    data = bridgehandler.evaluateXPath("//BodyOfWater/@flow", xmlResponse);
-                    updateData(HaywardBindingConstants.CHANNEL_BOW_FLOW, data.get(i));
-
-                    // Water Temp
-                    data = bridgehandler.evaluateXPath("//BodyOfWater/@waterTemp", xmlResponse);
-                    updateData(HaywardBindingConstants.CHANNEL_BOW_WATERTEMP, data.get(i));
-                }
+        Status status = TelemetryParser.parse(xmlResponse);
+        String sysId = getThing().getUID().getId();
+        for (BodyOfWater bow : status.getBodiesOfWater()) {
+            if (sysId.equals(bow.getSystemId())) {
+                updateData(HaywardBindingConstants.CHANNEL_BOW_FLOW, bow.getFlow());
+                updateData(HaywardBindingConstants.CHANNEL_BOW_WATERTEMP, bow.getWaterTemp());
             }
-            this.updateStatus(ThingStatus.ONLINE);
-        } else {
-            this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
         }
+        updateStatus(ThingStatus.ONLINE);
     }
 }

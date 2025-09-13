@@ -8,7 +8,11 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Backyard;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
@@ -34,6 +38,24 @@ public class HaywardBackyardHandler extends HaywardThingHandler {
         putIfPresent(values, "backyardStatus_" + sysId, getThing().getProperties(), "backyardStatus");
         putIfPresent(values, "backyardState_" + sysId, getThing().getProperties(), "backyardState");
         updateIfPresent(values, "backyardAlarm1_" + sysId, "backyardAlarm1");
+    }
+
+    @Override
+    public void getTelemetry(String xmlResponse) throws HaywardException {
+        Status status = TelemetryParser.parse(xmlResponse);
+        String sysId = getThing().getProperties().get("systemID");
+        if (sysId == null) {
+            return;
+        }
+
+        for (Backyard by : status.getBackyards()) {
+            if (sysId.equals(by.getSystemId())) {
+                updateData(HaywardBindingConstants.CHANNEL_BACKYARD_AIRTEMP, by.getAirTemp());
+                updateData(HaywardBindingConstants.CHANNEL_BACKYARD_STATUS, by.getStatus());
+                updateData(HaywardBindingConstants.CHANNEL_BACKYARD_STATE, by.getState());
+            }
+        }
+        updateStatus(ThingStatus.ONLINE);
     }
 
     public boolean getAlarmList(String systemID) {

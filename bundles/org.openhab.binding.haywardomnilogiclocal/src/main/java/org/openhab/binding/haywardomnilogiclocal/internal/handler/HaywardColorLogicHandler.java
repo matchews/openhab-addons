@@ -6,6 +6,10 @@ import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.ColorLogicLight;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
@@ -47,5 +51,20 @@ public class HaywardColorLogicHandler extends HaywardThingHandler {
 
         putIfPresent(values, "colorMode_" + sysId, getThing().getProperties(), "colorMode");
         updateIfPresent(values, "brightness_" + sysId, "brightness");
+    }
+
+    @Override
+    public void getTelemetry(String xmlResponse) throws HaywardException {
+        Status status = TelemetryParser.parse(xmlResponse);
+        String sysId = getThing().getProperties().get("systemID");
+        if (sysId == null) {
+            return;
+        }
+        for (ColorLogicLight cl : status.getColorLogicLights()) {
+            if (sysId.equals(cl.getSystemId())) {
+                updateData("colorMode", cl.getCurrentShow());
+                updateData("brightness", cl.getBrightness());
+            }
+        }
     }
 }
