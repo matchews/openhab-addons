@@ -1,6 +1,7 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.telemetry;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -10,25 +11,25 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 public class BodyOfWater {
     @XStreamAsAttribute
     @XStreamAlias("systemId")
-    private String systemId;
+    private @Nullable String systemId;
 
     @XStreamAsAttribute
     @XStreamAlias("waterTemp")
-    private String waterTemp;
+    private @Nullable String waterTemp;
 
     @XStreamAsAttribute
     @XStreamAlias("flow")
-    private String flow;
+    private @Nullable String flow;
 
-    public String getSystemId() {
+    public @Nullable String getSystemId() {
         return systemId;
     }
 
-    public String getWaterTemp() {
+    public @Nullable String getWaterTemp() {
         return waterTemp;
     }
 
-    public String getFlow() {
+    public @Nullable String getFlow() {
         return flow;
     }
 }

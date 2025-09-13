@@ -1,6 +1,7 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.telemetry;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -10,30 +11,30 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 public class Backyard {
     @XStreamAsAttribute
     @XStreamAlias("systemId")
-    private String systemId;
+    private @Nullable String systemId;
 
     @XStreamAsAttribute
-    private String airTemp;
+    private @Nullable String airTemp;
 
     @XStreamAsAttribute
-    private String status;
+    private @Nullable String status;
 
     @XStreamAsAttribute
-    private String state;
+    private @Nullable String state;
 
-    public String getSystemId() {
+    public @Nullable String getSystemId() {
         return systemId;
     }
 
-    public String getAirTemp() {
+    public @Nullable String getAirTemp() {
         return airTemp;
     }
 
-    public String getStatus() {
+    public @Nullable String getStatus() {
         return status;
     }
 
-    public String getState() {
+    public @Nullable String getState() {
         return state;
     }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
@@ -50,9 +51,29 @@ public class HaywardBackyardHandler extends HaywardThingHandler {
 
         for (Backyard by : status.getBackyards()) {
             if (sysId.equals(by.getSystemId())) {
-                updateData(HaywardBindingConstants.CHANNEL_BACKYARD_AIRTEMP, by.getAirTemp());
-                updateData(HaywardBindingConstants.CHANNEL_BACKYARD_STATUS, by.getStatus());
-                updateData(HaywardBindingConstants.CHANNEL_BACKYARD_STATE, by.getState());
+                @Nullable
+                String airTemp = by.getAirTemp();
+                if (airTemp != null) {
+                    updateData(HaywardBindingConstants.CHANNEL_BACKYARD_AIRTEMP, airTemp);
+                } else {
+                    logger.debug("Backyard air temperature missing");
+                }
+
+                @Nullable
+                String byStatus = by.getStatus();
+                if (byStatus != null) {
+                    updateData(HaywardBindingConstants.CHANNEL_BACKYARD_STATUS, byStatus);
+                } else {
+                    logger.debug("Backyard status missing");
+                }
+
+                @Nullable
+                String state = by.getState();
+                if (state != null) {
+                    updateData(HaywardBindingConstants.CHANNEL_BACKYARD_STATE, state);
+                } else {
+                    logger.debug("Backyard state missing");
+                }
             }
         }
         updateStatus(ThingStatus.ONLINE);

@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
@@ -85,9 +86,20 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
         String sysId = getThing().getUID().getId();
         for (VirtualHeater vh : status.getVirtualHeaters()) {
             if (sysId.equals(vh.getSystemId())) {
-                updateData(HaywardBindingConstants.CHANNEL_VIRTUALHEATER_CURRENTSETPOINT, vh.getCurrentSetPoint());
-                String enable = "yes".equals(vh.getEnable()) ? "1" : "0";
-                updateData(HaywardBindingConstants.CHANNEL_VIRTUALHEATER_ENABLE, enable);
+                @Nullable String setPoint = vh.getCurrentSetPoint();
+                if (setPoint != null) {
+                    updateData(HaywardBindingConstants.CHANNEL_VIRTUALHEATER_CURRENTSETPOINT, setPoint);
+                } else {
+                    logger.debug("Virtual heater set point missing");
+                }
+
+                @Nullable String enableStr = vh.getEnable();
+                if (enableStr != null) {
+                    String enable = "yes".equals(enableStr) ? "1" : "0";
+                    updateData(HaywardBindingConstants.CHANNEL_VIRTUALHEATER_ENABLE, enable);
+                } else {
+                    logger.debug("Virtual heater enable missing");
+                }
             }
         }
         updateStatus(ThingStatus.ONLINE);

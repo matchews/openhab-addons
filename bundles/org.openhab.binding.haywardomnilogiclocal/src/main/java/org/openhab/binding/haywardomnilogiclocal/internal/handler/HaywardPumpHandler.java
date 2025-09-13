@@ -2,6 +2,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
@@ -68,10 +69,21 @@ public class HaywardPumpHandler extends HaywardThingHandler {
         }
         for (Pump p : status.getPumps()) {
             if (sysId.equals(p.getSystemId())) {
-                updateData("pumpEnable", p.getPumpState());
-                updateData("pumpSpeed", p.getPumpSpeed());
-                updateData("pumpState", p.getPumpState());
-                updateData("pumpLastSpeed", p.getLastSpeed());
+                @Nullable String pumpState = p.getPumpState();
+                if (pumpState != null) {
+                    updateData("pumpEnable", pumpState);
+                    updateData("pumpState", pumpState);
+                }
+
+                @Nullable String pumpSpeed = p.getPumpSpeed();
+                if (pumpSpeed != null) {
+                    updateData("pumpSpeed", pumpSpeed);
+                }
+
+                @Nullable String lastSpeed = p.getLastSpeed();
+                if (lastSpeed != null) {
+                    updateData("pumpLastSpeed", lastSpeed);
+                }
             }
         }
     }
