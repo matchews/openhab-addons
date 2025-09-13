@@ -78,7 +78,9 @@ public class UdpClient {
                         if (msgType == HaywardMessageType.ACK) {
                             state = State.RECEIVE;
                         } else if (msgType == HaywardMessageType.MSP_LEADMESSAGE) {
-                            handleLead(data, assembler, hdr.isCompressed());
+                            boolean compressed = hdr.isCompressed()
+                                    || requestType == HaywardMessageType.GET_TELEMETRY;
+                            handleLead(data, assembler, compressed);
                             state = State.RECEIVE;
                         } else if (msgType == HaywardMessageType.MSP_BLOCKMESSAGE) {
                             if (handleBlock(data, assembler)) {

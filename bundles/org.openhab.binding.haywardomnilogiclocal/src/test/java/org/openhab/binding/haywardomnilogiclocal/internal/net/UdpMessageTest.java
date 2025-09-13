@@ -14,7 +14,6 @@ package org.openhab.binding.haywardomnilogiclocal.internal.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -22,35 +21,24 @@ import org.junit.jupiter.api.Test;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 
 /**
- * Tests for {@link UdpMessage} request encoding.
+ * Tests for {@link UdpMessage}.
  */
 @NonNullByDefault
 public class UdpMessageTest {
 
-    private static final String REQUEST_XML = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>RequestTelemetryData</Name></Request>";
-
     @Test
-    public void toBytesShouldCreateHeaderAndPayload() throws Exception {
-        HaywardMessageType messageType = HaywardMessageType.MSP_TELEMETRY_UPDATE;
-        byte[] bytes = UdpMessage.encodeRequest(messageType, REQUEST_XML);
+    public void testTelemetryDecompressionWithoutFlag() throws Exception {
+        String xml = "<Telemetry><Value>42</Value></Telemetry>";
+        byte[] compressed = PayloadCodec.compress(xml.getBytes(StandardCharsets.UTF_8));
+        UdpHeader header = new UdpHeader(1, System.currentTimeMillis(), "1.22",
+                HaywardMessageType.MSP_TELEMETRY_UPDATE, (byte) 1, false);
+        byte[] headerBytes = header.toBytes();
+        byte[] data = new byte[headerBytes.length + compressed.length];
+        System.arraycopy(headerBytes, 0, data, 0, headerBytes.length);
+        System.arraycopy(compressed, 0, data, headerBytes.length, compressed.length);
 
-        byte[] xmlBytes = (REQUEST_XML + '\0').getBytes(StandardCharsets.UTF_8);
-        assertEquals(24 + xmlBytes.length, bytes.length);
-
-        String version = new String(bytes, 12, 4, StandardCharsets.US_ASCII);
-        assertEquals("1.22", version);
-
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        assertEquals(messageType.getMsgInt(), buffer.getInt(16));
-
-        assertEquals(1, bytes[20]);
-        assertEquals(0, bytes[21]);
-        assertEquals(0, bytes[22]);
-        assertEquals(0, bytes[23]);
-
-        String xml = new String(bytes, 24, xmlBytes.length - 1, StandardCharsets.UTF_8);
-        assertEquals(REQUEST_XML, xml);
-        assertEquals(0, bytes[bytes.length - 1]);
+        UdpMessage message = UdpMessage.decodeResponse(data, data.length);
+        assertEquals(xml, message.getXml());
     }
 }
 

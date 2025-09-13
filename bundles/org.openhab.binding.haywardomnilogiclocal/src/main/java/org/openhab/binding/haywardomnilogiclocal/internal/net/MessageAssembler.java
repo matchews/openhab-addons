@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.QNameMap;
@@ -52,12 +53,15 @@ public class MessageAssembler {
      */
     public void handleLead(byte[] data, boolean isCompressed) {
         blocks.reset();
-        compressed = isCompressed;
         String xml = new String(data, UdpHeader.HEADER_LENGTH, data.length - UdpHeader.HEADER_LENGTH,
                 StandardCharsets.UTF_8).trim();
         Object obj = XSTREAM.fromXML(xml);
+        compressed = isCompressed;
         if (obj instanceof LeadMessageResponse lead) {
             remainingBlocks = lead.getMsgBlockCount();
+            if (lead.getType() == HaywardMessageType.GET_TELEMETRY.getMsgInt()) {
+                compressed = true;
+            }
         }
     }
 
