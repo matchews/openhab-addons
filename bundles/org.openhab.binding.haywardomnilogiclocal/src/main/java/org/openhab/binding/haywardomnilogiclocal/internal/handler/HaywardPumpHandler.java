@@ -6,6 +6,10 @@ import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Pump;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
@@ -53,5 +57,22 @@ public class HaywardPumpHandler extends HaywardThingHandler {
         updateIfPresent(values, "pumpSpeed_" + sysId, "pumpSpeed");
         putIfPresent(values, "pumpState_" + sysId, getThing().getProperties(), "pumpState");
         updateIfPresent(values, "pumpLastSpeed_" + sysId, "pumpLastSpeed");
+    }
+
+    @Override
+    public void getTelemetry(String xmlResponse) throws HaywardException {
+        Status status = TelemetryParser.parse(xmlResponse);
+        String sysId = getThing().getProperties().get("systemID");
+        if (sysId == null) {
+            return;
+        }
+        for (Pump p : status.getPumps()) {
+            if (sysId.equals(p.getSystemId())) {
+                updateData("pumpEnable", p.getPumpState());
+                updateData("pumpSpeed", p.getPumpSpeed());
+                updateData("pumpState", p.getPumpState());
+                updateData("pumpLastSpeed", p.getLastSpeed());
+            }
+        }
     }
 }

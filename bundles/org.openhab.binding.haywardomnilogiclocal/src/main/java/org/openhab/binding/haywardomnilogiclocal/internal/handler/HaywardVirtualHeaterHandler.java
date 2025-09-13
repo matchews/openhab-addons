@@ -13,8 +13,6 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -23,6 +21,9 @@ import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.VirtualHeater;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Channel;
@@ -80,30 +81,16 @@ public class HaywardVirtualHeaterHandler extends HaywardThingHandler {
 
     @Override
     public void getTelemetry(String xmlResponse) throws HaywardException {
-        List<String> systemIDs = new ArrayList<>();
-        List<String> data = new ArrayList<>();
-
-        Bridge bridge = getBridge();
-        if (bridge != null && bridge.getHandler() instanceof HaywardBridgeHandler bridgehandler) {
-            systemIDs = bridgehandler.evaluateXPath("//VirtualHeater/@systemId", xmlResponse);
-            String thingSystemID = getThing().getUID().getId();
-            for (int i = 0; i < systemIDs.size(); i++) {
-                if (systemIDs.get(i).equals(thingSystemID)) {
-                    data = bridgehandler.evaluateXPath("//VirtualHeater/@Current-Set-Point", xmlResponse);
-                    updateData(HaywardBindingConstants.CHANNEL_VIRTUALHEATER_CURRENTSETPOINT, data.get(i));
-
-                    data = bridgehandler.evaluateXPath("//VirtualHeater/@enable", xmlResponse);
-                    if ("yes".equals(data.get(i))) {
-                        updateData(HaywardBindingConstants.CHANNEL_VIRTUALHEATER_ENABLE, "1");
-                    } else if ("no".equals(data.get(i))) {
-                        updateData(HaywardBindingConstants.CHANNEL_VIRTUALHEATER_ENABLE, "0");
-                    }
-                }
+        Status status = TelemetryParser.parse(xmlResponse);
+        String sysId = getThing().getUID().getId();
+        for (VirtualHeater vh : status.getVirtualHeaters()) {
+            if (sysId.equals(vh.getSystemId())) {
+                updateData(HaywardBindingConstants.CHANNEL_VIRTUALHEATER_CURRENTSETPOINT, vh.getCurrentSetPoint());
+                String enable = "yes".equals(vh.getEnable()) ? "1" : "0";
+                updateData(HaywardBindingConstants.CHANNEL_VIRTUALHEATER_ENABLE, enable);
             }
-            this.updateStatus(ThingStatus.ONLINE);
-        } else {
-            this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
         }
+        updateStatus(ThingStatus.ONLINE);
     }
 
     @Override
