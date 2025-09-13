@@ -38,8 +38,15 @@ public class UdpClient {
         this.port = port;
     }
 
+    private enum State {
+        SEND,
+        RECEIVE,
+        DONE
+    }
+
     public UdpMessage send(HaywardMessageType requestType, String xml) throws IOException {
-        byte[] out = UdpMessage.encodeRequest(requestType, xml);
+        byte clientType = (requestType == HaywardMessageType.GET_TELEMETRY) ? (byte) 0 : (byte) 1;
+        byte[] out = UdpMessage.encodeRequest(requestType, xml, clientType);
         UdpMessage response = null;
         try (DatagramSocket socket = new DatagramSocket()) {
             AckHandler ackHandler = new AckHandler(address, port);
@@ -80,6 +87,9 @@ public class UdpClient {
                             } else {
                                 state = State.RECEIVE;
                             }
+                        } else if (msgType == HaywardMessageType.MSP_TELEMETRY_UPDATE) {
+                            response = finishResponse(data);
+                            state = State.DONE;
                         } else {
                             response = finishResponse(data);
                             state = State.DONE;
@@ -109,7 +119,7 @@ public class UdpClient {
     private DatagramPacket receivePacket(DatagramSocket socket) throws IOException {
         byte[] buf = new byte[4096];
         DatagramPacket responsePacket = new DatagramPacket(buf, buf.length);
-        socket.setSoTimeout(5000);
+        socket.setSoTimeout(10500);
         socket.receive(responsePacket);
         return responsePacket;
     }
@@ -132,11 +142,5 @@ public class UdpClient {
 
     private UdpMessage finishResponse(byte[] data) throws UnsupportedEncodingException {
         return UdpMessage.decodeResponse(data, data.length);
-    }
-
-    private enum State {
-        SEND,
-        RECEIVE,
-        DONE
     }
 }

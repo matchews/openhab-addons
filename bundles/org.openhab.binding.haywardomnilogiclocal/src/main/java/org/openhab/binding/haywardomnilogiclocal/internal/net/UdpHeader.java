@@ -48,6 +48,10 @@ public class UdpHeader {
         this(messageId, System.currentTimeMillis(), "1.22", messageType, (byte) 1, false);
     }
 
+    public UdpHeader(HaywardMessageType messageType, int messageId, byte clientType) {
+        this(messageId, System.currentTimeMillis(), "1.22", messageType, clientType, false);
+    }
+
     public int getMessageId() {
         return messageId;
     }
@@ -117,4 +121,3 @@ public class UdpHeader {
         return new UdpHeader(msgId, ts, ver, msgType, client, comp);
     }
 }
-

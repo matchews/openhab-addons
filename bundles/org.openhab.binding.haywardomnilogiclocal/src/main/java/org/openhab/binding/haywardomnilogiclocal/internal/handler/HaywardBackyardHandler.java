@@ -51,7 +51,7 @@ public class HaywardBackyardHandler extends HaywardThingHandler {
                     + "</Parameter><Parameter name=\"CultureInfoName\" dataType=\"String\">en-us</Parameter></Parameters></Request>";
 
             try {
-                String xmlResponse = bridgehandler.udpXmlResponse(urlParameters, HaywardMessageType.MSP_ALARM_LIST);
+                String xmlResponse = bridgehandler.sendRequest(urlParameters, HaywardMessageType.MSP_ALARM_LIST);
 
                 if (xmlResponse.isEmpty()) {
                     logger.debug("Hayward getAlarmList XML response was empty");

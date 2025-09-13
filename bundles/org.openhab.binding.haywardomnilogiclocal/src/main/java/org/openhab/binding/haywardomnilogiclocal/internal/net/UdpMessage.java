@@ -56,14 +56,13 @@ public class UdpMessage {
     /**
      * Encodes a request message for sending to the controller.
      */
-    public static byte[] encodeRequest(HaywardMessageType msgType, String xml, @Nullable Integer messageId)
-            throws UnsupportedEncodingException {
+    public static byte[] encodeRequest(HaywardMessageType msgType, String xml, @Nullable Integer messageId,
+            byte clientType) throws UnsupportedEncodingException {
         Random random = new Random();
         int msgId = messageId != null ? messageId.intValue() : random.nextInt();
-        UdpHeader header = new UdpHeader(msgType, msgId);
+        UdpHeader header = new UdpHeader(msgType, msgId, clientType);
         byte[] headerBytes = header.toBytes();
         byte[] xmlBytes = (xml + '\0').getBytes("UTF-8");
-
         byte[] packet = new byte[headerBytes.length + xmlBytes.length];
         System.arraycopy(headerBytes, 0, packet, 0, headerBytes.length);
         System.arraycopy(xmlBytes, 0, packet, headerBytes.length, xmlBytes.length);
@@ -71,17 +70,33 @@ public class UdpMessage {
     }
 
     /**
-     * Convenience method to encode a request with no explicit message id.
+     * Convenience method to encode a request with no explicit message id and no clientType.
      */
     public static byte[] encodeRequest(HaywardMessageType msgType, String xml) throws UnsupportedEncodingException {
-        return encodeRequest(msgType, xml, null);
+        return encodeRequest(msgType, xml, null, (byte) 1);
+    }
+
+    /**
+     * Convenience method to encode a request with no explicit message id.
+     */
+    public static byte[] encodeRequest(HaywardMessageType msgType, String xml, byte clientType)
+            throws UnsupportedEncodingException {
+        return encodeRequest(msgType, xml, null, clientType);
+    }
+
+    /**
+     * Convenience method to encode a request with no explicit message id.
+     */
+    public static byte[] encodeRequest(HaywardMessageType msgType, String xml, Integer messageId)
+            throws UnsupportedEncodingException {
+        return encodeRequest(msgType, xml, messageId, (byte) 1);
     }
 
     /**
      * Builds a single ACK packet for the given message id.
      */
     public static byte[] buildAck(int messageId) throws UnsupportedEncodingException {
-        return encodeRequest(HaywardMessageType.ACK, "ACK", Integer.valueOf(messageId));
+        return encodeRequest(HaywardMessageType.ACK, "ACK", Integer.valueOf(messageId), (byte) 1);
     }
 
     /**
@@ -106,4 +121,3 @@ public class UdpMessage {
         return new UdpMessage(header, xml);
     }
 }
-

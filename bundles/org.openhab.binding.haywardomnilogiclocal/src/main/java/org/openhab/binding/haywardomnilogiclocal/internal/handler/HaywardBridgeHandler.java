@@ -128,7 +128,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             clearPolling(pollTelemetryFuture);
             clearPolling(pollAlarmsFuture);
 
-            if (!requestConfiguration()) {
+            if (!requestConfiguration() || !requestTelemetryData()) {
                 updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
                         "Unable to complete UDP handshake");
                 clearPolling(pollTelemetryFuture);
@@ -166,35 +166,33 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
 
     public synchronized boolean requestConfiguration() throws HaywardException {
         String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>RequestConfiguration</Name></Request>";
-
-        String xmlResponse = udpXmlResponse(xmlRequest, HaywardMessageType.REQUEST_CONFIGURATION);
+        String xmlResponse = sendRequest(xmlRequest, HaywardMessageType.REQUEST_CONFIGURATION);
 
         if (xmlResponse.isEmpty()) {
-            logger.debug("Hayward Connection thing: Handshake XML response was null");
+            logger.debug("Hayward Connection thing: RequestConfiguration XML response was null");
             return false;
         }
 
         if (!evaluateXPath("/Response/Parameters//Parameter[@name='StatusMessage']/text()", xmlResponse).isEmpty()) {
-            logger.debug("Hayward Connection thing: Handshake XML response: {}", xmlResponse);
+            logger.debug("Hayward Connection thing: RequestConfiguration XML response: {}", xmlResponse);
             return false;
         }
 
-        logger.debug("Hayward Connection thing: Handshake successful");
+        logger.debug("Hayward Connection thing: RequestConfiguration successful");
         return true;
     }
 
-    public synchronized boolean getTelemetryData() throws HaywardException {
-        String urlParameters = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>GetTelemetryData</Name><Parameters/></Request>";
-
-        String xmlResponse = udpXmlResponse(urlParameters, HaywardMessageType.GET_TELEMETRY);
+    public synchronized boolean requestTelemetryData() throws HaywardException {
+        String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>RequestTelemetryData</Name></Request>";
+        String xmlResponse = sendRequest(xmlRequest, HaywardMessageType.GET_TELEMETRY);
 
         if (xmlResponse.isEmpty()) {
-            logger.debug("Hayward Connection thing: getTelemetry XML response was null");
+            logger.debug("Hayward Connection thing: RequestTelemetryData XML response was null");
             return false;
         }
 
         if (!evaluateXPath("/Response/Parameters//Parameter[@name='StatusMessage']/text()", xmlResponse).isEmpty()) {
-            logger.debug("Hayward Connection thing: getTelemetry XML response: {}", xmlResponse);
+            logger.debug("Hayward Connection thing: RequestTelemetryData XML response: {}", xmlResponse);
             return false;
         }
 
@@ -210,6 +208,20 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
     }
 
     public synchronized boolean getAlarmList() throws HaywardException {
+        String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>GetAllAlarmList</Name><Parameters/></Request>";
+        String xmlResponse = sendRequest(xmlRequest, HaywardMessageType.GET_ALARM_LIST);
+
+        if (xmlResponse.isEmpty()) {
+            logger.debug("Hayward Connection thing: GetAllAlarmList XML response was null");
+            return false;
+        }
+
+        if (!evaluateXPath("/Response/Parameters//Parameter[@name='StatusMessage']/text()", xmlResponse).isEmpty()) {
+            logger.debug("Hayward Connection thing: GetAllAlarmList XML response: {}", xmlResponse);
+            return false;
+        }
+
+        // TODO
         for (Thing thing : getThing().getThings()) {
             Map<String, String> properties = thing.getProperties();
             if ("BACKYARD".equals(properties.get(HaywardBindingConstants.PROPERTY_TYPE))) {
@@ -235,7 +247,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
                     initialize();
                     return;
                 }
-                if (!(getTelemetryData())) {
+                if (!(requestTelemetryData())) {
                     commFailureCount++;
                     return;
                 }
@@ -291,7 +303,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         return values;
     }
 
-    public synchronized String udpXmlResponse(String xmlRequest, HaywardMessageType msgType) throws HaywardException {
+    public synchronized String sendRequest(String xmlRequest, HaywardMessageType msgType) throws HaywardException {
         if (logger.isTraceEnabled()) {
             logger.trace("Hayward Connection thing:  {} Hayward UDP command: {}", getCallingMethod(), xmlRequest);
         } else if (logger.isDebugEnabled()) {

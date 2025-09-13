@@ -171,7 +171,7 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
         Bridge bridge = getBridge();
         if (bridge != null && bridge.getHandler() instanceof HaywardBridgeHandler bridgehandler) {
             try {
-                String response = bridgehandler.udpXmlResponse(xml, msgType);
+                String response = bridgehandler.sendRequest(xml, msgType);
                 if (logger.isTraceEnabled()) {
                     logger.trace("UDP response: {}", response);
                 }
