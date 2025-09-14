@@ -102,9 +102,11 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                     if (pumpId != null) {
                         pumpProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, pumpId);
                     }
-                    String label = pump.getName();
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_PUMP, label != null ? label : pumpId,
-                            pumpProps);
+                    String name = pump.getName() != null ? pump.getName() : pumpId;
+                    if (name == null) {
+                        name = "Pump";
+                    }
+                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_PUMP, name, pumpProps);
                 }
 
                 for (FilterConfig filter : backyard.getFilters()) {
