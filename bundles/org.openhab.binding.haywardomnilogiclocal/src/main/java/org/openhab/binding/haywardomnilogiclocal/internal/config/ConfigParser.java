@@ -14,6 +14,7 @@ public final class ConfigParser {
     private static final XStream XSTREAM = new XStream(new StaxDriver());
 
     static {
+        XSTREAM.setClassLoader(ConfigParser.class.getClassLoader());
         XSTREAM.ignoreUnknownElements();
         XSTREAM.addPermission(AnyTypePermission.ANY);
         XSTREAM.processAnnotations(MspConfig.class);
