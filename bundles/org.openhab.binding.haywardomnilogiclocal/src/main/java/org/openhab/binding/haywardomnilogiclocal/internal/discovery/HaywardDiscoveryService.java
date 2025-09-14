@@ -91,8 +91,8 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                     if (bowId != null) {
                         bowProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, bowId);
                     }
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_BOW,
-                            bowId != null ? bowId : "BodyOfWater", bowProps);
+                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_BOW, bowId != null ? bowId : "BodyOfWater",
+                            bowProps);
                 }
 
                 for (PumpConfig pump : backyard.getPumps()) {
@@ -103,8 +103,8 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                         pumpProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, pumpId);
                     }
                     String label = pump.getName();
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_PUMP,
-                            label != null ? label : pumpId, pumpProps);
+                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_PUMP, label != null ? label : pumpId,
+                            pumpProps);
                 }
 
                 for (FilterConfig filter : backyard.getFilters()) {
@@ -139,8 +139,8 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                     if (id != null) {
                         chlorProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
                     }
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_CHLORINATOR,
-                            id != null ? id : "Chlorinator", chlorProps);
+                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_CHLORINATOR, id != null ? id : "Chlorinator",
+                            chlorProps);
                 }
 
                 for (ColorLogicLightConfig light : backyard.getColorLogicLights()) {
@@ -150,8 +150,8 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                     if (id != null) {
                         lightProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
                     }
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_COLORLOGIC,
-                            id != null ? id : "ColorLogic", lightProps);
+                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_COLORLOGIC, id != null ? id : "ColorLogic",
+                            lightProps);
                 }
 
                 for (RelayConfig relay : backyard.getRelays()) {
@@ -162,8 +162,8 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                         relayProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
                     }
                     String label = relay.getName();
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_RELAY,
-                            label != null ? label : id, relayProps);
+                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_RELAY, label != null ? label : id,
+                            relayProps);
                 }
 
                 for (VirtualHeaterConfig vh : backyard.getVirtualHeaters()) {

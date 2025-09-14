@@ -161,8 +161,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
     }
 
     public String getMspConfig() throws HaywardException, InterruptedException {
-        String xmlRequest =
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>RequestConfiguration</Name></Request>";
+        String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>RequestConfiguration</Name></Request>";
         String xmlResponse = sendRequest(xmlRequest, HaywardMessageType.REQUEST_CONFIGURATION);
 
         if (xmlResponse.isEmpty()) {
@@ -174,7 +173,6 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
             logger.error("Hayward Connection thing: getMspConfig XML response: {}", xmlResponse);
             throw new HaywardException("MSP configuration response contains status message");
         }
-
         return xmlResponse;
     }
 
