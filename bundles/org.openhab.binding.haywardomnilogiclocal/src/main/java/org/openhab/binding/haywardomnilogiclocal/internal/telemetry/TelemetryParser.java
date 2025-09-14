@@ -16,6 +16,7 @@ public final class TelemetryParser {
     static {
         XSTREAM.ignoreUnknownElements();
         XSTREAM.addPermission(AnyTypePermission.ANY);
+        XSTREAM.setClassLoader(TelemetryParser.class.getClassLoader());
         XSTREAM.processAnnotations(Status.class);
     }
 
