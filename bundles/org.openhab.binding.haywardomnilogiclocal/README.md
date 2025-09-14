@@ -32,7 +32,8 @@ The table below lists the Hayward OmniLogic binding thing types:
 ## Discovery
 
 Once the bridge is configured, the binding queries the controller over UDP to read its configuration.
-All connected equipment is then discovered and presented as things within openHAB.
+The configuration XML is parsed using XStream and all connected equipment is discovered and presented as
+things within openHAB.
 
 ## Thing Configuration
 
