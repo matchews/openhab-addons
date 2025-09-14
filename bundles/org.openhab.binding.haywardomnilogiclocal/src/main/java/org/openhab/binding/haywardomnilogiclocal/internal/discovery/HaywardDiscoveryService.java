@@ -164,9 +164,11 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                     if (id != null) {
                         relayProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
                     }
-                    String label = relay.getName();
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_RELAY, label != null ? label : id,
-                            relayProps);
+                    String name = relay.getName();
+                    if (name == null) {
+                        name = id != null ? id : "Relay";
+                    }
+                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_RELAY, name, relayProps);
                 }
 
                 for (VirtualHeaterConfig vh : backyard.getVirtualHeaters()) {
