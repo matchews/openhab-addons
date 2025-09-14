@@ -125,8 +125,9 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                     if (heaterId != null) {
                         heaterProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, heaterId);
                     }
-                    if (heater.getType() != null) {
-                        heaterProps.put(HaywardBindingConstants.PROPERTY_HEATER_TYPE, heater.getType());
+                    String type = heater.getType();
+                    if (type != null) {
+                        heaterProps.put(HaywardBindingConstants.PROPERTY_HEATER_TYPE, type);
                     }
                     onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_HEATER,
                             heaterId != null ? heaterId : "Heater", heaterProps);
