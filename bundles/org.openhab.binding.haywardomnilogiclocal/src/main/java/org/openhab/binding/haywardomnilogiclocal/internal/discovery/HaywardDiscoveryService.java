@@ -103,8 +103,9 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                         pumpProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, pumpId);
                     }
                     String label = pump.getName();
+                    String defaultLabel = pumpId != null ? pumpId : "Pump";
                     onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_PUMP,
-                            label != null ? label : pumpId, pumpProps);
+                            label != null ? label : defaultLabel, pumpProps);
                 }
 
                 for (FilterConfig filter : backyard.getFilters()) {
@@ -125,8 +126,9 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                     if (heaterId != null) {
                         heaterProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, heaterId);
                     }
-                    if (heater.getType() != null) {
-                        heaterProps.put(HaywardBindingConstants.PROPERTY_HEATER_TYPE, heater.getType());
+                    String heaterType = heater.getType();
+                    if (heaterType != null) {
+                        heaterProps.put(HaywardBindingConstants.PROPERTY_HEATER_TYPE, heaterType);
                     }
                     onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_HEATER,
                             heaterId != null ? heaterId : "Heater", heaterProps);
@@ -162,8 +164,9 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                         relayProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
                     }
                     String label = relay.getName();
+                    String defaultLabel = id != null ? id : "Relay";
                     onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_RELAY,
-                            label != null ? label : id, relayProps);
+                            label != null ? label : defaultLabel, relayProps);
                 }
 
                 for (VirtualHeaterConfig vh : backyard.getVirtualHeaters()) {
