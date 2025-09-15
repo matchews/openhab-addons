@@ -166,7 +166,9 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                         if (id != null) {
                             valveProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
                         }
-                        valveProps.put(HaywardBindingConstants.PROPERTY_RELAY_TYPE, relayType);
+                        if (relayType != null) {
+                            valveProps.put(HaywardBindingConstants.PROPERTY_RELAY_TYPE, relayType);
+                        }
                         String function = relay.getFunction();
                         if (function != null) {
                             valveProps.put(HaywardBindingConstants.PROPERTY_RELAY_FUNCTION, function);

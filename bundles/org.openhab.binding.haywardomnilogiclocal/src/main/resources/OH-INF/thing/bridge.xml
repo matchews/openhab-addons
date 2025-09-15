@@ -7,7 +7,7 @@
 	<!-- The bridge to communicate with Hayward's server -->
 	<bridge-type id="bridge">
 		<label>Hayward OmniLogix Connection</label>
-		<description>Connection to Hayward's Server</description>
+		<description>Connection to Hayward controller</description>
 		<semantic-equipment-tag>WebService</semantic-equipment-tag>
 		<config-description>
             <parameter name="host" type="text" required="true">
