@@ -34,23 +34,22 @@ public class HaywardDiscoveryServiceTest {
     @Test
     public void mspConfigDiscoveryCreatesResultsForAllDevices() {
         String xml = "" +
-                "<MspConfig>" +
-                "  <System systemId='SYS'>" +
-                "    <Backyard systemId='BY'>" +
-                "      <BodyOfWater systemId='BOW1'/>" +
-                "      <BodyOfWater systemId='BOW2'/>" +
-                "      <Pump systemId='P1' name='Pump1'/>" +
-                "      <Pump systemId='P2' name='Pump2'/>" +
-                "      <Filter systemId='F1' pumpId='P1'/>" +
-                "      <Filter systemId='F2' pumpId='P2'/>" +
-                "      <Heater systemId='H1' type='gas'/>" +
-                "      <Chlorinator systemId='C1'/>" +
-                "      <ColorLogic-Light systemId='L1'/>" +
-                "      <Relay systemId='R1' name='Relay1'/>" +
-                "      <VirtualHeater systemId='VH1'/>" +
-                "    </Backyard>" +
-                "  </System>" +
-                "</MspConfig>";
+                "<MSPConfig>" +
+                "  <System systemId='SYS'/>" +
+                "  <Backyard systemId='BY'>" +
+                "    <BodyOfWater systemId='BOW1'/>" +
+                "    <BodyOfWater systemId='BOW2'/>" +
+                "    <Pump systemId='P1' name='Pump1'/>" +
+                "    <Pump systemId='P2' name='Pump2'/>" +
+                "    <Filter systemId='F1' pumpId='P1'/>" +
+                "    <Filter systemId='F2' pumpId='P2'/>" +
+                "    <Heater systemId='H1' type='gas'/>" +
+                "    <Chlorinator systemId='C1'/>" +
+                "    <ColorLogic-Light systemId='L1'/>" +
+                "    <Relay systemId='R1' name='Relay1'/>" +
+                "    <VirtualHeater systemId='VH1'/>" +
+                "  </Backyard>" +
+                "</MSPConfig>";
 
         TestDiscoveryService service = new TestDiscoveryService();
         service.mspConfigDiscovery(xml);
@@ -64,16 +63,15 @@ public class HaywardDiscoveryServiceTest {
     @Test
     public void mspConfigDiscoveryIdentifiesValveActuatorRelays() {
         String xml = "" +
-                "<MspConfig>" +
-                "  <System systemId='SYS'>" +
-                "    <Backyard systemId='BY'>" +
-                "      <Relay systemId='VA1' name='Valve'>" +
-                "        <Type>RLY_VALVE_ACTUATOR</Type>" +
-                "        <Function>POOL_RETURN</Function>" +
-                "      </Relay>" +
-                "    </Backyard>" +
-                "  </System>" +
-                "</MspConfig>";
+                "<MSPConfig>" +
+                "  <System systemId='SYS'/>" +
+                "  <Backyard systemId='BY'>" +
+                "    <Relay systemId='VA1' name='Valve'>" +
+                "      <Type>RLY_VALVE_ACTUATOR</Type>" +
+                "      <Function>POOL_RETURN</Function>" +
+                "    </Relay>" +
+                "  </Backyard>" +
+                "</MSPConfig>";
 
         TestDiscoveryService service = new TestDiscoveryService();
         service.mspConfigDiscovery(xml);

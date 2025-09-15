@@ -12,18 +12,17 @@ public class ConfigParserTest {
     public void testParsePopulatesAllListsAndAttributes() {
         String xml = "" +
                 "<MSPConfig>" +
-                "  <System systemId='SYS'>" +
-                "    <Backyard systemId='BY'>" +
-                "      <BodyOfWater systemId='BOW'/>" +
-                "      <Pump systemId='P1' name='Main'/>" +
-                "      <Filter systemId='F1' pumpId='P1'/>" +
-                "      <Heater systemId='H1' type='gas'/>" +
-                "      <VirtualHeater systemId='VH1'/>" +
-                "      <Chlorinator systemId='C1'/>" +
-                "      <ColorLogic-Light systemId='L1'/>" +
-                "      <Relay systemId='R1' name='Aux1'/>" +
-                "    </Backyard>" +
-                "  </System>" +
+                "  <System systemId='SYS'/>" +
+                "  <Backyard systemId='BY'>" +
+                "    <BodyOfWater systemId='BOW'/>" +
+                "    <Pump systemId='P1' name='Main'/>" +
+                "    <Filter systemId='F1' pumpId='P1'/>" +
+                "    <Heater systemId='H1' type='gas'/>" +
+                "    <VirtualHeater systemId='VH1'/>" +
+                "    <Chlorinator systemId='C1'/>" +
+                "    <ColorLogic-Light systemId='L1'/>" +
+                "    <Relay systemId='R1' name='Aux1'/>" +
+                "  </Backyard>" +
                 "</MSPConfig>";
 
         MspConfig config = ConfigParser.parse(xml);
@@ -31,9 +30,10 @@ public class ConfigParserTest {
 
         SystemConfig system = config.getSystems().get(0);
         assertEquals("SYS", system.getSystemId());
-        assertEquals(1, system.getBackyards().size());
 
-        BackyardConfig backyard = system.getBackyards().get(0);
+        assertEquals(1, config.getBackyards().size());
+
+        BackyardConfig backyard = config.getBackyards().get(0);
         assertEquals("BY", backyard.getSystemId());
         assertEquals(1, backyard.getBodiesOfWater().size());
         assertEquals("BOW", backyard.getBodiesOfWater().get(0).getSystemId());

@@ -17,8 +17,15 @@ public class MspConfig {
     @XStreamImplicit(itemFieldName = "System")
     private final List<SystemConfig> systems = new ArrayList<>();
 
+    @XStreamImplicit(itemFieldName = "Backyard")
+    private final List<BackyardConfig> backyards = new ArrayList<>();
+
     public List<SystemConfig> getSystems() {
         return systems;
+    }
+
+    public List<BackyardConfig> getBackyards() {
+        return backyards;
     }
 }
 
