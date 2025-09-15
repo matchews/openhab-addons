@@ -31,7 +31,6 @@ import org.openhab.binding.haywardomnilogiclocal.internal.config.HeaterConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.MspConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.PumpConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.RelayConfig;
-import org.openhab.binding.haywardomnilogiclocal.internal.config.SystemConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.VirtualHeaterConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardBridgeHandler;
 import org.openhab.core.config.discovery.AbstractThingHandlerDiscoveryService;
@@ -73,136 +72,133 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
     public synchronized void mspConfigDiscovery(String xmlResponse) {
         MspConfig config = ConfigParser.parse(xmlResponse);
 
-        for (SystemConfig system : config.getSystems()) {
-            String systemId = system.getSystemId();
+        for (BackyardConfig backyard : config.getBackyards()) {
+            Map<String, Object> backyardProps = new HashMap<>();
+            backyardProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.BACKYARD);
+            String systemId = backyard.getSystemId();
+            if (systemId != null) {
+                backyardProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, systemId);
+            }
+            onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_BACKYARD, "Backyard", backyardProps);
 
-            for (BackyardConfig backyard : system.getBackyards()) {
-                Map<String, Object> backyardProps = new HashMap<>();
-                backyardProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.BACKYARD);
-                if (systemId != null) {
-                    backyardProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, systemId);
+            for (BodyOfWaterConfig bow : backyard.getBodiesOfWater()) {
+                Map<String, Object> bowProps = new HashMap<>();
+                bowProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.BOW);
+                String bowId = bow.getSystemId();
+                if (bowId != null) {
+                    bowProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, bowId);
                 }
-                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_BACKYARD, "Backyard", backyardProps);
+                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_BOW, bowId != null ? bowId : "BodyOfWater",
+                        bowProps);
+            }
 
-                for (BodyOfWaterConfig bow : backyard.getBodiesOfWater()) {
-                    Map<String, Object> bowProps = new HashMap<>();
-                    bowProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.BOW);
-                    String bowId = bow.getSystemId();
-                    if (bowId != null) {
-                        bowProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, bowId);
-                    }
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_BOW, bowId != null ? bowId : "BodyOfWater",
-                            bowProps);
+            for (PumpConfig pump : backyard.getPumps()) {
+                Map<String, Object> pumpProps = new HashMap<>();
+                pumpProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.PUMP);
+                String pumpId = pump.getSystemId();
+                if (pumpId != null) {
+                    pumpProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, pumpId);
                 }
-
-                for (PumpConfig pump : backyard.getPumps()) {
-                    Map<String, Object> pumpProps = new HashMap<>();
-                    pumpProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.PUMP);
-                    String pumpId = pump.getSystemId();
-                    if (pumpId != null) {
-                        pumpProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, pumpId);
-                    }
-                    String name = pump.getName() != null ? pump.getName() : pumpId;
-                    if (name == null) {
-                        name = "Pump";
-                    }
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_PUMP, name, pumpProps);
+                String name = pump.getName() != null ? pump.getName() : pumpId;
+                if (name == null) {
+                    name = "Pump";
                 }
+                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_PUMP, name, pumpProps);
+            }
 
-                for (FilterConfig filter : backyard.getFilters()) {
-                    Map<String, Object> filterProps = new HashMap<>();
-                    filterProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.FILTER);
-                    String filterId = filter.getSystemId();
-                    if (filterId != null) {
-                        filterProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, filterId);
-                    }
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_FILTER,
-                            filterId != null ? filterId : "Filter", filterProps);
+            for (FilterConfig filter : backyard.getFilters()) {
+                Map<String, Object> filterProps = new HashMap<>();
+                filterProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.FILTER);
+                String filterId = filter.getSystemId();
+                if (filterId != null) {
+                    filterProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, filterId);
                 }
+                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_FILTER,
+                        filterId != null ? filterId : "Filter", filterProps);
+            }
 
-                for (HeaterConfig heater : backyard.getHeaters()) {
-                    Map<String, Object> heaterProps = new HashMap<>();
-                    heaterProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.HEATER);
-                    String heaterId = heater.getSystemId();
-                    if (heaterId != null) {
-                        heaterProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, heaterId);
-                    }
-                    String type = heater.getType();
-                    if (type != null) {
-                        heaterProps.put(HaywardBindingConstants.PROPERTY_HEATER_TYPE, type);
-                    }
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_HEATER,
-                            heaterId != null ? heaterId : "Heater", heaterProps);
+            for (HeaterConfig heater : backyard.getHeaters()) {
+                Map<String, Object> heaterProps = new HashMap<>();
+                heaterProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.HEATER);
+                String heaterId = heater.getSystemId();
+                if (heaterId != null) {
+                    heaterProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, heaterId);
                 }
+                String type = heater.getType();
+                if (type != null) {
+                    heaterProps.put(HaywardBindingConstants.PROPERTY_HEATER_TYPE, type);
+                }
+                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_HEATER,
+                        heaterId != null ? heaterId : "Heater", heaterProps);
+            }
 
-                for (ChlorinatorConfig chlorinator : backyard.getChlorinators()) {
-                    Map<String, Object> chlorProps = new HashMap<>();
-                    chlorProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.CHLORINATOR);
-                    String id = chlorinator.getSystemId();
+            for (ChlorinatorConfig chlorinator : backyard.getChlorinators()) {
+                Map<String, Object> chlorProps = new HashMap<>();
+                chlorProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.CHLORINATOR);
+                String id = chlorinator.getSystemId();
+                if (id != null) {
+                    chlorProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
+                }
+                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_CHLORINATOR, id != null ? id : "Chlorinator",
+                        chlorProps);
+            }
+
+            for (ColorLogicLightConfig light : backyard.getColorLogicLights()) {
+                Map<String, Object> lightProps = new HashMap<>();
+                lightProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.COLORLOGIC);
+                String id = light.getSystemId();
+                if (id != null) {
+                    lightProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
+                }
+                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_COLORLOGIC, id != null ? id : "ColorLogic",
+                        lightProps);
+            }
+
+            for (RelayConfig relay : backyard.getRelays()) {
+                String id = relay.getSystemId();
+                String relayType = relay.getType();
+                if ("RLY_VALVE_ACTUATOR".equals(relayType)) {
+                    Map<String, Object> valveProps = new HashMap<>();
+                    valveProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.VALVEACTUATOR);
                     if (id != null) {
-                        chlorProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
+                        valveProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
                     }
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_CHLORINATOR, id != null ? id : "Chlorinator",
-                            chlorProps);
-                }
-
-                for (ColorLogicLightConfig light : backyard.getColorLogicLights()) {
-                    Map<String, Object> lightProps = new HashMap<>();
-                    lightProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.COLORLOGIC);
-                    String id = light.getSystemId();
-                    if (id != null) {
-                        lightProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
+                    if (relayType != null) {
+                        valveProps.put(HaywardBindingConstants.PROPERTY_RELAY_TYPE, relayType);
                     }
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_COLORLOGIC, id != null ? id : "ColorLogic",
-                            lightProps);
-                }
-
-                for (RelayConfig relay : backyard.getRelays()) {
-                    String id = relay.getSystemId();
-                    String relayType = relay.getType();
-                    if ("RLY_VALVE_ACTUATOR".equals(relayType)) {
-                        Map<String, Object> valveProps = new HashMap<>();
-                        valveProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.VALVEACTUATOR);
-                        if (id != null) {
-                            valveProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
-                        }
-                        if (relayType != null) {
-                            valveProps.put(HaywardBindingConstants.PROPERTY_RELAY_TYPE, relayType);
-                        }
-                        String function = relay.getFunction();
-                        if (function != null) {
-                            valveProps.put(HaywardBindingConstants.PROPERTY_RELAY_FUNCTION, function);
-                        }
-                        String name = relay.getName();
-                        if (name == null) {
-                            name = id != null ? id : "ValveActuator";
-                        }
-                        onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_VALVEACTUATOR, name, valveProps);
-                        continue;
-                    }
-
-                    Map<String, Object> relayProps = new HashMap<>();
-                    relayProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.RELAY);
-                    if (id != null) {
-                        relayProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
+                    String function = relay.getFunction();
+                    if (function != null) {
+                        valveProps.put(HaywardBindingConstants.PROPERTY_RELAY_FUNCTION, function);
                     }
                     String name = relay.getName();
                     if (name == null) {
-                        name = id != null ? id : "Relay";
+                        name = id != null ? id : "ValveActuator";
                     }
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_RELAY, name, relayProps);
+                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_VALVEACTUATOR, name, valveProps);
+                    continue;
                 }
 
-                for (VirtualHeaterConfig vh : backyard.getVirtualHeaters()) {
-                    Map<String, Object> vhProps = new HashMap<>();
-                    vhProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.VIRTUALHEATER);
-                    String id = vh.getSystemId();
-                    if (id != null) {
-                        vhProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
-                    }
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_VIRTUALHEATER,
-                            id != null ? id : "VirtualHeater", vhProps);
+                Map<String, Object> relayProps = new HashMap<>();
+                relayProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.RELAY);
+                if (id != null) {
+                    relayProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
                 }
+                String name = relay.getName();
+                if (name == null) {
+                    name = id != null ? id : "Relay";
+                }
+                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_RELAY, name, relayProps);
+            }
+
+            for (VirtualHeaterConfig vh : backyard.getVirtualHeaters()) {
+                Map<String, Object> vhProps = new HashMap<>();
+                vhProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.VIRTUALHEATER);
+                String id = vh.getSystemId();
+                if (id != null) {
+                    vhProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
+                }
+                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_VIRTUALHEATER,
+                        id != null ? id : "VirtualHeater", vhProps);
             }
         }
     }
