@@ -18,6 +18,7 @@ public final class TelemetryParser {
         XSTREAM.addPermission(AnyTypePermission.ANY);
         XSTREAM.setClassLoader(TelemetryParser.class.getClassLoader());
         XSTREAM.processAnnotations(Status.class);
+        XSTREAM.processAnnotations(ValveActuator.class);
     }
 
     private TelemetryParser() {
