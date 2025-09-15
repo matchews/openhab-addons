@@ -30,6 +30,7 @@ public enum HaywardTypeToRequest {
     HEATER,
     PUMP,
     RELAY,
+    VALVEACTUATOR,
     SENSOR,
     VIRTUALHEATER
 }

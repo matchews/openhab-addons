@@ -158,9 +158,29 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                 }
 
                 for (RelayConfig relay : backyard.getRelays()) {
+                    String id = relay.getSystemId();
+                    String relayType = relay.getType();
+                    if ("RLY_VALVE_ACTUATOR".equals(relayType)) {
+                        Map<String, Object> valveProps = new HashMap<>();
+                        valveProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.VALVEACTUATOR);
+                        if (id != null) {
+                            valveProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
+                        }
+                        valveProps.put(HaywardBindingConstants.PROPERTY_RELAY_TYPE, relayType);
+                        String function = relay.getFunction();
+                        if (function != null) {
+                            valveProps.put(HaywardBindingConstants.PROPERTY_RELAY_FUNCTION, function);
+                        }
+                        String name = relay.getName();
+                        if (name == null) {
+                            name = id != null ? id : "ValveActuator";
+                        }
+                        onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_VALVEACTUATOR, name, valveProps);
+                        continue;
+                    }
+
                     Map<String, Object> relayProps = new HashMap<>();
                     relayProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.RELAY);
-                    String id = relay.getSystemId();
                     if (id != null) {
                         relayProps.put(HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
                     }
