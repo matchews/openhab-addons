@@ -19,6 +19,7 @@ The table below lists the Hayward OmniLogic binding thing types:
 | Heater Equipment             | Actual heater (i.e. gas, solar, electric)                                       | heater        |
 | Pump                         | Auxillary pump control (i.e. spillover)                                         | pump          |
 | Relay                        | Accessory relay control (deck jet sprinklers, lights, etc.)                     | relay         |
+| Valve Actuator               | Valve actuator control                                                          | valveactuator  |
 | Virtaul Heater               | A Virtual Heater that can control all of the heater equipment based on priority | virtualHeater |
 
 ## Discovery
@@ -160,6 +161,14 @@ Hayward OmniLogic Connection Parameters:
 | Channel Type ID | Item Type | Description | Read Write |
 |-----------------|-----------|-------------|:----------:|
 | relayState      | Switch    | Relay state |     R/W    |
+
+### Valve Actuator Channels
+
+| Channel Type ID    | Item Type | Description          | Read Write |
+|--------------------|-----------|----------------------|:----------:|
+| valveActuatorState | Switch    | Valve actuator state |      R     |
+
+_Valve actuators are discovered with their configured type and function as thing properties. The binding currently exposes the state reported by OmniLogic but does not send commands to reposition the actuator._
 
 ### Virtual Heater Channels
 
