@@ -12,7 +12,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
  * Representation of the MSP configuration root element.
  */
 @NonNullByDefault
-@XStreamAlias("MspConfig")
+@XStreamAlias("MSPConfig")
 public class MspConfig {
     @XStreamImplicit(itemFieldName = "System")
     private final List<SystemConfig> systems = new ArrayList<>();

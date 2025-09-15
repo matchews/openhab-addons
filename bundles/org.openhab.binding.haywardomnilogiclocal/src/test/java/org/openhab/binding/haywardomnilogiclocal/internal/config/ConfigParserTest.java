@@ -11,7 +11,7 @@ public class ConfigParserTest {
     @Test
     public void testParsePopulatesAllListsAndAttributes() {
         String xml = "" +
-                "<MspConfig>" +
+                "<MSPConfig>" +
                 "  <System systemId='SYS'>" +
                 "    <Backyard systemId='BY'>" +
                 "      <BodyOfWater systemId='BOW'/>" +
@@ -24,7 +24,7 @@ public class ConfigParserTest {
                 "      <Relay systemId='R1' name='Aux1'/>" +
                 "    </Backyard>" +
                 "  </System>" +
-                "</MspConfig>";
+                "</MSPConfig>";
 
         MspConfig config = ConfigParser.parse(xml);
         assertEquals(1, config.getSystems().size());
