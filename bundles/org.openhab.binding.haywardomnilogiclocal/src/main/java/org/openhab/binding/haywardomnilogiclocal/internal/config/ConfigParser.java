@@ -18,7 +18,7 @@ public final class ConfigParser {
         XSTREAM.ignoreUnknownElements();
         XSTREAM.addPermission(AnyTypePermission.ANY);
         XSTREAM.processAnnotations(new Class<?>[] { MspConfig.class, SystemConfig.class, BackyardConfig.class,
-                BodyOfWaterConfig.class, PumpConfig.class, FilterConfig.class, HeaterConfig.class,
+                BodyOfWaterConfig.class, PumpConfig.class, FilterConfig.class, HeaterConfig.class, SensorConfig.class,
                 VirtualHeaterConfig.class, ChlorinatorConfig.class, ColorLogicLightConfig.class, RelayConfig.class,
                 SchedulesConfig.class, ScheduleConfig.class, ScheduleActionConfig.class, DeviceConfig.class,
                 ParameterConfig.class, DmtConfig.class });

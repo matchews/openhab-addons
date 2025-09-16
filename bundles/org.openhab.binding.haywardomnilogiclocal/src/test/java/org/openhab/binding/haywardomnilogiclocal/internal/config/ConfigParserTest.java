@@ -29,7 +29,16 @@ public class ConfigParserTest {
                 "    <UI-Show-SuperChlor>true</UI-Show-SuperChlor>" +
                 "    <UI-Show-SuperChlorTimeout>false</UI-Show-SuperChlorTimeout>" +
                 "  </System>" +
-                "  <Backyard systemId='BY'>" +
+                "  <Backyard>" +
+                "    <System-Id>BY</System-Id>" +
+                "    <Name>Main Backyard</Name>" +
+                "    <Service-Mode-Timeout>15</Service-Mode-Timeout>" +
+                "    <Sensor>" +
+                "      <System-Id>SEN1</System-Id>" +
+                "      <Name>Water Sensor</Name>" +
+                "      <Type>SENSOR_WATER_TEMP</Type>" +
+                "      <Units>UNITS_FAHRENHEIT</Units>" +
+                "    </Sensor>" +
                 "    <BodyOfWater systemId='BOW'/>" +
                 "    <Pump systemId='P1' name='Main'/>" +
                 "    <Filter systemId='F1' pumpId='P1'/>" +
@@ -81,6 +90,8 @@ public class ConfigParserTest {
 
         BackyardConfig backyard = config.getBackyards().get(0);
         assertEquals("BY", backyard.getSystemId());
+        assertEquals("Main Backyard", backyard.getName());
+        assertEquals("15", backyard.getServiceModeTimeout());
         assertEquals(1, backyard.getBodiesOfWater().size());
         assertEquals("BOW", backyard.getBodiesOfWater().get(0).getSystemId());
 
@@ -104,6 +115,13 @@ public class ConfigParserTest {
 
         assertEquals(1, backyard.getChlorinators().size());
         assertEquals("C1", backyard.getChlorinators().get(0).getSystemId());
+
+        assertEquals(1, backyard.getSensors().size());
+        SensorConfig sensor = backyard.getSensors().get(0);
+        assertEquals("SEN1", sensor.getSystemId());
+        assertEquals("Water Sensor", sensor.getName());
+        assertEquals("SENSOR_WATER_TEMP", sensor.getType());
+        assertEquals("UNITS_FAHRENHEIT", sensor.getUnits());
 
         assertEquals(1, backyard.getColorLogicLights().size());
         assertEquals("L1", backyard.getColorLogicLights().get(0).getSystemId());
