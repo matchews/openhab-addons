@@ -120,6 +120,7 @@ public class ConfigParserTest {
                 "        <Type>SENSOR_WATER_TEMP</Type>" +
                 "        <Units>UNITS_FAHRENHEIT</Units>" +
                 "        <Operation>PEO_SENSOR_SAMPLE" +
+                "          <Parameter name='SampleRate' dataType='int'>5</Parameter>" +
                 "          <Action>PEA_SENSOR_REPORT" +
                 "            <Parameter name='Interval' dataType='int'>15</Parameter>" +
                 "          </Action>" +
@@ -141,6 +142,11 @@ public class ConfigParserTest {
                 "        <Action>PEA_SET_SPEED" +
                 "          <Parameter name='Speed' dataType='int'>3100</Parameter>" +
                 "        </Action>" +
+                "        <Operation>PEO_PUMP_CHILD" +
+                "          <Action>PEA_CHILD_SPEED" +
+                "            <Parameter name='Speed' dataType='int'>2800</Parameter>" +
+                "          </Action>" +
+                "        </Operation>" +
                 "      </Operation>" +
                 "    </Pump>" +
                 "    <VirtualHeater systemId='VH1' name='Spa Heat' enable='yes' currentSetPoint='90'>" +
@@ -235,10 +241,10 @@ public class ConfigParserTest {
         assertEquals("100", filter.getVspHighPumpSpeed());
         assertEquals("80", filter.getVspCustomPumpSpeed());
         assertEquals(1, filter.getOperations().size());
-        FilterConfig.OperationConfig filterOperation = filter.getOperations().get(0);
+        OperationConfig filterOperation = filter.getOperations().get(0);
         assertEquals("PEO_FILTER_SAMPLE", filterOperation.getType());
         assertEquals(1, filterOperation.getActions().size());
-        FilterConfig.ActionConfig filterAction = filterOperation.getActions().get(0);
+        ActionConfig filterAction = filterOperation.getActions().get(0);
         assertEquals("PEA_FILTER_SPEED", filterAction.getType());
         assertEquals(0, filterAction.getDevices().size());
         assertEquals(1, filterAction.getParameters().size());
@@ -257,7 +263,7 @@ public class ConfigParserTest {
         assertEquals("104", heater.getMaxSettableWaterTemp());
         assertEquals("no", heater.getCooldownEnabled());
         assertEquals(2, heater.getOperations().size());
-        HeaterConfig.OperationConfig heaterEquipmentOp = heater.getOperations().get(0);
+        OperationConfig heaterEquipmentOp = heater.getOperations().get(0);
         assertEquals("PEO_HEATER_EQUIPMENT", heaterEquipmentOp.getType());
         assertEquals(0, heaterEquipmentOp.getActions().size());
         assertEquals(1, heaterEquipmentOp.getHeaterEquipment().size());
@@ -267,10 +273,10 @@ public class ConfigParserTest {
         assertEquals("PET_HEATER", heaterEquipment.getType());
         assertEquals("HTR_GAS", heaterEquipment.getHeaterType());
         assertEquals("yes", heaterEquipment.getEnabled());
-        HeaterConfig.OperationConfig heaterFlowOp = heater.getOperations().get(1);
+        OperationConfig heaterFlowOp = heater.getOperations().get(1);
         assertEquals("PEO_HEATER_FLOW", heaterFlowOp.getType());
         assertEquals(1, heaterFlowOp.getActions().size());
-        HeaterConfig.ActionConfig heaterFlowAction = heaterFlowOp.getActions().get(0);
+        ActionConfig heaterFlowAction = heaterFlowOp.getActions().get(0);
         assertEquals("PEA_FLOW", heaterFlowAction.getType());
         assertEquals(0, heaterFlowAction.getDevices().size());
         assertEquals(1, heaterFlowAction.getParameters().size());
@@ -289,10 +295,10 @@ public class ConfigParserTest {
         assertEquals("CELL_TYPE_T15", chlorinator.getCellType());
         assertEquals("86400", chlorinator.getOrpTimeout());
         assertEquals(1, chlorinator.getOperations().size());
-        ChlorinatorConfig.OperationConfig chlorinatorOp = chlorinator.getOperations().get(0);
+        OperationConfig chlorinatorOp = chlorinator.getOperations().get(0);
         assertEquals("PEO_CHLOR_SAMPLE", chlorinatorOp.getType());
         assertEquals(1, chlorinatorOp.getActions().size());
-        ChlorinatorConfig.ActionConfig chlorinatorAction = chlorinatorOp.getActions().get(0);
+        ActionConfig chlorinatorAction = chlorinatorOp.getActions().get(0);
         assertEquals("PEA_SET_PERCENT", chlorinatorAction.getType());
         assertEquals(0, chlorinatorAction.getDevices().size());
         assertEquals(1, chlorinatorAction.getParameters().size());
@@ -317,10 +323,14 @@ public class ConfigParserTest {
         assertEquals("SENSOR_WATER_TEMP", sensor.getType());
         assertEquals("UNITS_FAHRENHEIT", sensor.getUnits());
         assertEquals(1, sensor.getOperations().size());
-        SensorConfig.OperationConfig sensorOperation = sensor.getOperations().get(0);
+        OperationConfig sensorOperation = sensor.getOperations().get(0);
         assertEquals("PEO_SENSOR_SAMPLE", sensorOperation.getType());
+        assertEquals(1, sensorOperation.getParameters().size());
+        ParameterConfig sensorOperationParameter = sensorOperation.getParameters().get(0);
+        assertEquals("SampleRate", sensorOperationParameter.getName());
+        assertEquals("5", sensorOperationParameter.getValue());
         assertEquals(1, sensorOperation.getActions().size());
-        SensorConfig.ActionConfig sensorAction = sensorOperation.getActions().get(0);
+        ActionConfig sensorAction = sensorOperation.getActions().get(0);
         assertEquals("PEA_SENSOR_REPORT", sensorAction.getType());
         assertEquals(0, sensorAction.getDevices().size());
         assertEquals(1, sensorAction.getParameters().size());
@@ -342,15 +352,24 @@ public class ConfigParserTest {
         assertEquals("100", pump.getVspHighPumpSpeed());
         assertEquals("30", pump.getVspLowPumpSpeed());
         assertEquals(1, pump.getOperations().size());
-        PumpConfig.OperationConfig pumpOperation = pump.getOperations().get(0);
+        OperationConfig pumpOperation = pump.getOperations().get(0);
         assertEquals("PEO_PUMP_SAMPLE", pumpOperation.getType());
         assertEquals(1, pumpOperation.getActions().size());
-        PumpConfig.ActionConfig pumpAction = pumpOperation.getActions().get(0);
+        ActionConfig pumpAction = pumpOperation.getActions().get(0);
         assertEquals("PEA_SET_SPEED", pumpAction.getType());
         assertEquals(0, pumpAction.getDevices().size());
         assertEquals(1, pumpAction.getParameters().size());
         assertEquals("Speed", pumpAction.getParameters().get(0).getName());
         assertEquals("3100", pumpAction.getParameters().get(0).getValue());
+        assertEquals(1, pumpOperation.getOperations().size());
+        OperationConfig nestedPumpOperation = pumpOperation.getOperations().get(0);
+        assertEquals("PEO_PUMP_CHILD", nestedPumpOperation.getType());
+        assertEquals(1, nestedPumpOperation.getActions().size());
+        ActionConfig nestedPumpAction = nestedPumpOperation.getActions().get(0);
+        assertEquals("PEA_CHILD_SPEED", nestedPumpAction.getType());
+        assertEquals(1, nestedPumpAction.getParameters().size());
+        assertEquals("Speed", nestedPumpAction.getParameters().get(0).getName());
+        assertEquals("2800", nestedPumpAction.getParameters().get(0).getValue());
 
         assertEquals(1, backyard.getVirtualHeaters().size());
         VirtualHeaterConfig virtualHeater = backyard.getVirtualHeaters().get(0);
