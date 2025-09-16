@@ -23,6 +23,21 @@ public class ConfigParserTest {
                 "    <ColorLogic-Light systemId='L1'/>" +
                 "    <Relay systemId='R1' name='Aux1'/>" +
                 "  </Backyard>" +
+                "  <Schedules>" +
+                "    <Schedule systemId='SCH1' name='Filter' type='equipment'>" +
+                "      <Device systemId='P1' name='Main Pump' type='Pump'/>" +
+                "      <Parameter name='StartTimeHours' dataType='int'>6</Parameter>" +
+                "      <Action type='on'>" +
+                "        <Device systemId='R1' name='Aux1' type='Relay'/>" +
+                "      </Action>" +
+                "    </Schedule>" +
+                "  </Schedules>" +
+                "  <DMT>" +
+                "    <Device systemId='DEV1' name='Filter Pump' type='Pump'>" +
+                "      <Parameter name='Speed' dataType='int'>3450</Parameter>" +
+                "    </Device>" +
+                "  </DMT>" +
+                "  <CHECKSUM>12345</CHECKSUM>" +
                 "</MSPConfig>";
 
         MspConfig config = ConfigParser.parse(xml);
@@ -66,6 +81,35 @@ public class ConfigParserTest {
         RelayConfig relay = backyard.getRelays().get(0);
         assertEquals("R1", relay.getSystemId());
         assertEquals("Aux1", relay.getName());
+
+        assertEquals(1, config.getSchedules().size());
+        ScheduleConfig schedule = config.getSchedules().get(0);
+        assertEquals("SCH1", schedule.getSystemId());
+        assertEquals("Filter", schedule.getName());
+        assertEquals(1, schedule.getDevices().size());
+        DeviceConfig scheduleDevice = schedule.getDevices().get(0);
+        assertEquals("P1", scheduleDevice.getSystemId());
+        assertEquals("Main Pump", scheduleDevice.getName());
+        assertEquals(1, schedule.getParameters().size());
+        ParameterConfig parameter = schedule.getParameters().get(0);
+        assertEquals("StartTimeHours", parameter.getName());
+        assertEquals("6", parameter.getValue());
+        assertEquals(1, schedule.getActions().size());
+        ScheduleActionConfig action = schedule.getActions().get(0);
+        assertEquals("on", action.getType());
+        assertEquals(1, action.getDevices().size());
+        assertEquals("R1", action.getDevices().get(0).getSystemId());
+
+        assertEquals(1, config.getDmt().getDevices().size());
+        DeviceConfig device = config.getDmt().getDevices().get(0);
+        assertEquals("DEV1", device.getSystemId());
+        assertEquals("Filter Pump", device.getName());
+        assertEquals("Pump", device.getType());
+        assertEquals(1, device.getParameters().size());
+        assertEquals("Speed", device.getParameters().get(0).getName());
+        assertEquals("3450", device.getParameters().get(0).getValue());
+
+        assertEquals("12345", config.getChecksum());
     }
 }
 

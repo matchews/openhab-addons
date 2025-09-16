@@ -17,7 +17,11 @@ public final class ConfigParser {
         XSTREAM.setClassLoader(ConfigParser.class.getClassLoader());
         XSTREAM.ignoreUnknownElements();
         XSTREAM.addPermission(AnyTypePermission.ANY);
-        XSTREAM.processAnnotations(MspConfig.class);
+        XSTREAM.processAnnotations(new Class<?>[] { MspConfig.class, SystemConfig.class, BackyardConfig.class,
+                BodyOfWaterConfig.class, PumpConfig.class, FilterConfig.class, HeaterConfig.class,
+                VirtualHeaterConfig.class, ChlorinatorConfig.class, ColorLogicLightConfig.class, RelayConfig.class,
+                SchedulesConfig.class, ScheduleConfig.class, ScheduleActionConfig.class, DeviceConfig.class,
+                ParameterConfig.class, DmtConfig.class });
     }
 
     private ConfigParser() {
