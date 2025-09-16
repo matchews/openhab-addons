@@ -33,20 +33,36 @@ public class ConfigParserTest {
                 "    <System-Id>BY</System-Id>" +
                 "    <Name>Main Backyard</Name>" +
                 "    <Service-Mode-Timeout>15</Service-Mode-Timeout>" +
-                "    <Sensor>" +
-                "      <System-Id>SEN1</System-Id>" +
-                "      <Name>Water Sensor</Name>" +
-                "      <Type>SENSOR_WATER_TEMP</Type>" +
-                "      <Units>UNITS_FAHRENHEIT</Units>" +
-                "    </Sensor>" +
-                "    <BodyOfWater systemId='BOW'/>" +
+                "    <BodyOfWater systemId='BOW' type='BOW_POOL' sharedType='BOW_SHARED_EQUIPMENT' supportsSpillover='yes'" +
+                "        spilloverMode='manual' spilloverTimedPercent='50' freezeProtectEnabled='yes'" +
+                "        freezeProtectSetPoint='38' sizeInLiters='56781'>" +
+                "      <Name>Main Pool</Name>" +
+                "      <Type>BOW_POOL</Type>" +
+                "      <Shared-Type>BOW_SHARED_EQUIPMENT</Shared-Type>" +
+                "      <Shared-Priority>SHARED_EQUIPMENT_HIGH_PRIORITY</Shared-Priority>" +
+                "      <Shared-Equipment-System-ID>BOW2</Shared-Equipment-System-ID>" +
+                "      <Use-Spillover-For-Filter-Operations>yes</Use-Spillover-For-Filter-Operations>" +
+                "      <Spillover-Manual-Timeout>10</Spillover-Manual-Timeout>" +
+                "      <Spillover-Timed-Timeout>20</Spillover-Timed-Timeout>" +
+                "      <Freeze-Protect-Override>no</Freeze-Protect-Override>" +
+                "      <Size-In-Gallons>15000</Size-In-Gallons>" +
+                "      <Filter systemId='F1' pumpId='P1'/>" +
+                "      <Heater systemId='H1' type='gas'/>" +
+                "      <Chlorinator systemId='C1'/>" +
+                "      <ColorLogic-Light systemId='L1'/>" +
+                "      <Relay systemId='R1' name='Aux1'>" +
+                "        <Type>RLY_HIGH_VOLTAGE_RELAY</Type>" +
+                "        <Function>GENERIC</Function>" +
+                "      </Relay>" +
+                "      <Sensor>" +
+                "        <System-Id>SEN1</System-Id>" +
+                "        <Name>Water Sensor</Name>" +
+                "        <Type>SENSOR_WATER_TEMP</Type>" +
+                "        <Units>UNITS_FAHRENHEIT</Units>" +
+                "      </Sensor>" +
+                "    </BodyOfWater>" +
                 "    <Pump systemId='P1' name='Main'/>" +
-                "    <Filter systemId='F1' pumpId='P1'/>" +
-                "    <Heater systemId='H1' type='gas'/>" +
                 "    <VirtualHeater systemId='VH1'/>" +
-                "    <Chlorinator systemId='C1'/>" +
-                "    <ColorLogic-Light systemId='L1'/>" +
-                "    <Relay systemId='R1' name='Aux1'/>" +
                 "  </Backyard>" +
                 "  <Schedules>" +
                 "    <Schedule systemId='SCH1' name='Filter' type='equipment'>" +
@@ -93,43 +109,60 @@ public class ConfigParserTest {
         assertEquals("Main Backyard", backyard.getName());
         assertEquals("15", backyard.getServiceModeTimeout());
         assertEquals(1, backyard.getBodiesOfWater().size());
-        assertEquals("BOW", backyard.getBodiesOfWater().get(0).getSystemId());
+        BodyOfWaterConfig bow = backyard.getBodiesOfWater().get(0);
+        assertEquals("BOW", bow.getSystemId());
+        assertEquals("Main Pool", bow.getName());
+        assertEquals("BOW_POOL", bow.getType());
+        assertEquals("BOW_SHARED_EQUIPMENT", bow.getSharedType());
+        assertEquals("SHARED_EQUIPMENT_HIGH_PRIORITY", bow.getSharedPriority());
+        assertEquals("BOW2", bow.getSharedEquipmentSystemId());
+        assertEquals("yes", bow.getSupportsSpillover());
+        assertEquals("yes", bow.getUseSpilloverForFilterOperations());
+        assertEquals("manual", bow.getSpilloverMode());
+        assertEquals("10", bow.getSpilloverManualTimeout());
+        assertEquals("50", bow.getSpilloverTimedPercent());
+        assertEquals("20", bow.getSpilloverTimedTimeout());
+        assertEquals("yes", bow.getFreezeProtectEnabled());
+        assertEquals("no", bow.getFreezeProtectOverride());
+        assertEquals("38", bow.getFreezeProtectSetPoint());
+        assertEquals("15000", bow.getSizeInGallons());
+        assertEquals("56781", bow.getSizeInLiters());
+
+        assertEquals(1, bow.getFilters().size());
+        FilterConfig filter = bow.getFilters().get(0);
+        assertEquals("F1", filter.getSystemId());
+        assertEquals("P1", filter.getPumpId());
+
+        assertEquals(1, bow.getHeaters().size());
+        HeaterConfig heater = bow.getHeaters().get(0);
+        assertEquals("H1", heater.getSystemId());
+        assertEquals("gas", heater.getType());
+
+        assertEquals(1, bow.getChlorinators().size());
+        assertEquals("C1", bow.getChlorinators().get(0).getSystemId());
+
+        assertEquals(1, bow.getColorLogicLights().size());
+        assertEquals("L1", bow.getColorLogicLights().get(0).getSystemId());
+
+        assertEquals(1, bow.getRelays().size());
+        RelayConfig relay = bow.getRelays().get(0);
+        assertEquals("R1", relay.getSystemId());
+        assertEquals("Aux1", relay.getName());
+
+        assertEquals(1, bow.getSensors().size());
+        SensorConfig sensor = bow.getSensors().get(0);
+        assertEquals("SEN1", sensor.getSystemId());
+        assertEquals("Water Sensor", sensor.getName());
+        assertEquals("SENSOR_WATER_TEMP", sensor.getType());
+        assertEquals("UNITS_FAHRENHEIT", sensor.getUnits());
 
         assertEquals(1, backyard.getPumps().size());
         PumpConfig pump = backyard.getPumps().get(0);
         assertEquals("P1", pump.getSystemId());
         assertEquals("Main", pump.getName());
 
-        assertEquals(1, backyard.getFilters().size());
-        FilterConfig filter = backyard.getFilters().get(0);
-        assertEquals("F1", filter.getSystemId());
-        assertEquals("P1", filter.getPumpId());
-
-        assertEquals(1, backyard.getHeaters().size());
-        HeaterConfig heater = backyard.getHeaters().get(0);
-        assertEquals("H1", heater.getSystemId());
-        assertEquals("gas", heater.getType());
-
         assertEquals(1, backyard.getVirtualHeaters().size());
         assertEquals("VH1", backyard.getVirtualHeaters().get(0).getSystemId());
-
-        assertEquals(1, backyard.getChlorinators().size());
-        assertEquals("C1", backyard.getChlorinators().get(0).getSystemId());
-
-        assertEquals(1, backyard.getSensors().size());
-        SensorConfig sensor = backyard.getSensors().get(0);
-        assertEquals("SEN1", sensor.getSystemId());
-        assertEquals("Water Sensor", sensor.getName());
-        assertEquals("SENSOR_WATER_TEMP", sensor.getType());
-        assertEquals("UNITS_FAHRENHEIT", sensor.getUnits());
-
-        assertEquals(1, backyard.getColorLogicLights().size());
-        assertEquals("L1", backyard.getColorLogicLights().get(0).getSystemId());
-
-        assertEquals(1, backyard.getRelays().size());
-        RelayConfig relay = backyard.getRelays().get(0);
-        assertEquals("R1", relay.getSystemId());
-        assertEquals("Aux1", relay.getName());
 
         assertEquals(1, config.getSchedules().size());
         ScheduleConfig schedule = config.getSchedules().get(0);

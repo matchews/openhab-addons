@@ -42,26 +42,8 @@ public class BackyardConfig {
     @XStreamImplicit(itemFieldName = "Pump")
     private final List<PumpConfig> pumps = new ArrayList<>();
 
-    @XStreamImplicit(itemFieldName = "Filter")
-    private final List<FilterConfig> filters = new ArrayList<>();
-
-    @XStreamImplicit(itemFieldName = "Heater")
-    private final List<HeaterConfig> heaters = new ArrayList<>();
-
     @XStreamImplicit(itemFieldName = "VirtualHeater")
     private final List<VirtualHeaterConfig> virtualHeaters = new ArrayList<>();
-
-    @XStreamImplicit(itemFieldName = "Chlorinator")
-    private final List<ChlorinatorConfig> chlorinators = new ArrayList<>();
-
-    @XStreamImplicit(itemFieldName = "ColorLogic-Light")
-    private final List<ColorLogicLightConfig> colorLogicLights = new ArrayList<>();
-
-    @XStreamImplicit(itemFieldName = "Relay")
-    private final List<RelayConfig> relays = new ArrayList<>();
-
-    @XStreamImplicit(itemFieldName = "Sensor")
-    private final List<SensorConfig> sensors = new ArrayList<>();
 
     public @Nullable String getSystemId() {
         return systemId != null ? systemId : systemIdElement;
@@ -83,32 +65,8 @@ public class BackyardConfig {
         return pumps;
     }
 
-    public List<FilterConfig> getFilters() {
-        return filters;
-    }
-
-    public List<HeaterConfig> getHeaters() {
-        return heaters;
-    }
-
     public List<VirtualHeaterConfig> getVirtualHeaters() {
         return virtualHeaters;
-    }
-
-    public List<ChlorinatorConfig> getChlorinators() {
-        return chlorinators;
-    }
-
-    public List<ColorLogicLightConfig> getColorLogicLights() {
-        return colorLogicLights;
-    }
-
-    public List<RelayConfig> getRelays() {
-        return relays;
-    }
-
-    public List<SensorConfig> getSensors() {
-        return sensors;
     }
 }
 

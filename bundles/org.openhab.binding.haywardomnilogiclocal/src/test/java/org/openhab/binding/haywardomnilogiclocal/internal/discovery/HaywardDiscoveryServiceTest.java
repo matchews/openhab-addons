@@ -37,16 +37,23 @@ public class HaywardDiscoveryServiceTest {
                 "<MSPConfig>" +
                 "  <System systemId='SYS'/>" +
                 "  <Backyard systemId='BY'>" +
-                "    <BodyOfWater systemId='BOW1'/>" +
-                "    <BodyOfWater systemId='BOW2'/>" +
+                "    <BodyOfWater systemId='BOW1' name='Pool' type='BOW_POOL' sharedType='BOW_SHARED_EQUIPMENT'" +
+                "        sharedPriority='SHARED_EQUIPMENT_HIGH_PRIORITY' sharedEquipmentSystemId='BOW2'" +
+                "        supportsSpillover='yes' sizeInGallons='15000'>" +
+                "      <Filter systemId='F1' pumpId='P1'/>" +
+                "      <Heater systemId='H1' type='gas'/>" +
+                "      <Chlorinator systemId='C1'/>" +
+                "      <ColorLogic-Light systemId='L1'/>" +
+                "      <Relay systemId='R1' name='Relay1'>" +
+                "        <Type>RLY_HIGH_VOLTAGE_RELAY</Type>" +
+                "      </Relay>" +
+                "      <Sensor systemId='S1' name='Water' type='SENSOR_WATER_TEMP' units='UNITS_FAHRENHEIT'/>" +
+                "    </BodyOfWater>" +
+                "    <BodyOfWater systemId='BOW2'>" +
+                "      <Filter systemId='F2' pumpId='P2'/>" +
+                "    </BodyOfWater>" +
                 "    <Pump systemId='P1' name='Pump1'/>" +
                 "    <Pump systemId='P2' name='Pump2'/>" +
-                "    <Filter systemId='F1' pumpId='P1'/>" +
-                "    <Filter systemId='F2' pumpId='P2'/>" +
-                "    <Heater systemId='H1' type='gas'/>" +
-                "    <Chlorinator systemId='C1'/>" +
-                "    <ColorLogic-Light systemId='L1'/>" +
-                "    <Relay systemId='R1' name='Relay1'/>" +
                 "    <VirtualHeater systemId='VH1'/>" +
                 "  </Backyard>" +
                 "</MSPConfig>";
@@ -54,10 +61,32 @@ public class HaywardDiscoveryServiceTest {
         TestDiscoveryService service = new TestDiscoveryService();
         service.mspConfigDiscovery(xml);
 
-        assertEquals(12, service.types.size());
+        assertEquals(13, service.types.size());
         assertEquals(2, service.types.stream().filter(t -> t.equals(HaywardBindingConstants.THING_TYPE_PUMP)).count());
         assertEquals(2, service.types.stream().filter(t -> t.equals(HaywardBindingConstants.THING_TYPE_FILTER)).count());
         assertEquals(2, service.types.stream().filter(t -> t.equals(HaywardBindingConstants.THING_TYPE_BOW)).count());
+        assertEquals(1, service.types.stream().filter(t -> t.equals(HaywardBindingConstants.THING_TYPE_SENSOR)).count());
+
+        Map<String, Object> bowProps = null;
+        for (int i = 0; i < service.types.size(); i++) {
+            if (service.types.get(i).equals(HaywardBindingConstants.THING_TYPE_BOW)) {
+                Map<String, Object> properties = service.propertyMaps.get(i);
+                if ("BOW1".equals(properties.get(HaywardBindingConstants.PROPERTY_SYSTEM_ID))) {
+                    bowProps = properties;
+                    break;
+                }
+            }
+        }
+
+        assertNotNull(bowProps);
+        assertEquals("Pool", bowProps.get(HaywardBindingConstants.PROPERTY_BOWNAME));
+        assertEquals("BOW1", bowProps.get(HaywardBindingConstants.PROPERTY_BOWID));
+        assertEquals("BOW_POOL", bowProps.get(HaywardBindingConstants.PROPERTY_BOW_TYPE));
+        assertEquals("BOW_SHARED_EQUIPMENT", bowProps.get(HaywardBindingConstants.PROPERTY_BOW_SHAREDTYPE));
+        assertEquals("SHARED_EQUIPMENT_HIGH_PRIORITY", bowProps.get(HaywardBindingConstants.PROPERTY_BOW_SHAREDPRIORITY));
+        assertEquals("BOW2", bowProps.get(HaywardBindingConstants.PROPERTY_BOW_SHAREDEQUIPID));
+        assertEquals("yes", bowProps.get(HaywardBindingConstants.PROPERTY_BOW_SUPPORTSSPILLOVER));
+        assertEquals("15000", bowProps.get(HaywardBindingConstants.PROPERTY_BOW_SIZEINGALLONS));
     }
 
     @Test
@@ -66,10 +95,12 @@ public class HaywardDiscoveryServiceTest {
                 "<MSPConfig>" +
                 "  <System systemId='SYS'/>" +
                 "  <Backyard systemId='BY'>" +
-                "    <Relay systemId='VA1' name='Valve'>" +
-                "      <Type>RLY_VALVE_ACTUATOR</Type>" +
-                "      <Function>POOL_RETURN</Function>" +
-                "    </Relay>" +
+                "    <BodyOfWater systemId='BOW1'>" +
+                "      <Relay systemId='VA1' name='Valve'>" +
+                "        <Type>RLY_VALVE_ACTUATOR</Type>" +
+                "        <Function>POOL_RETURN</Function>" +
+                "      </Relay>" +
+                "    </BodyOfWater>" +
                 "  </Backyard>" +
                 "</MSPConfig>";
 
@@ -92,5 +123,6 @@ public class HaywardDiscoveryServiceTest {
         assertEquals("RLY_VALVE_ACTUATOR", valveProps.get(HaywardBindingConstants.PROPERTY_RELAY_TYPE));
         assertEquals("POOL_RETURN", valveProps.get(HaywardBindingConstants.PROPERTY_RELAY_FUNCTION));
         assertEquals("VA1", valveProps.get(HaywardBindingConstants.PROPERTY_SYSTEM_ID));
+        assertEquals("BOW1", valveProps.get(HaywardBindingConstants.PROPERTY_BOWID));
     }
 }
