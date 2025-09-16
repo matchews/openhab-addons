@@ -12,7 +12,23 @@ public class ConfigParserTest {
     public void testParsePopulatesAllListsAndAttributes() {
         String xml = "" +
                 "<MSPConfig>" +
-                "  <System systemId='SYS'/>" +
+                "  <System systemId='SYS'>" +
+                "    <Msp-Vsp-Speed-Format>Percent</Msp-Vsp-Speed-Format>" +
+                "    <Msp-Time-Format>12 Hour Format</Msp-Time-Format>" +
+                "    <Time-Zone>America/New_York</Time-Zone>" +
+                "    <DST>Enabled</DST>" +
+                "    <Internet-Time>Disabled</Internet-Time>" +
+                "    <Units>Metric</Units>" +
+                "    <Msp-Chlor-Display>Salt</Msp-Chlor-Display>" +
+                "    <Msp-Language>French</Msp-Language>" +
+                "    <UI-Show-Backyard>true</UI-Show-Backyard>" +
+                "    <UI-Show-Equipment>false</UI-Show-Equipment>" +
+                "    <UI-Show-Heaters>true</UI-Show-Heaters>" +
+                "    <UI-Show-Lights>true</UI-Show-Lights>" +
+                "    <UI-Show-Spillover>false</UI-Show-Spillover>" +
+                "    <UI-Show-SuperChlor>true</UI-Show-SuperChlor>" +
+                "    <UI-Show-SuperChlorTimeout>false</UI-Show-SuperChlorTimeout>" +
+                "  </System>" +
                 "  <Backyard systemId='BY'>" +
                 "    <BodyOfWater systemId='BOW'/>" +
                 "    <Pump systemId='P1' name='Main'/>" +
@@ -45,6 +61,21 @@ public class ConfigParserTest {
 
         SystemConfig system = config.getSystems().get(0);
         assertEquals("SYS", system.getSystemId());
+        assertEquals("Percent", system.getMspVspSpeedFormat());
+        assertEquals("12 Hour Format", system.getMspTimeFormat());
+        assertEquals("America/New_York", system.getTimeZone());
+        assertEquals("Enabled", system.getDst());
+        assertEquals("Disabled", system.getInternetTime());
+        assertEquals("Metric", system.getUnits());
+        assertEquals("Salt", system.getMspChlorDisplay());
+        assertEquals("French", system.getMspLanguage());
+        assertEquals("true", system.getUiShowBackyard());
+        assertEquals("false", system.getUiShowEquipment());
+        assertEquals("true", system.getUiShowHeaters());
+        assertEquals("true", system.getUiShowLights());
+        assertEquals("false", system.getUiShowSpillover());
+        assertEquals("true", system.getUiShowSuperChlor());
+        assertEquals("false", system.getUiShowSuperChlorTimeout());
 
         assertEquals(1, config.getBackyards().size());
 
