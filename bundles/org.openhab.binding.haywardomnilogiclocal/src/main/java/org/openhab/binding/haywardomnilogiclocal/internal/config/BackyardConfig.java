@@ -20,6 +20,22 @@ public class BackyardConfig {
     @XStreamAlias("systemId")
     private @Nullable String systemId;
 
+    @XStreamAlias("System-Id")
+    private @Nullable String systemIdElement;
+
+    @XStreamAsAttribute
+    private @Nullable String name;
+
+    @XStreamAlias("Name")
+    private @Nullable String nameElement;
+
+    @XStreamAsAttribute
+    @XStreamAlias("serviceModeTimeout")
+    private @Nullable String serviceModeTimeout;
+
+    @XStreamAlias("Service-Mode-Timeout")
+    private @Nullable String serviceModeTimeoutElement;
+
     @XStreamImplicit(itemFieldName = "BodyOfWater")
     private final List<BodyOfWaterConfig> bodiesOfWater = new ArrayList<>();
 
@@ -44,8 +60,19 @@ public class BackyardConfig {
     @XStreamImplicit(itemFieldName = "Relay")
     private final List<RelayConfig> relays = new ArrayList<>();
 
+    @XStreamImplicit(itemFieldName = "Sensor")
+    private final List<SensorConfig> sensors = new ArrayList<>();
+
     public @Nullable String getSystemId() {
-        return systemId;
+        return systemId != null ? systemId : systemIdElement;
+    }
+
+    public @Nullable String getName() {
+        return name != null ? name : nameElement;
+    }
+
+    public @Nullable String getServiceModeTimeout() {
+        return serviceModeTimeout != null ? serviceModeTimeout : serviceModeTimeoutElement;
     }
 
     public List<BodyOfWaterConfig> getBodiesOfWater() {
@@ -78,6 +105,10 @@ public class BackyardConfig {
 
     public List<RelayConfig> getRelays() {
         return relays;
+    }
+
+    public List<SensorConfig> getSensors() {
+        return sensors;
     }
 }
 
