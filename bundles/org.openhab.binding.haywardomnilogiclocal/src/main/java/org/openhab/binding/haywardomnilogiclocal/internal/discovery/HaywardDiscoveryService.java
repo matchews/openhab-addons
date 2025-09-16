@@ -81,6 +81,20 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
             putIfNotNull(backyardProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, systemId);
             onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_BACKYARD, "Backyard", backyardProps);
 
+            for (SensorConfig sensor : backyard.getSensors()) {
+                Map<String, Object> sensorProps = new HashMap<>();
+                sensorProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.SENSOR);
+                String sensorId = sensor.getSystemId();
+                putIfNotNull(sensorProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, sensorId);
+                putIfNotNull(sensorProps, HaywardBindingConstants.PROPERTY_SENSOR_TYPE, sensor.getType());
+                putIfNotNull(sensorProps, HaywardBindingConstants.PROPERTY_SENSOR_UNITS, sensor.getUnits());
+                String name = sensor.getName();
+                if (name == null) {
+                    name = sensorId != null ? sensorId : "Sensor";
+                }
+                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_SENSOR, name, sensorProps);
+            }
+
             for (BodyOfWaterConfig bow : backyard.getBodiesOfWater()) {
                 Map<String, Object> bowProps = new HashMap<>();
                 bowProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.BOW);

@@ -36,6 +36,9 @@ public class BackyardConfig {
     @XStreamAlias("Service-Mode-Timeout")
     private @Nullable String serviceModeTimeoutElement;
 
+    @XStreamImplicit(itemFieldName = "Sensor")
+    private final List<SensorConfig> sensors = new ArrayList<>();
+
     @XStreamImplicit(itemFieldName = "BodyOfWater")
     private final List<BodyOfWaterConfig> bodiesOfWater = new ArrayList<>();
 
@@ -55,6 +58,10 @@ public class BackyardConfig {
 
     public @Nullable String getServiceModeTimeout() {
         return serviceModeTimeout != null ? serviceModeTimeout : serviceModeTimeoutElement;
+    }
+
+    public List<SensorConfig> getSensors() {
+        return sensors;
     }
 
     public List<BodyOfWaterConfig> getBodiesOfWater() {
