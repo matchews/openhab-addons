@@ -16,6 +16,9 @@ public class SystemConfig {
     @XStreamAlias("systemId")
     private @Nullable String systemId;
 
+    @XStreamAlias("System-Id")
+    private @Nullable String systemIdElement;
+
     @XStreamAlias("Msp-Vsp-Speed-Format")
     private @Nullable String mspVspSpeedFormat;
 
@@ -62,7 +65,7 @@ public class SystemConfig {
     private @Nullable String uiShowSuperChlorTimeout;
 
     public @Nullable String getSystemId() {
-        return systemId;
+        return systemId != null ? systemId : systemIdElement;
     }
 
     public @Nullable String getMspVspSpeedFormat() {
