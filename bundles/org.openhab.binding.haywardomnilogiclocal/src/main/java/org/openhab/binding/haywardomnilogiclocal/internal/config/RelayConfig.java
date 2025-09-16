@@ -16,29 +16,41 @@ public class RelayConfig {
     @XStreamAlias("systemId")
     private @Nullable String systemId;
 
+    @XStreamAlias("System-Id")
+    private @Nullable String systemIdElement;
+
     @XStreamAsAttribute
     private @Nullable String name;
 
+    @XStreamAlias("Name")
+    private @Nullable String nameElement;
+
+    @XStreamAsAttribute
+    private @Nullable String typeAttribute;
+
     @XStreamAlias("Type")
-    private @Nullable String type;
+    private @Nullable String typeElement;
+
+    @XStreamAsAttribute
+    private @Nullable String functionAttribute;
 
     @XStreamAlias("Function")
-    private @Nullable String function;
+    private @Nullable String functionElement;
 
     public @Nullable String getSystemId() {
-        return systemId;
+        return systemId != null ? systemId : systemIdElement;
     }
 
     public @Nullable String getName() {
-        return name;
+        return name != null ? name : nameElement;
     }
 
     public @Nullable String getType() {
-        return type;
+        return typeAttribute != null ? typeAttribute : typeElement;
     }
 
     public @Nullable String getFunction() {
-        return function;
+        return functionAttribute != null ? functionAttribute : functionElement;
     }
 }
 

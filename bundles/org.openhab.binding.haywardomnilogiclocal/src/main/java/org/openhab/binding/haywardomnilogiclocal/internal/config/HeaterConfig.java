@@ -1,10 +1,16 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
+import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 
 /**
  * Representation of a Heater element.
@@ -16,15 +22,177 @@ public class HeaterConfig {
     @XStreamAlias("systemId")
     private @Nullable String systemId;
 
+    @XStreamAlias("System-Id")
+    private @Nullable String systemIdElement;
+
     @XStreamAsAttribute
     private @Nullable String type;
 
+    @XStreamAlias("Type")
+    private @Nullable String typeElement;
+
+    @XStreamAsAttribute
+    @XStreamAlias("sharedType")
+    private @Nullable String sharedTypeAttribute;
+
+    @XStreamAlias("Shared-Type")
+    private @Nullable String sharedTypeElement;
+
+    @XStreamAsAttribute
+    private @Nullable String enabledAttribute;
+
+    @XStreamAlias("Enabled")
+    private @Nullable String enabledElement;
+
+    @XStreamAsAttribute
+    @XStreamAlias("currentSetPoint")
+    private @Nullable String currentSetPointAttribute;
+
+    @XStreamAlias("Current-Set-Point")
+    private @Nullable String currentSetPointElement;
+
+    @XStreamAlias("Max-Water-Temp")
+    private @Nullable String maxWaterTemp;
+
+    @XStreamAlias("Min-Settable-Water-Temp")
+    private @Nullable String minSettableWaterTemp;
+
+    @XStreamAlias("Max-Settable-Water-Temp")
+    private @Nullable String maxSettableWaterTemp;
+
+    @XStreamAlias("Cooldown-Enabled")
+    private @Nullable String cooldownEnabled;
+
+    @XStreamImplicit(itemFieldName = "Operation")
+    private final List<OperationConfig> operations = new ArrayList<>();
+
     public @Nullable String getSystemId() {
-        return systemId;
+        return systemId != null ? systemId : systemIdElement;
     }
 
     public @Nullable String getType() {
-        return type;
+        return type != null ? type : typeElement;
+    }
+
+    public @Nullable String getSharedType() {
+        return sharedTypeAttribute != null ? sharedTypeAttribute : sharedTypeElement;
+    }
+
+    public @Nullable String getEnabled() {
+        return enabledAttribute != null ? enabledAttribute : enabledElement;
+    }
+
+    public @Nullable String getCurrentSetPoint() {
+        return currentSetPointAttribute != null ? currentSetPointAttribute : currentSetPointElement;
+    }
+
+    public @Nullable String getMaxWaterTemp() {
+        return maxWaterTemp;
+    }
+
+    public @Nullable String getMinSettableWaterTemp() {
+        return minSettableWaterTemp;
+    }
+
+    public @Nullable String getMaxSettableWaterTemp() {
+        return maxSettableWaterTemp;
+    }
+
+    public @Nullable String getCooldownEnabled() {
+        return cooldownEnabled;
+    }
+
+    public List<OperationConfig> getOperations() {
+        return operations;
+    }
+
+    @NonNullByDefault
+    @XStreamAlias("Operation")
+    @XStreamConverter(value = ToAttributedValueConverter.class, strings = "type")
+    public static class OperationConfig {
+        private @Nullable String type;
+
+        @XStreamImplicit(itemFieldName = "Action")
+        private final List<ActionConfig> actions = new ArrayList<>();
+
+        @XStreamImplicit(itemFieldName = "Heater-Equipment")
+        private final List<HeaterEquipmentConfig> heaterEquipment = new ArrayList<>();
+
+        public @Nullable String getType() {
+            return type;
+        }
+
+        public List<ActionConfig> getActions() {
+            return actions;
+        }
+
+        public List<HeaterEquipmentConfig> getHeaterEquipment() {
+            return heaterEquipment;
+        }
+    }
+
+    @NonNullByDefault
+    @XStreamAlias("Action")
+    @XStreamConverter(value = ToAttributedValueConverter.class, strings = "type")
+    public static class ActionConfig {
+        private @Nullable String type;
+
+        @XStreamImplicit(itemFieldName = "Device")
+        private final List<DeviceConfig> devices = new ArrayList<>();
+
+        @XStreamImplicit(itemFieldName = "Parameter")
+        private final List<ParameterConfig> parameters = new ArrayList<>();
+
+        public @Nullable String getType() {
+            return type;
+        }
+
+        public List<DeviceConfig> getDevices() {
+            return devices;
+        }
+
+        public List<ParameterConfig> getParameters() {
+            return parameters;
+        }
+    }
+
+    @NonNullByDefault
+    @XStreamAlias("Heater-Equipment")
+    public static class HeaterEquipmentConfig {
+        @XStreamAlias("System-Id")
+        private @Nullable String systemId;
+
+        @XStreamAlias("Name")
+        private @Nullable String name;
+
+        @XStreamAlias("Type")
+        private @Nullable String type;
+
+        @XStreamAlias("Heater-Type")
+        private @Nullable String heaterType;
+
+        @XStreamAlias("Enabled")
+        private @Nullable String enabled;
+
+        public @Nullable String getSystemId() {
+            return systemId;
+        }
+
+        public @Nullable String getName() {
+            return name;
+        }
+
+        public @Nullable String getType() {
+            return type;
+        }
+
+        public @Nullable String getHeaterType() {
+            return heaterType;
+        }
+
+        public @Nullable String getEnabled() {
+            return enabled;
+        }
     }
 }
 

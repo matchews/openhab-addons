@@ -16,8 +16,31 @@ public class ColorLogicLightConfig {
     @XStreamAlias("systemId")
     private @Nullable String systemId;
 
+    @XStreamAlias("System-Id")
+    private @Nullable String systemIdElement;
+
+    @XStreamAsAttribute
+    private @Nullable String nameAttribute;
+
+    @XStreamAlias("Name")
+    private @Nullable String nameElement;
+
+    @XStreamAsAttribute
+    private @Nullable String typeAttribute;
+
+    @XStreamAlias("Type")
+    private @Nullable String typeElement;
+
     public @Nullable String getSystemId() {
-        return systemId;
+        return systemId != null ? systemId : systemIdElement;
+    }
+
+    public @Nullable String getName() {
+        return nameAttribute != null ? nameAttribute : nameElement;
+    }
+
+    public @Nullable String getType() {
+        return typeAttribute != null ? typeAttribute : typeElement;
     }
 }
 
