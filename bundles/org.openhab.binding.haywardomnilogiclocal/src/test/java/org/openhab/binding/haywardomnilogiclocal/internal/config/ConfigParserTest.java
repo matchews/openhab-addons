@@ -1,6 +1,11 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 
@@ -9,169 +14,8 @@ import org.junit.jupiter.api.Test;
  */
 public class ConfigParserTest {
     @Test
-    public void testParsePopulatesAllListsAndAttributes() {
-        String xml = "" +
-                "<MSPConfig>" +
-                "  <System systemId='SYS'>" +
-                "    <Msp-Vsp-Speed-Format>Percent</Msp-Vsp-Speed-Format>" +
-                "    <Msp-Time-Format>12 Hour Format</Msp-Time-Format>" +
-                "    <Time-Zone>America/New_York</Time-Zone>" +
-                "    <DST>Enabled</DST>" +
-                "    <Internet-Time>Disabled</Internet-Time>" +
-                "    <Units>Metric</Units>" +
-                "    <Msp-Chlor-Display>Salt</Msp-Chlor-Display>" +
-                "    <Msp-Language>French</Msp-Language>" +
-                "    <UI-Show-Backyard>true</UI-Show-Backyard>" +
-                "    <UI-Show-Equipment>false</UI-Show-Equipment>" +
-                "    <UI-Show-Heaters>true</UI-Show-Heaters>" +
-                "    <UI-Show-Lights>true</UI-Show-Lights>" +
-                "    <UI-Show-Spillover>false</UI-Show-Spillover>" +
-                "    <UI-Show-SuperChlor>true</UI-Show-SuperChlor>" +
-                "    <UI-Show-SuperChlorTimeout>false</UI-Show-SuperChlorTimeout>" +
-                "  </System>" +
-                "  <Backyard>" +
-                "    <System-Id>BY</System-Id>" +
-                "    <Name>Main Backyard</Name>" +
-                "    <Service-Mode-Timeout>15</Service-Mode-Timeout>" +
-                "    <Sensor>" +
-                "      <System-Id>SENBY1</System-Id>" +
-                "      <Name>Air Sensor</Name>" +
-                "      <Type>SENSOR_AIR_TEMP</Type>" +
-                "      <Units>UNITS_FAHRENHEIT</Units>" +
-                "    </Sensor>" +
-                "    <BodyOfWater systemId='BOW' type='BOW_POOL' sharedType='BOW_SHARED_EQUIPMENT' supportsSpillover='yes'" +
-                "        spilloverMode='manual' spilloverTimedPercent='50' freezeProtectEnabled='yes'" +
-                "        freezeProtectSetPoint='38' sizeInLiters='56781'>" +
-                "      <Name>Main Pool</Name>" +
-                "      <Type>BOW_POOL</Type>" +
-                "      <Shared-Type>BOW_SHARED_EQUIPMENT</Shared-Type>" +
-                "      <Shared-Priority>SHARED_EQUIPMENT_HIGH_PRIORITY</Shared-Priority>" +
-                "      <Shared-Equipment-System-ID>BOW2</Shared-Equipment-System-ID>" +
-                "      <Use-Spillover-For-Filter-Operations>yes</Use-Spillover-For-Filter-Operations>" +
-                "      <Spillover-Manual-Timeout>10</Spillover-Manual-Timeout>" +
-                "      <Spillover-Timed-Timeout>20</Spillover-Timed-Timeout>" +
-                "      <Freeze-Protect-Override>no</Freeze-Protect-Override>" +
-                "      <Size-In-Gallons>15000</Size-In-Gallons>" +
-                "      <Filter systemId='F1' pumpId='P1'>" +
-                "        <Name>Filter Pump</Name>" +
-                "        <Shared-Type>BOW_SHARED_EQUIPMENT</Shared-Type>" +
-                "        <Filter-Type>FMT_VARIABLE_SPEED_PUMP</Filter-Type>" +
-                "        <Max-Pump-Speed>100</Max-Pump-Speed>" +
-                "        <Min-Pump-Speed>18</Min-Pump-Speed>" +
-                "        <Max-Pump-RPM>3450</Max-Pump-RPM>" +
-                "        <Min-Pump-RPM>600</Min-Pump-RPM>" +
-                "        <Vsp-Low-Pump-Speed>18</Vsp-Low-Pump-Speed>" +
-                "        <Vsp-Medium-Pump-Speed>50</Vsp-Medium-Pump-Speed>" +
-                "        <Vsp-High-Pump-Speed>100</Vsp-High-Pump-Speed>" +
-                "        <Vsp-Custom-Pump-Speed>80</Vsp-Custom-Pump-Speed>" +
-                "        <Operation>PEO_FILTER_SAMPLE" +
-                "          <Action>PEA_FILTER_SPEED" +
-                "            <Parameter name='Speed' dataType='int'>3200</Parameter>" +
-                "          </Action>" +
-                "        </Operation>" +
-                "      </Filter>" +
-                "      <Heater systemId='H1' type='gas' sharedType='BOW_SHARED_EQUIPMENT' enabled='yes' currentSetPoint='80'>" +
-                "        <Shared-Type>BOW_SHARED_EQUIPMENT</Shared-Type>" +
-                "        <Enabled>yes</Enabled>" +
-                "        <Current-Set-Point>82</Current-Set-Point>" +
-                "        <Max-Water-Temp>104</Max-Water-Temp>" +
-                "        <Min-Settable-Water-Temp>65</Min-Settable-Water-Temp>" +
-                "        <Max-Settable-Water-Temp>104</Max-Settable-Water-Temp>" +
-                "        <Cooldown-Enabled>no</Cooldown-Enabled>" +
-                "        <Operation>PEO_HEATER_EQUIPMENT" +
-                "          <Heater-Equipment>" +
-                "            <System-Id>HX1</System-Id>" +
-                "            <Name>Gas Heater</Name>" +
-                "            <Type>PET_HEATER</Type>" +
-                "            <Heater-Type>HTR_GAS</Heater-Type>" +
-                "            <Enabled>yes</Enabled>" +
-                "          </Heater-Equipment>" +
-                "        </Operation>" +
-                "        <Operation>PEO_HEATER_FLOW" +
-                "          <Action>PEA_FLOW" +
-                "            <Parameter name='Flow' dataType='int'>40</Parameter>" +
-                "          </Action>" +
-                "        </Operation>" +
-                "      </Heater>" +
-                "      <Chlorinator systemId='C1' sharedType='BOW_SHARED_EQUIPMENT' enabled='yes'>" +
-                "        <Name>Chlorinator</Name>" +
-                "        <Mode>CHLOR_OP_MODE_ORP_AUTO</Mode>" +
-                "        <Timed-Percent>50</Timed-Percent>" +
-                "        <SuperChlor-Timeout>24</SuperChlor-Timeout>" +
-                "        <Cell-Type>CELL_TYPE_T15</Cell-Type>" +
-                "        <ORP-Timeout>86400</ORP-Timeout>" +
-                "        <Operation>PEO_CHLOR_SAMPLE" +
-                "          <Action>PEA_SET_PERCENT" +
-                "            <Parameter name='Percent' dataType='int'>60</Parameter>" +
-                "          </Action>" +
-                "        </Operation>" +
-                "      </Chlorinator>" +
-                "      <ColorLogic-Light systemId='L1'>" +
-                "        <Name>Pool Light</Name>" +
-                "        <Type>COLOR_LOGIC_UCL</Type>" +
-                "      </ColorLogic-Light>" +
-                "      <Relay systemId='R1' name='Aux1'>" +
-                "        <Type>RLY_HIGH_VOLTAGE_RELAY</Type>" +
-                "        <Function>GENERIC</Function>" +
-                "      </Relay>" +
-                "      <Sensor>" +
-                "        <System-Id>SEN1</System-Id>" +
-                "        <Name>Water Sensor</Name>" +
-                "        <Type>SENSOR_WATER_TEMP</Type>" +
-                "        <Units>UNITS_FAHRENHEIT</Units>" +
-                "        <Operation>PEO_SENSOR_SAMPLE" +
-                "          <Parameter name='SampleRate' dataType='int'>5</Parameter>" +
-                "          <Action>PEA_SENSOR_REPORT" +
-                "            <Parameter name='Interval' dataType='int'>15</Parameter>" +
-                "          </Action>" +
-                "        </Operation>" +
-                "      </Sensor>" +
-                "    </BodyOfWater>" +
-                "    <Pump systemId='P1' name='Main'>" +
-                "      <Type>PMP_VARIABLE_SPEED_PUMP</Type>" +
-                "      <Function>PMP_FILTER</Function>" +
-                "      <Max-Pump-RPM>3450</Max-Pump-RPM>" +
-                "      <Min-Pump-RPM>600</Min-Pump-RPM>" +
-                "      <Min-Pump-Speed>20</Min-Pump-Speed>" +
-                "      <Max-Pump-Speed>100</Max-Pump-Speed>" +
-                "      <Vsp-Medium-Pump-Speed>60</Vsp-Medium-Pump-Speed>" +
-                "      <Vsp-Custom-Pump-Speed>70</Vsp-Custom-Pump-Speed>" +
-                "      <Vsp-High-Pump-Speed>100</Vsp-High-Pump-Speed>" +
-                "      <Vsp-Low-Pump-Speed>30</Vsp-Low-Pump-Speed>" +
-                "      <Operation>PEO_PUMP_SAMPLE" +
-                "        <Action>PEA_SET_SPEED" +
-                "          <Parameter name='Speed' dataType='int'>3100</Parameter>" +
-                "        </Action>" +
-                "        <Operation>PEO_PUMP_CHILD" +
-                "          <Action>PEA_CHILD_SPEED" +
-                "            <Parameter name='Speed' dataType='int'>2800</Parameter>" +
-                "          </Action>" +
-                "        </Operation>" +
-                "      </Operation>" +
-                "    </Pump>" +
-                "    <VirtualHeater systemId='VH1' name='Spa Heat' enable='yes' currentSetPoint='90'>" +
-                "      <Enable>yes</Enable>" +
-                "      <Current-Set-Point>92</Current-Set-Point>" +
-                "    </VirtualHeater>" +
-                "  </Backyard>" +
-                "  <Schedules>" +
-                "    <Schedule systemId='SCH1' name='Filter' type='equipment'>" +
-                "      <Device systemId='P1' name='Main Pump' type='Pump'/>" +
-                "      <Parameter name='StartTimeHours' dataType='int'>6</Parameter>" +
-                "      <Action type='on'>" +
-                "        <Device systemId='R1' name='Aux1' type='Relay'/>" +
-                "      </Action>" +
-                "    </Schedule>" +
-                "  </Schedules>" +
-                "  <DMT>" +
-                "    <Device systemId='DEV1' name='Filter Pump' type='Pump'>" +
-                "      <Parameter name='Speed' dataType='int'>3450</Parameter>" +
-                "    </Device>" +
-                "  </DMT>" +
-                "  <CHECKSUM>12345</CHECKSUM>" +
-                "</MSPConfig>";
-
-        MspConfig config = ConfigParser.parse(xml);
+    public void testParsePopulatesAllListsAndAttributes() throws IOException {
+        MspConfig config = parseSampleConfiguration();
         assertEquals(1, config.getSystems().size());
 
         SystemConfig system = config.getSystems().get(0);
@@ -361,6 +205,12 @@ public class ConfigParserTest {
         assertEquals(1, pumpAction.getParameters().size());
         assertEquals("Speed", pumpAction.getParameters().get(0).getName());
         assertEquals("3100", pumpAction.getParameters().get(0).getValue());
+        assertEquals(1, pumpAction.getOperations().size());
+        OperationConfig pumpActionNestedOperation = pumpAction.getOperations().get(0);
+        assertEquals("PEO_ACTION_CHILD", pumpActionNestedOperation.getType());
+        assertEquals(1, pumpActionNestedOperation.getParameters().size());
+        assertEquals("ChildParam", pumpActionNestedOperation.getParameters().get(0).getName());
+        assertEquals("1", pumpActionNestedOperation.getParameters().get(0).getValue());
         assertEquals(1, pumpOperation.getOperations().size());
         OperationConfig nestedPumpOperation = pumpOperation.getOperations().get(0);
         assertEquals("PEO_PUMP_CHILD", nestedPumpOperation.getType());
@@ -395,6 +245,10 @@ public class ConfigParserTest {
         assertEquals("on", action.getType());
         assertEquals(1, action.getDevices().size());
         assertEquals("R1", action.getDevices().get(0).getSystemId());
+        assertEquals(1, action.getParameters().size());
+        ParameterConfig scheduleActionParameter = action.getParameters().get(0);
+        assertEquals("Duration", scheduleActionParameter.getName());
+        assertEquals("30", scheduleActionParameter.getValue());
 
         assertEquals(1, config.getDmt().getDevices().size());
         DeviceConfig device = config.getDmt().getDevices().get(0);
@@ -406,6 +260,29 @@ public class ConfigParserTest {
         assertEquals("3450", device.getParameters().get(0).getValue());
 
         assertEquals("12345", config.getChecksum());
+    }
+
+    @Test
+    public void testParseSampleConfigurationNestedActionOperations() throws IOException {
+        MspConfig config = parseSampleConfiguration();
+
+        PumpConfig pump = config.getBackyards().get(0).getPumps().get(0);
+        OperationConfig pumpOperation = pump.getOperations().get(0);
+        ActionConfig pumpAction = pumpOperation.getActions().get(0);
+
+        assertEquals(1, pumpAction.getOperations().size());
+        OperationConfig nestedOperation = pumpAction.getOperations().get(0);
+        assertEquals("PEO_ACTION_CHILD", nestedOperation.getType());
+        assertEquals("ChildParam", nestedOperation.getParameters().get(0).getName());
+        assertEquals("1", nestedOperation.getParameters().get(0).getValue());
+    }
+
+    private static MspConfig parseSampleConfiguration() throws IOException {
+        try (InputStream stream = ConfigParserTest.class.getResourceAsStream("request-configuration-sample.xml")) {
+            assertNotNull(stream, "Sample RequestConfiguration XML is missing");
+            String xml = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+            return ConfigParser.parse(xml);
+        }
     }
 }
 
