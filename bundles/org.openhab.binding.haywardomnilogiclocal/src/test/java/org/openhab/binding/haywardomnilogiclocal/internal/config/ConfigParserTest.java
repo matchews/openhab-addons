@@ -33,6 +33,12 @@ public class ConfigParserTest {
                 "    <System-Id>BY</System-Id>" +
                 "    <Name>Main Backyard</Name>" +
                 "    <Service-Mode-Timeout>15</Service-Mode-Timeout>" +
+                "    <Sensor>" +
+                "      <System-Id>SENBY1</System-Id>" +
+                "      <Name>Air Sensor</Name>" +
+                "      <Type>SENSOR_AIR_TEMP</Type>" +
+                "      <Units>UNITS_FAHRENHEIT</Units>" +
+                "    </Sensor>" +
                 "    <BodyOfWater systemId='BOW' type='BOW_POOL' sharedType='BOW_SHARED_EQUIPMENT' supportsSpillover='yes'" +
                 "        spilloverMode='manual' spilloverTimedPercent='50' freezeProtectEnabled='yes'" +
                 "        freezeProtectSetPoint='38' sizeInLiters='56781'>" +
@@ -113,6 +119,11 @@ public class ConfigParserTest {
                 "        <Name>Water Sensor</Name>" +
                 "        <Type>SENSOR_WATER_TEMP</Type>" +
                 "        <Units>UNITS_FAHRENHEIT</Units>" +
+                "        <Operation>PEO_SENSOR_SAMPLE" +
+                "          <Action>PEA_SENSOR_REPORT" +
+                "            <Parameter name='Interval' dataType='int'>15</Parameter>" +
+                "          </Action>" +
+                "        </Operation>" +
                 "      </Sensor>" +
                 "    </BodyOfWater>" +
                 "    <Pump systemId='P1' name='Main'>" +
@@ -181,6 +192,13 @@ public class ConfigParserTest {
         assertEquals("BY", backyard.getSystemId());
         assertEquals("Main Backyard", backyard.getName());
         assertEquals("15", backyard.getServiceModeTimeout());
+        assertEquals(1, backyard.getSensors().size());
+        SensorConfig backyardSensor = backyard.getSensors().get(0);
+        assertEquals("SENBY1", backyardSensor.getSystemId());
+        assertEquals("Air Sensor", backyardSensor.getName());
+        assertEquals("SENSOR_AIR_TEMP", backyardSensor.getType());
+        assertEquals("UNITS_FAHRENHEIT", backyardSensor.getUnits());
+        assertEquals(0, backyardSensor.getOperations().size());
         assertEquals(1, backyard.getBodiesOfWater().size());
         BodyOfWaterConfig bow = backyard.getBodiesOfWater().get(0);
         assertEquals("BOW", bow.getSystemId());
@@ -298,6 +316,16 @@ public class ConfigParserTest {
         assertEquals("Water Sensor", sensor.getName());
         assertEquals("SENSOR_WATER_TEMP", sensor.getType());
         assertEquals("UNITS_FAHRENHEIT", sensor.getUnits());
+        assertEquals(1, sensor.getOperations().size());
+        SensorConfig.OperationConfig sensorOperation = sensor.getOperations().get(0);
+        assertEquals("PEO_SENSOR_SAMPLE", sensorOperation.getType());
+        assertEquals(1, sensorOperation.getActions().size());
+        SensorConfig.ActionConfig sensorAction = sensorOperation.getActions().get(0);
+        assertEquals("PEA_SENSOR_REPORT", sensorAction.getType());
+        assertEquals(0, sensorAction.getDevices().size());
+        assertEquals(1, sensorAction.getParameters().size());
+        assertEquals("Interval", sensorAction.getParameters().get(0).getName());
+        assertEquals("15", sensorAction.getParameters().get(0).getValue());
 
         assertEquals(1, backyard.getPumps().size());
         PumpConfig pump = backyard.getPumps().get(0);

@@ -1,6 +1,7 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.discovery;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class HaywardDiscoveryServiceTest {
                 "<MSPConfig>" +
                 "  <System systemId='SYS'/>" +
                 "  <Backyard systemId='BY'>" +
+                "    <Sensor systemId='S2' name='Air' type='SENSOR_AIR_TEMP' units='UNITS_FAHRENHEIT'/>" +
                 "    <BodyOfWater systemId='BOW1' name='Pool' type='BOW_POOL' sharedType='BOW_SHARED_EQUIPMENT'" +
                 "        sharedPriority='SHARED_EQUIPMENT_HIGH_PRIORITY' sharedEquipmentSystemId='BOW2'" +
                 "        supportsSpillover='yes' sizeInGallons='15000'>" +
@@ -61,19 +63,28 @@ public class HaywardDiscoveryServiceTest {
         TestDiscoveryService service = new TestDiscoveryService();
         service.mspConfigDiscovery(xml);
 
-        assertEquals(13, service.types.size());
+        assertEquals(14, service.types.size());
         assertEquals(2, service.types.stream().filter(t -> t.equals(HaywardBindingConstants.THING_TYPE_PUMP)).count());
         assertEquals(2, service.types.stream().filter(t -> t.equals(HaywardBindingConstants.THING_TYPE_FILTER)).count());
         assertEquals(2, service.types.stream().filter(t -> t.equals(HaywardBindingConstants.THING_TYPE_BOW)).count());
-        assertEquals(1, service.types.stream().filter(t -> t.equals(HaywardBindingConstants.THING_TYPE_SENSOR)).count());
+        assertEquals(2, service.types.stream().filter(t -> t.equals(HaywardBindingConstants.THING_TYPE_SENSOR)).count());
 
         Map<String, Object> bowProps = null;
+        Map<String, Object> backyardSensorProps = null;
         for (int i = 0; i < service.types.size(); i++) {
+            if (bowProps != null && backyardSensorProps != null) {
+                break;
+            }
             if (service.types.get(i).equals(HaywardBindingConstants.THING_TYPE_BOW)) {
                 Map<String, Object> properties = service.propertyMaps.get(i);
                 if ("BOW1".equals(properties.get(HaywardBindingConstants.PROPERTY_SYSTEM_ID))) {
                     bowProps = properties;
-                    break;
+                }
+            }
+            if (service.types.get(i).equals(HaywardBindingConstants.THING_TYPE_SENSOR)) {
+                Map<String, Object> properties = service.propertyMaps.get(i);
+                if ("S2".equals(properties.get(HaywardBindingConstants.PROPERTY_SYSTEM_ID))) {
+                    backyardSensorProps = properties;
                 }
             }
         }
@@ -87,6 +98,12 @@ public class HaywardDiscoveryServiceTest {
         assertEquals("BOW2", bowProps.get(HaywardBindingConstants.PROPERTY_BOW_SHAREDEQUIPID));
         assertEquals("yes", bowProps.get(HaywardBindingConstants.PROPERTY_BOW_SUPPORTSSPILLOVER));
         assertEquals("15000", bowProps.get(HaywardBindingConstants.PROPERTY_BOW_SIZEINGALLONS));
+
+        assertNotNull(backyardSensorProps);
+        assertEquals(HaywardTypeToRequest.SENSOR, backyardSensorProps.get(HaywardBindingConstants.PROPERTY_TYPE));
+        assertEquals("SENSOR_AIR_TEMP", backyardSensorProps.get(HaywardBindingConstants.PROPERTY_SENSOR_TYPE));
+        assertEquals("UNITS_FAHRENHEIT", backyardSensorProps.get(HaywardBindingConstants.PROPERTY_SENSOR_UNITS));
+        assertFalse(backyardSensorProps.containsKey(HaywardBindingConstants.PROPERTY_BOWID));
     }
 
     @Test
