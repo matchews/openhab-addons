@@ -9,8 +9,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
-import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 
 /**
  * Representation of a Filter element.
@@ -135,47 +133,5 @@ public class FilterConfig {
         return operations;
     }
 
-    @NonNullByDefault
-    @XStreamAlias("Operation")
-    @XStreamConverter(value = ToAttributedValueConverter.class, strings = "type")
-    public static class OperationConfig {
-        private @Nullable String type;
-
-        @XStreamImplicit(itemFieldName = "Action")
-        private final List<ActionConfig> actions = new ArrayList<>();
-
-        public @Nullable String getType() {
-            return type;
-        }
-
-        public List<ActionConfig> getActions() {
-            return actions;
-        }
-    }
-
-    @NonNullByDefault
-    @XStreamAlias("Action")
-    @XStreamConverter(value = ToAttributedValueConverter.class, strings = "type")
-    public static class ActionConfig {
-        private @Nullable String type;
-
-        @XStreamImplicit(itemFieldName = "Device")
-        private final List<DeviceConfig> devices = new ArrayList<>();
-
-        @XStreamImplicit(itemFieldName = "Parameter")
-        private final List<ParameterConfig> parameters = new ArrayList<>();
-
-        public @Nullable String getType() {
-            return type;
-        }
-
-        public List<DeviceConfig> getDevices() {
-            return devices;
-        }
-
-        public List<ParameterConfig> getParameters() {
-            return parameters;
-        }
-    }
 }
 
