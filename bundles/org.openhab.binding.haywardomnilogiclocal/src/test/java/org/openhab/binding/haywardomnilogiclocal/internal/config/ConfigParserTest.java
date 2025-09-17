@@ -277,9 +277,50 @@ public class ConfigParserTest {
         assertEquals("1", nestedOperation.getParameters().get(0).getValue());
     }
 
+    @Test
+    public void testParseSchedulesWithScheElements() throws IOException {
+        MspConfig config = parseConfigurationResource("request-configuration-msp-sample.xml");
+
+        assertEquals(2, config.getSchedules().size());
+
+        ScheduleConfig firstSchedule = config.getSchedules().get(0);
+        assertEquals("SCH1", firstSchedule.getSystemId());
+        assertEquals("Filter Schedule", firstSchedule.getName());
+        assertEquals("equipment", firstSchedule.getType());
+        assertEquals("pump", firstSchedule.getSubType());
+        assertEquals("yes", firstSchedule.getEnabled());
+        assertEquals(1, firstSchedule.getDevices().size());
+        assertEquals("P1", firstSchedule.getDevices().get(0).getSystemId());
+        assertEquals(1, firstSchedule.getParameters().size());
+        assertEquals("StartTimeHours", firstSchedule.getParameters().get(0).getName());
+        assertEquals("6", firstSchedule.getParameters().get(0).getValue());
+        assertEquals(1, firstSchedule.getActions().size());
+        ScheduleActionConfig firstAction = firstSchedule.getActions().get(0);
+        assertEquals("on", firstAction.getType());
+        assertEquals(1, firstAction.getParameters().size());
+        assertEquals("Duration", firstAction.getParameters().get(0).getName());
+        assertEquals("30", firstAction.getParameters().get(0).getValue());
+
+        ScheduleConfig secondSchedule = config.getSchedules().get(1);
+        assertEquals("SCH2", secondSchedule.getSystemId());
+        assertEquals("Chlorinator", secondSchedule.getName());
+        assertEquals("equipment", secondSchedule.getType());
+        assertEquals("chlorinator", secondSchedule.getSubType());
+        assertEquals("no", secondSchedule.getEnabled());
+        assertEquals(0, secondSchedule.getDevices().size());
+        assertEquals(1, secondSchedule.getParameters().size());
+        assertEquals("StartTimeHours", secondSchedule.getParameters().get(0).getName());
+        assertEquals("2", secondSchedule.getParameters().get(0).getValue());
+        assertEquals(0, secondSchedule.getActions().size());
+    }
+
     private static MspConfig parseSampleConfiguration() throws IOException {
-        try (InputStream stream = ConfigParserTest.class.getResourceAsStream("request-configuration-sample.xml")) {
-            assertNotNull(stream, "Sample RequestConfiguration XML is missing");
+        return parseConfigurationResource("request-configuration-sample.xml");
+    }
+
+    private static MspConfig parseConfigurationResource(String resourceName) throws IOException {
+        try (InputStream stream = ConfigParserTest.class.getResourceAsStream(resourceName)) {
+            assertNotNull(stream, "Sample RequestConfiguration XML is missing: " + resourceName);
             String xml = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
             return ConfigParser.parse(xml);
         }
