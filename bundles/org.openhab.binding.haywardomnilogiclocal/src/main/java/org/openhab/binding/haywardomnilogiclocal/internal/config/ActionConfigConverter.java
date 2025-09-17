@@ -22,17 +22,17 @@ public class ActionConfigConverter implements Converter {
     private static final String NODE_PARAMETER = "Parameter";
 
     @Override
-    public boolean canConvert(Class<?> type) {
-        return ActionConfig.class.isAssignableFrom(type);
+    public boolean canConvert(@Nullable Class<?> type) {
+        return type != null && ActionConfig.class.isAssignableFrom(type);
     }
 
     @Override
-    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+    public void marshal(@Nullable Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         throw new UnsupportedOperationException("ActionConfigConverter only supports unmarshalling");
     }
 
     @Override
-    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+    public @Nullable Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         ActionConfig action = new ActionConfig();
 
         action.setLegacyType(reader.getValue());
