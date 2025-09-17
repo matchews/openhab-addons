@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MSPConfig>
+  <DMT>
+    <Device>
+      <Device-System-Id>DEV-PARENT</Device-System-Id>
+      <Device-Name>Water Feature Pump</Device-Name>
+      <Device-Type>PMP_WATER_FEATURE</Device-Type>
+      <Device-Sub-Type>PMP_FEATURE</Device-Sub-Type>
+      <Device-Parent-System-Id>BY1</Device-Parent-System-Id>
+      <Node-ID>NODE-001</Node-ID>
+      <Devices>
+        <Device>
+          <Device-System-Id>DEV-CHILD</Device-System-Id>
+          <Device-Name>Waterfall Light</Device-Name>
+          <Device-Type>LIGHT_COLOR_LOGIC</Device-Type>
+          <Device-Sub-Type>LIGHT_FEATURE</Device-Sub-Type>
+          <Device-Parent-System-Id>DEV-PARENT</Device-Parent-System-Id>
+          <Node-ID>NODE-002</Node-ID>
+        </Device>
+      </Devices>
+    </Device>
+  </DMT>
+</MSPConfig>
