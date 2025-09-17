@@ -44,14 +44,29 @@
         <Name>Filter Pump</Name>
         <Shared-Type>BOW_SHARED_EQUIPMENT</Shared-Type>
         <Filter-Type>FMT_VARIABLE_SPEED_PUMP</Filter-Type>
-        <Max-Pump-Speed>100</Max-Pump-Speed>
-        <Min-Pump-Speed>18</Min-Pump-Speed>
-        <Max-Pump-RPM>3450</Max-Pump-RPM>
-        <Min-Pump-RPM>600</Min-Pump-RPM>
-        <Vsp-Low-Pump-Speed>18</Vsp-Low-Pump-Speed>
-        <Vsp-Medium-Pump-Speed>50</Vsp-Medium-Pump-Speed>
-        <Vsp-High-Pump-Speed>100</Vsp-High-Pump-Speed>
-        <Vsp-Custom-Pump-Speed>80</Vsp-Custom-Pump-Speed>
+          <Max-Pump-Speed>100</Max-Pump-Speed>
+          <Min-Pump-Speed>18</Min-Pump-Speed>
+          <Max-Pump-RPM>3450</Max-Pump-RPM>
+          <Min-Pump-RPM>600</Min-Pump-RPM>
+          <Min-Priming-Interval>5</Min-Priming-Interval>
+          <Priming-Enabled>yes</Priming-Enabled>
+          <Priming-Duration>60</Priming-Duration>
+          <Cooldown-Duration>120</Cooldown-Duration>
+          <Shutdown-Request-Timeout>30</Shutdown-Request-Timeout>
+          <No-Water-Flow-Timeout-Enable>yes</No-Water-Flow-Timeout-Enable>
+          <No-Water-Flow-Timeout-Timeout>240</No-Water-Flow-Timeout-Timeout>
+          <Valve-Change-Off-Enable>no</Valve-Change-Off-Enable>
+          <Valve-Change-Off-Duration>10</Valve-Change-Off-Duration>
+          <Freeze-Protect-Enable>yes</Freeze-Protect-Enable>
+          <Freeze-Protect-Temp>37</Freeze-Protect-Temp>
+          <Freeze-Protect-Speed>65</Freeze-Protect-Speed>
+          <Shared-Filter-Timeout>45</Shared-Filter-Timeout>
+          <Filter-Valve-Position>FLT_VALVES_POS_POOL_ONLY</Filter-Valve-Position>
+          <Freeze-Protect-Override-Interval>90</Freeze-Protect-Override-Interval>
+          <Vsp-Low-Pump-Speed>18</Vsp-Low-Pump-Speed>
+          <Vsp-Medium-Pump-Speed>50</Vsp-Medium-Pump-Speed>
+          <Vsp-High-Pump-Speed>100</Vsp-High-Pump-Speed>
+          <Vsp-Custom-Pump-Speed>80</Vsp-Custom-Pump-Speed>
         <Operation>PEO_FILTER_SAMPLE
           <Action>PEA_FILTER_SPEED
             <Parameter name="Speed" dataType="int">3200</Parameter>
