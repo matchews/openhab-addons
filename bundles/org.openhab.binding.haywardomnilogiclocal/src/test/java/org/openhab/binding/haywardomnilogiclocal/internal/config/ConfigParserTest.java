@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -312,6 +313,33 @@ public class ConfigParserTest {
         assertEquals("StartTimeHours", secondSchedule.getParameters().get(0).getName());
         assertEquals("2", secondSchedule.getParameters().get(0).getValue());
         assertEquals(0, secondSchedule.getActions().size());
+    }
+
+    @Test
+    public void testParseDmtNestedDevices() throws IOException {
+        MspConfig config = parseConfigurationResource("request-dmt-nested-sample.xml");
+
+        List<DeviceConfig> devices = config.getDmt().getDevices();
+        assertEquals(1, devices.size());
+
+        DeviceConfig parentDevice = devices.get(0);
+        assertEquals("DEV-PARENT", parentDevice.getSystemId());
+        assertEquals("Water Feature Pump", parentDevice.getName());
+        assertEquals("PMP_WATER_FEATURE", parentDevice.getType());
+        assertEquals("PMP_FEATURE", parentDevice.getSubType());
+        assertEquals("BY1", parentDevice.getParentSystemId());
+        assertEquals("NODE-001", parentDevice.getNodeId());
+
+        List<DeviceConfig> childDevices = parentDevice.getChildDevices();
+        assertEquals(1, childDevices.size());
+
+        DeviceConfig childDevice = childDevices.get(0);
+        assertEquals("DEV-CHILD", childDevice.getSystemId());
+        assertEquals("Waterfall Light", childDevice.getName());
+        assertEquals("LIGHT_COLOR_LOGIC", childDevice.getType());
+        assertEquals("LIGHT_FEATURE", childDevice.getSubType());
+        assertEquals("DEV-PARENT", childDevice.getParentSystemId());
+        assertEquals("NODE-002", childDevice.getNodeId());
     }
 
     private static MspConfig parseSampleConfiguration() throws IOException {
