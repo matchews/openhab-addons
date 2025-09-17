@@ -14,8 +14,12 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 @NonNullByDefault
 @XStreamAlias("Schedules")
 public class SchedulesConfig {
-    @XStreamImplicit(itemFieldName = "Schedule")
+    @XStreamImplicit(itemFieldName = "sche")
     private final List<ScheduleConfig> schedules = new ArrayList<>();
+
+    @SuppressWarnings("unused")
+    @XStreamImplicit(itemFieldName = "Schedule")
+    private final List<ScheduleConfig> legacySchedules = schedules;
 
     public List<ScheduleConfig> getSchedules() {
         return schedules;

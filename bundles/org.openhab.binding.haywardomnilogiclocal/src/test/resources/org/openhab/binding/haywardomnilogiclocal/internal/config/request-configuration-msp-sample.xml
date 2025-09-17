@@ -1,0 +1,19 @@
+<MSPConfig>
+  <Schedules>
+    <sche>
+      <system-id>SCH1</system-id>
+      <name>Filter Schedule</name>
+      <type>equipment</type>
+      <sub-type>pump</sub-type>
+      <enabled>yes</enabled>
+      <device systemId="P1" name="Main Pump" type="Pump" />
+      <parameter name="StartTimeHours" dataType="int">6</parameter>
+      <action type="on">
+        <parameter name="Duration" dataType="int">30</parameter>
+      </action>
+    </sche>
+    <sche system-id="SCH2" name="Chlorinator" type="equipment" sub-type="chlorinator" enabled="no">
+      <parameter name="StartTimeHours" dataType="int">2</parameter>
+    </sche>
+  </Schedules>
+</MSPConfig>
