@@ -88,7 +88,10 @@ public class ConfigParserTest {
         assertEquals("PEO_FILTER_SAMPLE", filterOperation.getType());
         assertEquals(1, filterOperation.getActions().size());
         ActionConfig filterAction = filterOperation.getActions().get(0);
+        assertEquals("PEA_FILTER_SPEED", filterAction.getActionFunction());
         assertEquals("PEA_FILTER_SPEED", filterAction.getType());
+        assertEquals(List.of("3200", "RPM"), filterAction.getActionData());
+        assertEquals("3200", filterAction.getActionDataValue(1));
         assertEquals(0, filterAction.getDevices().size());
         assertEquals(1, filterAction.getParameters().size());
         assertEquals("Speed", filterAction.getParameters().get(0).getName());
@@ -120,7 +123,8 @@ public class ConfigParserTest {
         assertEquals("PEO_HEATER_FLOW", heaterFlowOp.getType());
         assertEquals(1, heaterFlowOp.getActions().size());
         ActionConfig heaterFlowAction = heaterFlowOp.getActions().get(0);
-        assertEquals("PEA_FLOW", heaterFlowAction.getType());
+        assertEquals("PEA_FLOW", heaterFlowAction.getActionFunction());
+        assertEquals("40", heaterFlowAction.getActionDataValue(1));
         assertEquals(0, heaterFlowAction.getDevices().size());
         assertEquals(1, heaterFlowAction.getParameters().size());
         assertEquals("Flow", heaterFlowAction.getParameters().get(0).getName());
@@ -142,7 +146,8 @@ public class ConfigParserTest {
         assertEquals("PEO_CHLOR_SAMPLE", chlorinatorOp.getType());
         assertEquals(1, chlorinatorOp.getActions().size());
         ActionConfig chlorinatorAction = chlorinatorOp.getActions().get(0);
-        assertEquals("PEA_SET_PERCENT", chlorinatorAction.getType());
+        assertEquals("PEA_SET_PERCENT", chlorinatorAction.getActionFunction());
+        assertEquals(List.of("60"), chlorinatorAction.getActionData());
         assertEquals(0, chlorinatorAction.getDevices().size());
         assertEquals(1, chlorinatorAction.getParameters().size());
         assertEquals("Percent", chlorinatorAction.getParameters().get(0).getName());
@@ -174,7 +179,8 @@ public class ConfigParserTest {
         assertEquals("5", sensorOperationParameter.getValue());
         assertEquals(1, sensorOperation.getActions().size());
         ActionConfig sensorAction = sensorOperation.getActions().get(0);
-        assertEquals("PEA_SENSOR_REPORT", sensorAction.getType());
+        assertEquals("PEA_SENSOR_REPORT", sensorAction.getActionFunction());
+        assertEquals("15", sensorAction.getActionDataValue(1));
         assertEquals(0, sensorAction.getDevices().size());
         assertEquals(1, sensorAction.getParameters().size());
         assertEquals("Interval", sensorAction.getParameters().get(0).getName());
@@ -199,7 +205,8 @@ public class ConfigParserTest {
         assertEquals("PEO_PUMP_SAMPLE", pumpOperation.getType());
         assertEquals(1, pumpOperation.getActions().size());
         ActionConfig pumpAction = pumpOperation.getActions().get(0);
-        assertEquals("PEA_SET_SPEED", pumpAction.getType());
+        assertEquals("PEA_SET_SPEED", pumpAction.getActionFunction());
+        assertEquals("3100", pumpAction.getActionDataValue(1));
         assertEquals(0, pumpAction.getDevices().size());
         assertEquals(1, pumpAction.getParameters().size());
         assertEquals("Speed", pumpAction.getParameters().get(0).getName());
@@ -215,7 +222,8 @@ public class ConfigParserTest {
         assertEquals("PEO_PUMP_CHILD", nestedPumpOperation.getType());
         assertEquals(1, nestedPumpOperation.getActions().size());
         ActionConfig nestedPumpAction = nestedPumpOperation.getActions().get(0);
-        assertEquals("PEA_CHILD_SPEED", nestedPumpAction.getType());
+        assertEquals("PEA_CHILD_SPEED", nestedPumpAction.getActionFunction());
+        assertEquals("2800", nestedPumpAction.getActionDataValue(1));
         assertEquals(1, nestedPumpAction.getParameters().size());
         assertEquals("Speed", nestedPumpAction.getParameters().get(0).getName());
         assertEquals("2800", nestedPumpAction.getParameters().get(0).getValue());

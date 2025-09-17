@@ -68,7 +68,10 @@
           <Vsp-High-Pump-Speed>100</Vsp-High-Pump-Speed>
           <Vsp-Custom-Pump-Speed>80</Vsp-Custom-Pump-Speed>
         <Operation>PEO_FILTER_SAMPLE
-          <Action>PEA_FILTER_SPEED
+          <Action>
+            <Action-Function>PEA_FILTER_SPEED</Action-Function>
+            <Action-Data1>3200</Action-Data1>
+            <Action-Data2>RPM</Action-Data2>
             <Parameter name="Speed" dataType="int">3200</Parameter>
           </Action>
         </Operation>
@@ -91,7 +94,9 @@
           </Heater-Equipment>
         </Operation>
         <Operation>PEO_HEATER_FLOW
-          <Action>PEA_FLOW
+          <Action>
+            <Action-Function>PEA_FLOW</Action-Function>
+            <Action-Data1>40</Action-Data1>
             <Parameter name="Flow" dataType="int">40</Parameter>
           </Action>
         </Operation>
@@ -104,7 +109,9 @@
         <Cell-Type>CELL_TYPE_T15</Cell-Type>
         <ORP-Timeout>86400</ORP-Timeout>
         <Operation>PEO_CHLOR_SAMPLE
-          <Action>PEA_SET_PERCENT
+          <Action>
+            <Action-Function>PEA_SET_PERCENT</Action-Function>
+            <Action-Data1>60</Action-Data1>
             <Parameter name="Percent" dataType="int">60</Parameter>
           </Action>
         </Operation>
@@ -124,7 +131,9 @@
         <Units>UNITS_FAHRENHEIT</Units>
         <Operation>PEO_SENSOR_SAMPLE
           <Parameter name="SampleRate" dataType="int">5</Parameter>
-          <Action>PEA_SENSOR_REPORT
+          <Action>
+            <Action-Function>PEA_SENSOR_REPORT</Action-Function>
+            <Action-Data1>15</Action-Data1>
             <Parameter name="Interval" dataType="int">15</Parameter>
           </Action>
         </Operation>
@@ -142,14 +151,18 @@
       <Vsp-High-Pump-Speed>100</Vsp-High-Pump-Speed>
       <Vsp-Low-Pump-Speed>30</Vsp-Low-Pump-Speed>
       <Operation>PEO_PUMP_SAMPLE
-        <Action>PEA_SET_SPEED
+        <Action>
+          <Action-Function>PEA_SET_SPEED</Action-Function>
+          <Action-Data1>3100</Action-Data1>
           <Parameter name="Speed" dataType="int">3100</Parameter>
           <Operation>PEO_ACTION_CHILD
             <Parameter name="ChildParam" dataType="int">1</Parameter>
           </Operation>
         </Action>
         <Operation>PEO_PUMP_CHILD
-          <Action>PEA_CHILD_SPEED
+          <Action>
+            <Action-Function>PEA_CHILD_SPEED</Action-Function>
+            <Action-Data1>2800</Action-Data1>
             <Parameter name="Speed" dataType="int">2800</Parameter>
           </Action>
         </Operation>
