@@ -33,7 +33,6 @@ import org.openhab.binding.haywardomnilogiclocal.internal.config.MspConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.PumpConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.RelayConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.SensorConfig;
-import org.openhab.binding.haywardomnilogiclocal.internal.config.VirtualHeaterConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardBridgeHandler;
 import org.openhab.core.config.discovery.AbstractThingHandlerDiscoveryService;
 import org.openhab.core.config.discovery.DiscoveryResult;
@@ -143,8 +142,8 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                     String id = chlorinator.getSystemId();
                     putIfNotNull(chlorProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
                     addBowContext(chlorProps, bow);
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_CHLORINATOR,
-                            id != null ? id : "Chlorinator", chlorProps);
+                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_CHLORINATOR, id != null ? id : "Chlorinator",
+                            chlorProps);
                 }
 
                 for (ColorLogicLightConfig light : bow.getColorLogicLights()) {
@@ -153,8 +152,8 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                     String id = light.getSystemId();
                     putIfNotNull(lightProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
                     addBowContext(lightProps, bow);
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_COLORLOGIC,
-                            id != null ? id : "ColorLogic", lightProps);
+                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_COLORLOGIC, id != null ? id : "ColorLogic",
+                            lightProps);
                 }
 
                 for (RelayConfig relay : bow.getRelays()) {
@@ -213,13 +212,31 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                 }
                 onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_PUMP, name, pumpProps);
             }
-            for (VirtualHeaterConfig vh : backyard.getVirtualHeaters()) {
-                Map<String, Object> vhProps = new HashMap<>();
-                vhProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.VIRTUALHEATER);
-                String id = vh.getSystemId();
-                putIfNotNull(vhProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
-                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_VIRTUALHEATER,
-                        id != null ? id : "VirtualHeater", vhProps);
+            for (RelayConfig relay : backyard.getRelays()) {
+                String id = relay.getSystemId();
+                String relayType = relay.getType();
+                if ("RLY_VALVE_ACTUATOR".equals(relayType)) {
+                    Map<String, Object> valveProps = new HashMap<>();
+                    valveProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.VALVEACTUATOR);
+                    putIfNotNull(valveProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
+                    putIfNotNull(valveProps, HaywardBindingConstants.PROPERTY_RELAY_TYPE, relayType);
+                    putIfNotNull(valveProps, HaywardBindingConstants.PROPERTY_RELAY_FUNCTION, relay.getFunction());
+                    String name = relay.getName();
+                    if (name == null) {
+                        name = id != null ? id : "ValveActuator";
+                    }
+                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_VALVEACTUATOR, name, valveProps);
+                    continue;
+                }
+
+                Map<String, Object> relayProps = new HashMap<>();
+                relayProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.RELAY);
+                putIfNotNull(relayProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
+                String name = relay.getName();
+                if (name == null) {
+                    name = id != null ? id : "Relay";
+                }
+                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_RELAY, name, relayProps);
             }
         }
     }

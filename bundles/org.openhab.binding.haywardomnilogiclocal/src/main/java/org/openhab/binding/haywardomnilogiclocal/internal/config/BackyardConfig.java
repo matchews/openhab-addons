@@ -17,47 +17,37 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 @XStreamAlias("Backyard")
 public class BackyardConfig {
     @XStreamAsAttribute
-    @XStreamAlias("systemId")
+    @XStreamAlias("System-Id")
     private @Nullable String systemId;
 
-    @XStreamAlias("System-Id")
-    private @Nullable String systemIdElement;
-
-    @XStreamAsAttribute
+    @XStreamAlias("Name")
     private @Nullable String name;
 
-    @XStreamAlias("Name")
-    private @Nullable String nameElement;
-
-    @XStreamAsAttribute
-    @XStreamAlias("serviceModeTimeout")
-    private @Nullable String serviceModeTimeout;
-
     @XStreamAlias("Service-Mode-Timeout")
-    private @Nullable String serviceModeTimeoutElement;
+    private @Nullable String serviceModeTimeout;
 
     @XStreamImplicit(itemFieldName = "Sensor")
     private final List<SensorConfig> sensors = new ArrayList<>();
 
-    @XStreamImplicit(itemFieldName = "BodyOfWater")
+    @XStreamImplicit(itemFieldName = "Body-of-water")
     private final List<BodyOfWaterConfig> bodiesOfWater = new ArrayList<>();
 
     @XStreamImplicit(itemFieldName = "Pump")
     private final List<PumpConfig> pumps = new ArrayList<>();
 
-    @XStreamImplicit(itemFieldName = "VirtualHeater")
-    private final List<VirtualHeaterConfig> virtualHeaters = new ArrayList<>();
+    @XStreamImplicit(itemFieldName = "Relay")
+    private final List<RelayConfig> relays = new ArrayList<>();
 
     public @Nullable String getSystemId() {
-        return systemId != null ? systemId : systemIdElement;
+        return systemId;
     }
 
     public @Nullable String getName() {
-        return name != null ? name : nameElement;
+        return name;
     }
 
     public @Nullable String getServiceModeTimeout() {
-        return serviceModeTimeout != null ? serviceModeTimeout : serviceModeTimeoutElement;
+        return serviceModeTimeout;
     }
 
     public List<SensorConfig> getSensors() {
@@ -72,8 +62,7 @@ public class BackyardConfig {
         return pumps;
     }
 
-    public List<VirtualHeaterConfig> getVirtualHeaters() {
-        return virtualHeaters;
+    public List<RelayConfig> getRelays() {
+        return relays;
     }
 }
-

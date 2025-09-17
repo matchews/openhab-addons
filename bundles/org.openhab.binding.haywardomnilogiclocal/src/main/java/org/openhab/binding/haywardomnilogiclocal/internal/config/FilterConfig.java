@@ -1,14 +1,9 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
  * Representation of a Filter element.
@@ -16,39 +11,18 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 @NonNullByDefault
 @XStreamAlias("Filter")
 public class FilterConfig {
-    @XStreamAsAttribute
-    @XStreamAlias("systemId")
-    private @Nullable String systemId;
 
     @XStreamAlias("System-Id")
-    private @Nullable String systemIdElement;
-
-    @XStreamAsAttribute
-    @XStreamAlias("pumpId")
-    private @Nullable String pumpId;
-
-    @XStreamAlias("Pump-Id")
-    private @Nullable String pumpIdElement;
-
-    @XStreamAsAttribute
-    private @Nullable String nameAttribute;
+    private @Nullable String systemId;
 
     @XStreamAlias("Name")
-    private @Nullable String nameElement;
-
-    @XStreamAsAttribute
-    @XStreamAlias("sharedType")
-    private @Nullable String sharedTypeAttribute;
+    private @Nullable String name;
 
     @XStreamAlias("Shared-Type")
-    private @Nullable String sharedTypeElement;
-
-    @XStreamAsAttribute
-    @XStreamAlias("filterType")
-    private @Nullable String filterTypeAttribute;
+    private @Nullable String sharedType;
 
     @XStreamAlias("Filter-Type")
-    private @Nullable String filterTypeElement;
+    private @Nullable String filterType;
 
     @XStreamAlias("Max-Pump-Speed")
     private @Nullable String maxPumpSpeed;
@@ -62,6 +36,18 @@ public class FilterConfig {
     @XStreamAlias("Min-Pump-RPM")
     private @Nullable String minPumpRpm;
 
+    @XStreamAlias("Min-Priming-Interval")
+    private @Nullable String minPrimingInterval;
+
+    @XStreamAlias("Priming-Enabled")
+    private @Nullable String primingEnabled;
+
+    @XStreamAlias("Priming-Duration")
+    private @Nullable String primingDuration;
+
+    @XStreamAlias("Cooldown-Duration")
+    private @Nullable String cooldownDuration;
+
     @XStreamAlias("Vsp-Low-Pump-Speed")
     private @Nullable String vspLowPumpSpeed;
 
@@ -74,27 +60,20 @@ public class FilterConfig {
     @XStreamAlias("Vsp-Custom-Pump-Speed")
     private @Nullable String vspCustomPumpSpeed;
 
-    @XStreamImplicit(itemFieldName = "Operation")
-    private final List<OperationConfig> operations = new ArrayList<>();
-
     public @Nullable String getSystemId() {
-        return systemId != null ? systemId : systemIdElement;
-    }
-
-    public @Nullable String getPumpId() {
-        return pumpId != null ? pumpId : pumpIdElement;
+        return systemId;
     }
 
     public @Nullable String getName() {
-        return nameAttribute != null ? nameAttribute : nameElement;
+        return name;
     }
 
     public @Nullable String getSharedType() {
-        return sharedTypeAttribute != null ? sharedTypeAttribute : sharedTypeElement;
+        return sharedType;
     }
 
     public @Nullable String getFilterType() {
-        return filterTypeAttribute != null ? filterTypeAttribute : filterTypeElement;
+        return filterType;
     }
 
     public @Nullable String getMaxPumpSpeed() {
@@ -129,9 +108,4 @@ public class FilterConfig {
         return vspCustomPumpSpeed;
     }
 
-    public List<OperationConfig> getOperations() {
-        return operations;
-    }
-
 }
-

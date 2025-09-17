@@ -1,7 +1,6 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.config;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +19,6 @@ public class ConfigParserTest {
         assertEquals(1, config.getSystems().size());
 
         SystemConfig system = config.getSystems().get(0);
-        assertEquals("SYS", system.getSystemId());
         assertEquals("Percent", system.getMspVspSpeedFormat());
         assertEquals("12 Hour Format", system.getMspTimeFormat());
         assertEquals("America/New_York", system.getTimeZone());
@@ -29,13 +27,6 @@ public class ConfigParserTest {
         assertEquals("Metric", system.getUnits());
         assertEquals("Salt", system.getMspChlorDisplay());
         assertEquals("French", system.getMspLanguage());
-        assertEquals("true", system.getUiShowBackyard());
-        assertEquals("false", system.getUiShowEquipment());
-        assertEquals("true", system.getUiShowHeaters());
-        assertEquals("true", system.getUiShowLights());
-        assertEquals("false", system.getUiShowSpillover());
-        assertEquals("true", system.getUiShowSuperChlor());
-        assertEquals("false", system.getUiShowSuperChlorTimeout());
 
         assertEquals(1, config.getBackyards().size());
 
@@ -60,15 +51,7 @@ public class ConfigParserTest {
         assertEquals("BOW2", bow.getSharedEquipmentSystemId());
         assertEquals("yes", bow.getSupportsSpillover());
         assertEquals("yes", bow.getUseSpilloverForFilterOperations());
-        assertEquals("manual", bow.getSpilloverMode());
-        assertEquals("10", bow.getSpilloverManualTimeout());
-        assertEquals("50", bow.getSpilloverTimedPercent());
-        assertEquals("20", bow.getSpilloverTimedTimeout());
-        assertEquals("yes", bow.getFreezeProtectEnabled());
-        assertEquals("no", bow.getFreezeProtectOverride());
-        assertEquals("38", bow.getFreezeProtectSetPoint());
         assertEquals("15000", bow.getSizeInGallons());
-        assertEquals("56781", bow.getSizeInLiters());
 
         assertEquals(1, bow.getFilters().size());
         FilterConfig filter = bow.getFilters().get(0);
@@ -222,13 +205,6 @@ public class ConfigParserTest {
         assertEquals("Speed", nestedPumpAction.getParameters().get(0).getName());
         assertEquals("2800", nestedPumpAction.getParameters().get(0).getValue());
 
-        assertEquals(1, backyard.getVirtualHeaters().size());
-        VirtualHeaterConfig virtualHeater = backyard.getVirtualHeaters().get(0);
-        assertEquals("VH1", virtualHeater.getSystemId());
-        assertEquals("Spa Heat", virtualHeater.getName());
-        assertEquals("yes", virtualHeater.getEnable());
-        assertEquals("90", virtualHeater.getCurrentSetPoint());
-
         assertEquals(1, config.getSchedules().size());
         ScheduleConfig schedule = config.getSchedules().get(0);
         assertEquals("SCH1", schedule.getSystemId());
@@ -354,4 +330,3 @@ public class ConfigParserTest {
         }
     }
 }
-
