@@ -7,7 +7,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
@@ -16,31 +15,17 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 @NonNullByDefault
 @XStreamAlias("Chlorinator")
 public class ChlorinatorConfig {
-    @XStreamAsAttribute
-    @XStreamAlias("systemId")
+    @XStreamAlias("System-Id")
     private @Nullable String systemId;
 
-    @XStreamAlias("System-Id")
-    private @Nullable String systemIdElement;
-
-    @XStreamAsAttribute
-    private @Nullable String nameAttribute;
-
     @XStreamAlias("Name")
-    private @Nullable String nameElement;
-
-    @XStreamAsAttribute
-    @XStreamAlias("sharedType")
-    private @Nullable String sharedTypeAttribute;
+    private @Nullable String name;
 
     @XStreamAlias("Shared-Type")
-    private @Nullable String sharedTypeElement;
-
-    @XStreamAsAttribute
-    private @Nullable String enabledAttribute;
+    private @Nullable String sharedType;
 
     @XStreamAlias("Enabled")
-    private @Nullable String enabledElement;
+    private @Nullable String enabled;
 
     @XStreamAlias("Mode")
     private @Nullable String mode;
@@ -54,26 +39,32 @@ public class ChlorinatorConfig {
     @XStreamAlias("Cell-Type")
     private @Nullable String cellType;
 
+    @XStreamAlias("Dispenser-Type")
+    private @Nullable String dispenserType;
+
     @XStreamAlias("ORP-Timeout")
     private @Nullable String orpTimeout;
+
+    @XStreamAlias("ORP-Sensor-ID")
+    private @Nullable String orpSensorId;
 
     @XStreamImplicit(itemFieldName = "Operation")
     private final List<OperationConfig> operations = new ArrayList<>();
 
     public @Nullable String getSystemId() {
-        return systemId != null ? systemId : systemIdElement;
+        return systemId;
     }
 
     public @Nullable String getName() {
-        return nameAttribute != null ? nameAttribute : nameElement;
+        return name;
     }
 
     public @Nullable String getSharedType() {
-        return sharedTypeAttribute != null ? sharedTypeAttribute : sharedTypeElement;
+        return sharedType;
     }
 
     public @Nullable String getEnabled() {
-        return enabledAttribute != null ? enabledAttribute : enabledElement;
+        return enabled;
     }
 
     public @Nullable String getMode() {
@@ -96,9 +87,15 @@ public class ChlorinatorConfig {
         return orpTimeout;
     }
 
+    public @Nullable String dispenserType() {
+        return dispenserType;
+    }
+
+    public @Nullable String orpSensorId() {
+        return orpSensorId;
+    }
+
     public List<OperationConfig> getOperations() {
         return operations;
     }
-
 }
-

@@ -4,7 +4,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
  * Representation of a Relay element.
@@ -12,45 +11,52 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 @NonNullByDefault
 @XStreamAlias("Relay")
 public class RelayConfig {
-    @XStreamAsAttribute
-    @XStreamAlias("systemId")
+    @XStreamAlias("System-Id")
     private @Nullable String systemId;
 
-    @XStreamAlias("System-Id")
-    private @Nullable String systemIdElement;
-
-    @XStreamAsAttribute
+    @XStreamAlias("Name")
     private @Nullable String name;
 
-    @XStreamAlias("Name")
-    private @Nullable String nameElement;
-
-    @XStreamAsAttribute
-    private @Nullable String typeAttribute;
-
     @XStreamAlias("Type")
-    private @Nullable String typeElement;
-
-    @XStreamAsAttribute
-    private @Nullable String functionAttribute;
+    private @Nullable String type;
 
     @XStreamAlias("Function")
-    private @Nullable String functionElement;
+    private @Nullable String function;
+
+    @XStreamAlias("Freeze-Protect-Enable")
+    private @Nullable String freezeProtectEnable;
+
+    @XStreamAlias("Valve-Cycle-Enable")
+    private @Nullable String valveCycleEnable;
+
+    @XStreamAlias("Valve-Cycle-Time")
+    private @Nullable String valveCycleTime;
 
     public @Nullable String getSystemId() {
-        return systemId != null ? systemId : systemIdElement;
+        return systemId;
     }
 
     public @Nullable String getName() {
-        return name != null ? name : nameElement;
+        return name;
     }
 
     public @Nullable String getType() {
-        return typeAttribute != null ? typeAttribute : typeElement;
+        return type;
     }
 
     public @Nullable String getFunction() {
-        return functionAttribute != null ? functionAttribute : functionElement;
+        return function;
+    }
+
+    public @Nullable String freezeProtectEnable() {
+        return freezeProtectEnable;
+    }
+
+    public @Nullable String valveCycleEnable() {
+        return valveCycleEnable;
+    }
+
+    public @Nullable String valveCycleTime() {
+        return valveCycleTime;
     }
 }
-

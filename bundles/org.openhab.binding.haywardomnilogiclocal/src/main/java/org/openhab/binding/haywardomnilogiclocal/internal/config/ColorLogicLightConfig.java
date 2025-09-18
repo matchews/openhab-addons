@@ -4,7 +4,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
  * Representation of a ColorLogic light element.
@@ -12,35 +11,38 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 @NonNullByDefault
 @XStreamAlias("ColorLogic-Light")
 public class ColorLogicLightConfig {
-    @XStreamAsAttribute
-    @XStreamAlias("systemId")
+    @XStreamAlias("System-Id")
     private @Nullable String systemId;
 
-    @XStreamAlias("System-Id")
-    private @Nullable String systemIdElement;
-
-    @XStreamAsAttribute
-    private @Nullable String nameAttribute;
-
     @XStreamAlias("Name")
-    private @Nullable String nameElement;
-
-    @XStreamAsAttribute
-    private @Nullable String typeAttribute;
+    private @Nullable String name;
 
     @XStreamAlias("Type")
-    private @Nullable String typeElement;
+    private @Nullable String type;
+
+    @XStreamAlias("Node-Id")
+    private @Nullable String nodeId;
+
+    @XStreamAlias("Networked")
+    private @Nullable String Networked;
 
     public @Nullable String getSystemId() {
-        return systemId != null ? systemId : systemIdElement;
+        return systemId;
     }
 
     public @Nullable String getName() {
-        return nameAttribute != null ? nameAttribute : nameElement;
+        return name;
     }
 
     public @Nullable String getType() {
-        return typeAttribute != null ? typeAttribute : typeElement;
+        return type;
+    }
+
+    public @Nullable String nodeId() {
+        return name;
+    }
+
+    public @Nullable String Networked() {
+        return type;
     }
 }
-

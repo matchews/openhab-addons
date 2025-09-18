@@ -56,7 +56,6 @@ public class ConfigParserTest {
         assertEquals(1, bow.getFilters().size());
         FilterConfig filter = bow.getFilters().get(0);
         assertEquals("F1", filter.getSystemId());
-        assertEquals("P1", filter.getPumpId());
         assertEquals("Filter Pump", filter.getName());
         assertEquals("BOW_SHARED_EQUIPMENT", filter.getSharedType());
         assertEquals("FMT_VARIABLE_SPEED_PUMP", filter.getFilterType());
@@ -100,7 +99,6 @@ public class ConfigParserTest {
         assertEquals(1, bow.getHeaters().size());
         HeaterConfig heater = bow.getHeaters().get(0);
         assertEquals("H1", heater.getSystemId());
-        assertEquals("gas", heater.getType());
         assertEquals("BOW_SHARED_EQUIPMENT", heater.getSharedType());
         assertEquals("yes", heater.getEnabled());
         assertEquals("80", heater.getCurrentSetPoint());

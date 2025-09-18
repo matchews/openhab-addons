@@ -45,6 +45,9 @@ public class BodyOfWaterConfig {
     @XStreamImplicit(itemFieldName = "Filter")
     private final List<FilterConfig> filters = new ArrayList<>();
 
+    @XStreamImplicit(itemFieldName = "Pump")
+    private final List<FilterConfig> pump = new ArrayList<>();
+
     @XStreamImplicit(itemFieldName = "Heater")
     private final List<HeaterConfig> heaters = new ArrayList<>();
 

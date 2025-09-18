@@ -7,7 +7,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
@@ -16,38 +15,17 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 @NonNullByDefault
 @XStreamAlias("Heater")
 public class HeaterConfig {
-    @XStreamAsAttribute
-    @XStreamAlias("systemId")
+    @XStreamAlias("System-Id")
     private @Nullable String systemId;
 
-    @XStreamAlias("System-Id")
-    private @Nullable String systemIdElement;
-
-    @XStreamAsAttribute
-    private @Nullable String type;
-
-    @XStreamAlias("Type")
-    private @Nullable String typeElement;
-
-    @XStreamAsAttribute
-    @XStreamAlias("sharedType")
-    private @Nullable String sharedTypeAttribute;
-
     @XStreamAlias("Shared-Type")
-    private @Nullable String sharedTypeElement;
-
-    @XStreamAsAttribute
-    private @Nullable String enabledAttribute;
+    private @Nullable String sharedType;
 
     @XStreamAlias("Enabled")
-    private @Nullable String enabledElement;
-
-    @XStreamAsAttribute
-    @XStreamAlias("currentSetPoint")
-    private @Nullable String currentSetPointAttribute;
+    private @Nullable String enabled;
 
     @XStreamAlias("Current-Set-Point")
-    private @Nullable String currentSetPointElement;
+    private @Nullable String currentSetPoint;
 
     @XStreamAlias("Max-Water-Temp")
     private @Nullable String maxWaterTemp;
@@ -61,27 +39,32 @@ public class HeaterConfig {
     @XStreamAlias("Cooldown-Enabled")
     private @Nullable String cooldownEnabled;
 
+    @XStreamAlias("Extend-Enabled")
+    private @Nullable String extendEnabled;
+
+    @XStreamAlias("Boost-Time-Interval")
+    private @Nullable String boostTimeInterval;
+
+    @XStreamAlias("Heater-Become-Valid-Timeout")
+    private @Nullable String heaterBecomeValidTimeout;
+
     @XStreamImplicit(itemFieldName = "Operation")
     private final List<OperationConfig> operations = new ArrayList<>();
 
     public @Nullable String getSystemId() {
-        return systemId != null ? systemId : systemIdElement;
-    }
-
-    public @Nullable String getType() {
-        return type != null ? type : typeElement;
+        return systemId;
     }
 
     public @Nullable String getSharedType() {
-        return sharedTypeAttribute != null ? sharedTypeAttribute : sharedTypeElement;
+        return sharedType;
     }
 
     public @Nullable String getEnabled() {
-        return enabledAttribute != null ? enabledAttribute : enabledElement;
+        return enabled;
     }
 
     public @Nullable String getCurrentSetPoint() {
-        return currentSetPointAttribute != null ? currentSetPointAttribute : currentSetPointElement;
+        return currentSetPoint;
     }
 
     public @Nullable String getMaxWaterTemp() {
@@ -98,6 +81,18 @@ public class HeaterConfig {
 
     public @Nullable String getCooldownEnabled() {
         return cooldownEnabled;
+    }
+
+    public @Nullable String extendEnabled() {
+        return extendEnabled;
+    }
+
+    public @Nullable String boostTimeInterval() {
+        return boostTimeInterval;
+    }
+
+    public @Nullable String heaterBecomeValidTimeout() {
+        return heaterBecomeValidTimeout;
     }
 
     public List<OperationConfig> getOperations() {
@@ -143,4 +138,3 @@ public class HeaterConfig {
         }
     }
 }
-

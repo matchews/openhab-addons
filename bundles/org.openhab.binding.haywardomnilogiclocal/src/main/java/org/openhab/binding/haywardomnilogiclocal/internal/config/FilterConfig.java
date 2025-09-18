@@ -7,7 +7,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
@@ -16,20 +15,8 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 @NonNullByDefault
 @XStreamAlias("Filter")
 public class FilterConfig {
-
-    @XStreamAsAttribute
-    @XStreamAlias("systemId")
-    private @Nullable String systemIdAttribute;
-
     @XStreamAlias("System-Id")
     private @Nullable String systemId;
-
-    @XStreamAsAttribute
-    @XStreamAlias("pumpId")
-    private @Nullable String pumpIdAttribute;
-
-    @XStreamAlias("Pump-Id")
-    private @Nullable String pumpId;
 
     @XStreamAlias("Name")
     private @Nullable String name;
@@ -113,11 +100,7 @@ public class FilterConfig {
     private final List<OperationConfig> operations = new ArrayList<>();
 
     public @Nullable String getSystemId() {
-        return systemIdAttribute != null ? systemIdAttribute : systemId;
-    }
-
-    public @Nullable String getPumpId() {
-        return pumpIdAttribute != null ? pumpIdAttribute : pumpId;
+        return systemId;
     }
 
     public @Nullable String getName() {

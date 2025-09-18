@@ -7,7 +7,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
@@ -16,30 +15,17 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 @NonNullByDefault
 @XStreamAlias("Pump")
 public class PumpConfig {
-    @XStreamAsAttribute
-    @XStreamAlias("systemId")
+    @XStreamAlias("System-Id")
     private @Nullable String systemId;
 
-    @XStreamAlias("System-Id")
-    private @Nullable String systemIdElement;
-
-    @XStreamAsAttribute
+    @XStreamAlias("Name")
     private @Nullable String name;
 
-    @XStreamAlias("Name")
-    private @Nullable String nameElement;
-
-    @XStreamAsAttribute
-    private @Nullable String typeAttribute;
-
     @XStreamAlias("Type")
-    private @Nullable String typeElement;
-
-    @XStreamAsAttribute
-    private @Nullable String functionAttribute;
+    private @Nullable String type;
 
     @XStreamAlias("Function")
-    private @Nullable String functionElement;
+    private @Nullable String function;
 
     @XStreamAlias("Max-Pump-RPM")
     private @Nullable String maxPumpRpm;
@@ -53,35 +39,43 @@ public class PumpConfig {
     @XStreamAlias("Max-Pump-Speed")
     private @Nullable String maxPumpSpeed;
 
+    @XStreamAlias("Vsp-Low-Pump-Speed")
+    private @Nullable String vspLowPumpSpeed;
+
     @XStreamAlias("Vsp-Medium-Pump-Speed")
     private @Nullable String vspMediumPumpSpeed;
-
-    @XStreamAlias("Vsp-Custom-Pump-Speed")
-    private @Nullable String vspCustomPumpSpeed;
 
     @XStreamAlias("Vsp-High-Pump-Speed")
     private @Nullable String vspHighPumpSpeed;
 
-    @XStreamAlias("Vsp-Low-Pump-Speed")
-    private @Nullable String vspLowPumpSpeed;
+    @XStreamAlias("Vsp-Custom-Pump-Speed")
+    private @Nullable String vspCustomPumpSpeed;
 
     @XStreamImplicit(itemFieldName = "Operation")
     private final List<OperationConfig> operations = new ArrayList<>();
 
     public @Nullable String getSystemId() {
-        return systemId != null ? systemId : systemIdElement;
+        return systemId;
     }
 
     public @Nullable String getName() {
-        return name != null ? name : nameElement;
+        return name;
     }
 
     public @Nullable String getType() {
-        return typeAttribute != null ? typeAttribute : typeElement;
+        return type;
     }
 
     public @Nullable String getFunction() {
-        return functionAttribute != null ? functionAttribute : functionElement;
+        return function;
+    }
+
+    public @Nullable String getMaxPumpSpeed() {
+        return maxPumpSpeed;
+    }
+
+    public @Nullable String getMinPumpSpeed() {
+        return minPumpSpeed;
     }
 
     public @Nullable String getMaxPumpRpm() {
@@ -92,28 +86,20 @@ public class PumpConfig {
         return minPumpRpm;
     }
 
-    public @Nullable String getMinPumpSpeed() {
-        return minPumpSpeed;
-    }
-
-    public @Nullable String getMaxPumpSpeed() {
-        return maxPumpSpeed;
+    public @Nullable String getVspLowPumpSpeed() {
+        return vspLowPumpSpeed;
     }
 
     public @Nullable String getVspMediumPumpSpeed() {
         return vspMediumPumpSpeed;
     }
 
-    public @Nullable String getVspCustomPumpSpeed() {
-        return vspCustomPumpSpeed;
-    }
-
     public @Nullable String getVspHighPumpSpeed() {
         return vspHighPumpSpeed;
     }
 
-    public @Nullable String getVspLowPumpSpeed() {
-        return vspLowPumpSpeed;
+    public @Nullable String getVspCustomPumpSpeed() {
+        return vspCustomPumpSpeed;
     }
 
     public List<OperationConfig> getOperations() {
@@ -121,4 +107,3 @@ public class PumpConfig {
     }
 
 }
-
