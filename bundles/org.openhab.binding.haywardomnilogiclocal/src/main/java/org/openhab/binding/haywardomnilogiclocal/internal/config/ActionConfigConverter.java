@@ -22,7 +22,8 @@ public class ActionConfigConverter implements Converter {
     private static final String NODE_PARAMETER = "Parameter";
 
     @Override
-    public boolean canConvert(@Nullable Class<?> type) {
+    @SuppressWarnings("rawtypes")
+    public boolean canConvert(@Nullable Class type) {
         return type != null && ActionConfig.class.isAssignableFrom(type);
     }
 
