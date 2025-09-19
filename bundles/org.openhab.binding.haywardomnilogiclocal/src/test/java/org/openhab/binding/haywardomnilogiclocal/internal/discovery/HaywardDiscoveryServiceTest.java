@@ -107,6 +107,30 @@ public class HaywardDiscoveryServiceTest {
     }
 
     @Test
+    public void mspConfigDiscoverySkipsMissingPumps() {
+        String xml = "" +
+                "<MSPConfig>" +
+                "  <System systemId='SYS'/>" +
+                "  <Backyard systemId='BY'>" +
+                "    <Sensor systemId='S1' name='Air' type='SENSOR_AIR_TEMP' units='UNITS_FAHRENHEIT'/>" +
+                "    <BodyOfWater systemId='BOW1' name='Pool'>" +
+                "      <Filter systemId='F1' pumpId='P1'/>" +
+                "    </BodyOfWater>" +
+                "  </Backyard>" +
+                "</MSPConfig>";
+
+        TestDiscoveryService service = new TestDiscoveryService();
+        service.mspConfigDiscovery(xml);
+
+        assertEquals(0, service.types.stream().filter(t -> t.equals(HaywardBindingConstants.THING_TYPE_PUMP)).count());
+        assertEquals(1,
+                service.types.stream().filter(t -> t.equals(HaywardBindingConstants.THING_TYPE_BACKYARD)).count());
+        assertEquals(1, service.types.stream().filter(t -> t.equals(HaywardBindingConstants.THING_TYPE_BOW)).count());
+        assertEquals(1, service.types.stream().filter(t -> t.equals(HaywardBindingConstants.THING_TYPE_FILTER)).count());
+        assertEquals(1, service.types.stream().filter(t -> t.equals(HaywardBindingConstants.THING_TYPE_SENSOR)).count());
+    }
+
+    @Test
     public void mspConfigDiscoveryIdentifiesValveActuatorRelays() {
         String xml = "" +
                 "<MSPConfig>" +
