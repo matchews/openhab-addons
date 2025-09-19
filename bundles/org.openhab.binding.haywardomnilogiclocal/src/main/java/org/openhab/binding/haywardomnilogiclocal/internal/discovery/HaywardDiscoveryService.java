@@ -15,6 +15,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.discovery;
 import static org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants.THING_TYPES_UIDS;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -203,16 +204,19 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                 }
             }
 
-            for (PumpConfig pump : backyard.getPumps()) {
-                Map<String, Object> pumpProps = new HashMap<>();
-                pumpProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.PUMP);
-                String pumpId = pump.getSystemId();
-                putIfNotNull(pumpProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, pumpId);
-                String name = pump.getName() != null ? pump.getName() : pumpId;
-                if (name == null) {
-                    name = "Pump";
+            List<PumpConfig> pumps = backyard.getPumps();
+            if (pumps != null) {
+                for (PumpConfig pump : pumps) {
+                    Map<String, Object> pumpProps = new HashMap<>();
+                    pumpProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.PUMP);
+                    String pumpId = pump.getSystemId();
+                    putIfNotNull(pumpProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, pumpId);
+                    String name = pump.getName() != null ? pump.getName() : pumpId;
+                    if (name == null) {
+                        name = "Pump";
+                    }
+                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_PUMP, name, pumpProps);
                 }
-                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_PUMP, name, pumpProps);
             }
 
             for (RelayConfig relay : backyard.getRelays()) {
