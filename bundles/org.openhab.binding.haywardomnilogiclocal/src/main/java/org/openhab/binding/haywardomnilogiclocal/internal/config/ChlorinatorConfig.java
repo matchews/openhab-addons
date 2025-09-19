@@ -1,13 +1,9 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
  * Representation of a Chlorinator element.
@@ -47,9 +43,6 @@ public class ChlorinatorConfig {
 
     @XStreamAlias("ORP-Sensor-ID")
     private @Nullable String orpSensorId;
-
-    @XStreamImplicit(itemFieldName = "Operation")
-    private final List<OperationConfig> operations = new ArrayList<>();
 
     public @Nullable String getSystemId() {
         return systemId;
@@ -93,9 +86,5 @@ public class ChlorinatorConfig {
 
     public @Nullable String orpSensorId() {
         return orpSensorId;
-    }
-
-    public List<OperationConfig> getOperations() {
-        return operations;
     }
 }

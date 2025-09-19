@@ -119,10 +119,12 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                     Map<String, Object> filterProps = new HashMap<>();
                     filterProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.FILTER);
                     String filterId = filter.getSystemId();
+                    String filterName = filter.getName();
+
                     putIfNotNull(filterProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, filterId);
                     addBowContext(filterProps, bow);
                     onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_FILTER,
-                            filterId != null ? filterId : "Filter", filterProps);
+                            filterName != null ? filterName : "Filter", filterProps);
                 }
 
                 for (HeaterConfig heater : bow.getHeaters()) {

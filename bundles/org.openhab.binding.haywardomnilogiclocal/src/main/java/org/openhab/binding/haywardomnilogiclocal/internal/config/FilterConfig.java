@@ -1,13 +1,9 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
  * Representation of a Filter element.
@@ -95,9 +91,6 @@ public class FilterConfig {
 
     @XStreamAlias("Vsp-Custom-Pump-Speed")
     private @Nullable String vspCustomPumpSpeed;
-
-    @XStreamImplicit(itemFieldName = "Operation")
-    private final List<OperationConfig> operations = new ArrayList<>();
 
     public @Nullable String getSystemId() {
         return systemId;
@@ -206,9 +199,4 @@ public class FilterConfig {
     public @Nullable String getVspCustomPumpSpeed() {
         return vspCustomPumpSpeed;
     }
-
-    public List<OperationConfig> getOperations() {
-        return operations;
-    }
-
 }

@@ -13,12 +13,12 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
 public final class ConfigParser {
     private static final XStream XSTREAM = new XStream(new StaxDriver());
 
-    private static final Class<?>[] ANNOTATED_CONFIG_TYPES = new Class<?>[] { ActionConfig.class, BackyardConfig.class,
+    private static final Class<?>[] ANNOTATED_CONFIG_TYPES = new Class<?>[] { BackyardConfig.class,
             BodyOfWaterConfig.class, ChlorinatorConfig.class, ColorLogicLightConfig.class, DeviceConfig.class,
             DmtConfig.class, FilterConfig.class, HeaterConfig.class, HeaterConfig.HeaterEquipmentConfig.class,
-            MspConfig.class, OperationConfig.class, ParameterConfig.class, PumpConfig.class, RelayConfig.class,
-            ScheduleActionConfig.class, ScheduleConfig.class, SchedulesConfig.class, SensorConfig.class,
-            SystemConfig.class, VirtualHeaterConfig.class };
+            MspConfig.class, ParameterConfig.class, PumpConfig.class, RelayConfig.class, ScheduleActionConfig.class,
+            ScheduleConfig.class, SchedulesConfig.class, SensorConfig.class, SystemConfig.class,
+            VirtualHeaterConfig.class };
 
     static {
         XSTREAM.setClassLoader(ConfigParser.class.getClassLoader());
@@ -34,4 +34,3 @@ public final class ConfigParser {
         return (MspConfig) XSTREAM.fromXML(xml);
     }
 }
-

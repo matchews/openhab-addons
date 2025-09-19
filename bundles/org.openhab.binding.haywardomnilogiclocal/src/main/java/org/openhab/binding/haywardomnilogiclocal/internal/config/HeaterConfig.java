@@ -1,13 +1,9 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
  * Representation of a Heater element.
@@ -47,9 +43,6 @@ public class HeaterConfig {
 
     @XStreamAlias("Heater-Become-Valid-Timeout")
     private @Nullable String heaterBecomeValidTimeout;
-
-    @XStreamImplicit(itemFieldName = "Operation")
-    private final List<OperationConfig> operations = new ArrayList<>();
 
     public @Nullable String getSystemId() {
         return systemId;
@@ -93,10 +86,6 @@ public class HeaterConfig {
 
     public @Nullable String heaterBecomeValidTimeout() {
         return heaterBecomeValidTimeout;
-    }
-
-    public List<OperationConfig> getOperations() {
-        return operations;
     }
 
     @NonNullByDefault
