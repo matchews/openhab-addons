@@ -15,10 +15,9 @@ public final class ConfigParser {
 
     private static final Class<?>[] ANNOTATED_CONFIG_TYPES = new Class<?>[] { BackyardConfig.class,
             BodyOfWaterConfig.class, ChlorinatorConfig.class, ColorLogicLightConfig.class, DeviceConfig.class,
-            DmtConfig.class, FilterConfig.class, HeaterConfig.class, HeaterConfig.HeaterEquipmentConfig.class,
-            MspConfig.class, ParameterConfig.class, PumpConfig.class, RelayConfig.class, ScheduleActionConfig.class,
-            ScheduleConfig.class, SchedulesConfig.class, SensorConfig.class, SystemConfig.class,
-            VirtualHeaterConfig.class };
+            DmtConfig.class, FilterConfig.class, MspConfig.class, ParameterConfig.class, PumpConfig.class,
+            RelayConfig.class, ScheduleActionConfig.class, ScheduleConfig.class, SchedulesConfig.class,
+            SystemConfig.class, VirtualHeaterConfig.class };
 
     static {
         XSTREAM.setClassLoader(ConfigParser.class.getClassLoader());

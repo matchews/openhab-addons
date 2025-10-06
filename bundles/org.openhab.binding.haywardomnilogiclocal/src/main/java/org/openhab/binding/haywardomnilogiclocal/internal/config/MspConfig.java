@@ -50,4 +50,3 @@ public class MspConfig {
         return checksum;
     }
 }
-

@@ -21,10 +21,6 @@ public class Pump {
     @XStreamAlias("pumpState")
     private @Nullable String pumpState;
 
-    @XStreamAsAttribute
-    @XStreamAlias("lastSpeed")
-    private @Nullable String lastSpeed;
-
     public @Nullable String getSystemId() {
         return systemId;
     }
@@ -35,9 +31,5 @@ public class Pump {
 
     public @Nullable String getPumpState() {
         return pumpState;
-    }
-
-    public @Nullable String getLastSpeed() {
-        return lastSpeed;
     }
 }

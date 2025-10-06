@@ -3,36 +3,84 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
     xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+    
+	<thing-type id="colorlogic" listed="false">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="bridge"/>
+		</supported-bridge-type-refs>
 
-  <thing-type id="colorlogic" listed="false">
-    <supported-bridge-type-refs>
-      <bridge-type-ref id="bridge"/>
-    </supported-bridge-type-refs>
+		<label>ColorLogic</label>
+		<channels>
+			<channel id="enable" typeId="system.power"/>
+			<channel id="currentShow" typeId="currentShow"/>
+			<channel id="speed" typeId="speed"/>
+			<channel id="brightness" typeId="brightness"/>
+			<channel id="specialEffect" typeId="specialEffect"/>
+		</channels>
 
-    <label>ColorLogic</label>
-    <channels>
-      <channel id="colorMode" typeId="colorMode"/>
-      <channel id="brightness" typeId="brightness"/>
-    </channels>
+		<properties>
+			<property name="vendor">Hayward</property>
+		</properties>
+		<representation-property>systemID</representation-property>
+	</thing-type>
 
-    <properties>
-      <property name="vendor">Hayward</property>
-      <property name="thingTypeVersion">2</property>
-    </properties>
-    <representation-property>systemID</representation-property>
-  </thing-type>
+	<channel-type id="currentShow">
+		<item-type>String</item-type>
+		<label>Show</label>
+		<state readOnly="false">
+			<options>
+			    <option value="0">Off</option>
+				<option value="1">Deep Blue Sea</option>
+				<option value="2">Afternoon Skies</option>
+				<option value="3">Emerald</option>
+				<option value="4">Sangria</option>
+				<option value="5">Cloud White</option>
+				<option value="6">Twilight</option>
+				<option value="7">Tranquility</option>
+				<option value="8">Gemstone</option>
+				<option value="9">USA</option>
+				<option value="10">Mardi Gras</option>
+				<option value="11">Cool Cabaret</option>
+			</options>
+		</state>
+	</channel-type>
 
-  <channel-type id="colorMode">
-    <item-type>String</item-type>
-    <label>Color Mode</label>
-    <state readOnly="false"/>
-  </channel-type>
+	<channel-type id="speed">
+		<item-type>String</item-type>
+		<label>Speed</label>
+		<state readOnly="false">
+			<options>
+				<option value="0">1/16x</option>
+				<option value="1">1/8x</option>
+				<option value="2">1/4x</option>
+				<option value="3">1/2x</option>
+				<option value="4">1x</option>
+				<option value="5">2x</option>
+				<option value="6">4x</option>
+				<option value="7">8x</option>
+				<option value="8">16x</option>
+			</options>
+		</state>
+	</channel-type>
 
-  <channel-type id="brightness">
-    <item-type>Number</item-type>
-    <label>Brightness</label>
-    <description>Brightness (unit % from config)</description>
-    <state readOnly="false"/>
-  </channel-type>
+	<channel-type id="brightness">
+		<item-type>String</item-type>
+		<label>Brightness</label>
+		<state readOnly="false">
+			<options>
+				<option value="0">20%</option>
+				<option value="1">40%</option>
+				<option value="2">60%</option>
+				<option value="3">80%</option>
+				<option value="4">100%</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="specialEffect">
+		<item-type>String</item-type>
+		<label>Special Effect</label>
+		<state readOnly="false"/>
+	</channel-type>
 
 </thing:thing-descriptions>

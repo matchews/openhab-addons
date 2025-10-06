@@ -30,8 +30,8 @@ public class UdpMessageTest {
     public void testTelemetryDecompressionWithoutFlag() throws Exception {
         String xml = "<Telemetry><Value>42</Value></Telemetry>";
         byte[] compressed = PayloadCodec.compress(xml.getBytes(StandardCharsets.UTF_8));
-        UdpHeader header = new UdpHeader(1, System.currentTimeMillis(), "1.22",
-                HaywardMessageType.MSP_TELEMETRY_UPDATE, (byte) 1, false);
+        UdpHeader header = new UdpHeader(1, System.currentTimeMillis(), "1.22", HaywardMessageType.MSP_TELEMETRY_UPDATE,
+                (byte) 1, false);
         byte[] headerBytes = header.toBytes();
         byte[] data = new byte[headerBytes.length + compressed.length];
         System.arraycopy(headerBytes, 0, data, 0, headerBytes.length);
@@ -41,4 +41,3 @@ public class UdpMessageTest {
         assertEquals(xml, message.getXml());
     }
 }
-

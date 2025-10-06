@@ -6,14 +6,17 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Relay;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
-import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.ValveActuator;
 import org.openhab.core.thing.Thing;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class HaywardValveActuatorHandler extends HaywardThingHandler {
+public class RelayHandler extends HaywardThingHandler {
+    private final Logger logger = LoggerFactory.getLogger(BackyardHandler.class);
 
-    public HaywardValveActuatorHandler(Thing thing) {
+    public RelayHandler(Thing thing) {
         super(thing);
     }
 
@@ -23,7 +26,7 @@ public class HaywardValveActuatorHandler extends HaywardThingHandler {
             return;
         }
 
-        updateIfPresent(values, "valveActuatorState_" + sysId, "valveActuatorState");
+        updateIfPresent(values, "relayState_" + sysId, "relayState");
     }
 
     @Override
@@ -33,11 +36,12 @@ public class HaywardValveActuatorHandler extends HaywardThingHandler {
         if (sysId == null) {
             return;
         }
-        for (ValveActuator valveActuator : status.getValveActuators()) {
-            if (sysId.equals(valveActuator.getSystemId())) {
-                @Nullable String valveActuatorState = valveActuator.getValveActuatorState();
-                if (valveActuatorState != null) {
-                    updateData("valveActuatorState", valveActuatorState);
+        for (Relay r : status.getRelays()) {
+            if (sysId.equals(r.getSystemId())) {
+                @Nullable
+                String relayState = r.getRelayState();
+                if (relayState != null) {
+                    updateData("relayState", relayState);
                 }
             }
         }

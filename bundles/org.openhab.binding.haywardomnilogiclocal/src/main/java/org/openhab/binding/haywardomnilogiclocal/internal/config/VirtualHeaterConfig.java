@@ -1,57 +1,102 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
- * Representation of a VirtualHeater element.
+ * Representation of a Virtural Heater element.
  */
 @NonNullByDefault
-@XStreamAlias("VirtualHeater")
+@XStreamAlias("Heater")
 public class VirtualHeaterConfig {
-    @XStreamAsAttribute
-    @XStreamAlias("systemId")
+    @XStreamAlias("System-Id")
     private @Nullable String systemId;
 
-    @XStreamAlias("System-Id")
-    private @Nullable String systemIdElement;
+    @XStreamAlias("Shared-Type")
+    private @Nullable String sharedType;
 
-    @XStreamAsAttribute
-    private @Nullable String name;
-
-    @XStreamAlias("Name")
-    private @Nullable String nameElement;
-
-    @XStreamAsAttribute
-    private @Nullable String enable;
-
-    @XStreamAlias("Enable")
-    private @Nullable String enableElement;
-
-    @XStreamAsAttribute
-    @XStreamAlias("currentSetPoint")
-    private @Nullable String currentSetPointAttribute;
+    @XStreamAlias("Enabled")
+    private @Nullable String enabled;
 
     @XStreamAlias("Current-Set-Point")
-    private @Nullable String currentSetPointElement;
+    private @Nullable String currentSetPoint;
+
+    @XStreamAlias("Max-Water-Temp")
+    private @Nullable String maxWaterTemp;
+
+    @XStreamAlias("Min-Settable-Water-Temp")
+    private @Nullable String minSettableWaterTemp;
+
+    @XStreamAlias("Max-Settable-Water-Temp")
+    private @Nullable String maxSettableWaterTemp;
+
+    @XStreamAlias("Cooldown-Enabled")
+    private @Nullable String cooldownEnabled;
+
+    @XStreamAlias("Extend-Enabled")
+    private @Nullable String extendEnabled;
+
+    @XStreamAlias("Boost-Time-Interval")
+    private @Nullable String boostTimeInterval;
+
+    @XStreamAlias("Heater-Become-Valid-Timeout")
+    private @Nullable String heaterBecomeValidTimeout;
+
+    @XStreamImplicit(itemFieldName = "Heater-Equipment")
+    private final List<HeaterEquipConfig> heaters = new ArrayList<>();
 
     public @Nullable String getSystemId() {
-        return systemId != null ? systemId : systemIdElement;
+        return systemId;
     }
 
-    public @Nullable String getName() {
-        return name != null ? name : nameElement;
+    public @Nullable String getSharedType() {
+        return sharedType;
     }
 
-    public @Nullable String getEnable() {
-        return enable != null ? enable : enableElement;
+    public @Nullable String getEnabled() {
+        return enabled;
     }
 
     public @Nullable String getCurrentSetPoint() {
-        return currentSetPointAttribute != null ? currentSetPointAttribute : currentSetPointElement;
+        return currentSetPoint;
     }
-}
 
+    public @Nullable String getMaxWaterTemp() {
+        return maxWaterTemp;
+    }
+
+    public @Nullable String getMinSettableWaterTemp() {
+        return minSettableWaterTemp;
+    }
+
+    public @Nullable String getMaxSettableWaterTemp() {
+        return maxSettableWaterTemp;
+    }
+
+    public @Nullable String getCooldownEnabled() {
+        return cooldownEnabled;
+    }
+
+    public @Nullable String getExtendEnabled() {
+        return extendEnabled;
+    }
+
+    public @Nullable String getBoostTimeInterval() {
+        return boostTimeInterval;
+    }
+
+    public @Nullable String getHeaterBecomeValidTimeout() {
+        return heaterBecomeValidTimeout;
+    }
+
+    public List<HeaterEquipConfig> getHeaters() {
+        return heaters;
+    }
+
+}

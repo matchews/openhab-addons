@@ -38,10 +38,9 @@ public class HaywardBindingConstants {
     public static final ThingTypeUID THING_TYPE_HEATER = new ThingTypeUID(BINDING_ID, "heater");
     public static final ThingTypeUID THING_TYPE_PUMP = new ThingTypeUID(BINDING_ID, "pump");
     public static final ThingTypeUID THING_TYPE_RELAY = new ThingTypeUID(BINDING_ID, "relay");
-    public static final ThingTypeUID THING_TYPE_VALVEACTUATOR = new ThingTypeUID(BINDING_ID, "valveActuator");
     public static final ThingTypeUID THING_TYPE_SENSOR = new ThingTypeUID(BINDING_ID, "sensor");
+    public static final ThingTypeUID THING_TYPE_VALVEACTUATOR = new ThingTypeUID(BINDING_ID, "valveActuator");
     public static final ThingTypeUID THING_TYPE_VIRTUALHEATER = new ThingTypeUID(BINDING_ID, "virtualHeater");
-
     public static final Set<ThingTypeUID> BRIDGE_THING_TYPES_UIDS = Set.of(THING_TYPE_BRIDGE);
 
     public static final Set<ThingTypeUID> THING_TYPES_UIDS = Set.of(HaywardBindingConstants.THING_TYPE_BACKYARD,
@@ -52,15 +51,27 @@ public class HaywardBindingConstants {
             HaywardBindingConstants.THING_TYPE_SENSOR, HaywardBindingConstants.THING_TYPE_VALVEACTUATOR,
             HaywardBindingConstants.THING_TYPE_VIRTUALHEATER);
 
-    // List of all Channel ids (bridge)
-    // No Channels
+    // Bridge
 
-    // List of all Channel ids (backyard)
+    public static final String PROPERTY_BRIDGE_VSPSPEEDFORMAT = "VSP Speed Format";
+    public static final String PROPERTY_BRIDGE_TIMEFORMAT = "Time Format";
+    public static final String PROPERTY_BRIDGE_TIMEZONE = "Timezone";
+    public static final String PROPERTY_BRIDGE_DST = "DST";
+    public static final String PROPERTY_BRIDGE_INTERNETTIME = "Internet Time";
+    public static final String PROPERTY_BRIDGE_UNITS = "MSP Units";
+    public static final String PROPERTY_BRIDGE_CHLORDISPLAY = "Chlor Display";
+    public static final String PROPERTY_BRIDGE_LANGUAGE = "MSP Units";
+    public static final String PROPERTY_BRIDGE_UIDISPLAYMODE = "MSP Units";
+    public static final String PROPERTY_BRIDGE_UIMOODCOLORENABLED = "MSP Units";
+    public static final String PROPERTY_BRIDGE_UIHEATERSIMPLEMODE = "MSP Units";
+    public static final String PROPERTY_BRIDGE_UIFILTERSIMPLEMODE = "MSP Units";
+    public static final String PROPERTY_BRIDGE_UILIGHTSSIMPLEMODE = "MSP Units";
+
+    // Backyard
     public static final String CHANNEL_BACKYARD_AIRTEMP = "backyardAirTemp";
-    public static final String CHANNEL_BACKYARD_STATUS = "backyardStatus";
     public static final String CHANNEL_BACKYARD_STATE = "backyardState";
 
-    // List of all Channel ids (bow)
+    // Body of Water
     public static final String CHANNEL_BOW_WATERTEMP = "bowWaterTemp";
     public static final String CHANNEL_BOW_FLOW = "bowFlow";
 
@@ -71,72 +82,70 @@ public class HaywardBindingConstants {
     public static final String PROPERTY_BOW_SUPPORTSSPILLOVER = "supportsSpillover";
     public static final String PROPERTY_BOW_SIZEINGALLONS = "sizeInGallons";
 
-    // List of all Channel ids (chlorinator)
-    public static final String CHANNEL_CHLORINATOR_ENABLE = "chlorEnable";
-    public static final String CHANNEL_CHLORINATOR_OPERATINGMODE = "chlorOperatingMode";
-    public static final String CHANNEL_CHLORINATOR_TIMEDPERCENT = "chlorTimedPercent";
-    public static final String CHANNEL_CHLORINATOR_SCMODE = "chlorScMode";
-    public static final String CHANNEL_CHLORINATOR_ERROR = "chlorError";
-    public static final String CHANNEL_CHLORINATOR_ALERT = "chlorAlert";
-    public static final String CHANNEL_CHLORINATOR_AVGSALTLEVEL = "chlorAvgSaltLevel";
-    public static final String CHANNEL_CHLORINATOR_INSTANTSALTLEVEL = "chlorInstantSaltLevel";
+    // Chlorinator
     public static final String CHANNEL_CHLORINATOR_STATUS = "chlorStatus";
+    public static final String CHANNEL_CHLORINATOR_INSTANTSALTLEVEL = "chlorSaltInstantLevel";
+    public static final String CHANNEL_CHLORINATOR_AVGSALTLEVEL = "chlorSaltAvgLevel";
+    public static final String CHANNEL_CHLORINATOR_ALERT = "chlorAlert";
+    public static final String CHANNEL_CHLORINATOR_ERROR = "chlorError";
+    public static final String CHANNEL_CHLORINATOR_SCMODE = "chlorScMode";
+    public static final String CHANNEL_CHLORINATOR_OPERATINGSTATE = "chlorOperatingState";
+    public static final String CHANNEL_CHLORINATOR_TIMEDPERCENT = "chlorTimedPercent";
+    public static final String CHANNEL_CHLORINATOR_OPERATINGMODE = "chlorOperatingMode";
+    public static final String CHANNEL_CHLORINATOR_ENABLE = "chlorEnable";
 
     public static final String PROPERTY_CHLORINATOR_SHAREDTYPE = "chlorSharedType";
     public static final String PROPERTY_CHLORINATOR_MODE = "chlorMode";
     public static final String PROPERTY_CHLORINATOR_CELLTYPE = "cellType";
     public static final String PROPERTY_CHLORINATOR_DISPENSERTYPE = "dispenserType";
 
-    // List of all Channel ids (colorlogic)
-    public static final String CHANNEL_COLORLOGIC_ENABLE = "colorLogicLightEnable";
-    public static final String CHANNEL_COLORLOGIC_STATE = "colorLogicLightState";
-    public static final String CHANNEL_COLORLOGIC_CURRENTSHOW = "colorLogicLightCurrentShow";
-    public static final String CHANNEL_COLORLOGIC_BRIGHTNESS = "colorLogicLightBrightness";
-    public static final String CHANNEL_COLORLOGIC_SPEED = "colorLogicLightSpeed";
-
-    public static final String TYPE_COLORLOGIC_LIGHTBRIGHTNESS = "lightBrightness";
-    public static final String TYPE_COLORLOGIC_LIGHTSPEED = "lightSpeed";
+    // Colorlogic
+    public static final String CHANNEL_COLORLOGIC_ENABLE = "enable";
+    public static final String CHANNEL_COLORLOGIC_CURRENTSHOW = "currentShow";
+    public static final String CHANNEL_COLORLOGIC_BRIGHTNESS = "brightness";
+    public static final String CHANNEL_COLORLOGIC_SPEED = "speed";
+    public static final String CHANNEL_COLORLOGIC_SPECIALEFFECT = "specialEffect";
 
     public static final String PROPERTY_COLORLOGIC_TYPE = "colorlogicType";
 
-    // List of all Channel ids (filter)
+    // Filter
     public static final String CHANNEL_FILTER_ENABLE = "filterEnable";
-    public static final String CHANNEL_FILTER_VALVEPOSITION = "filterValvePosition";
-    public static final String CHANNEL_FILTER_SPEEDPERCENT = "filterSpeedPercent";
-    public static final String CHANNEL_FILTER_SPEEDRPM = "filterSpeedRpm";
-    public static final String CHANNEL_FILTER_SPEEDSELECT = "filterSpeedSelect";
     public static final String CHANNEL_FILTER_STATE = "filterState";
+    public static final String CHANNEL_FILTER_VALVEPOSITION = "filterValvePosition";
+    public static final String CHANNEL_FILTER_SPEED = "filterSpeed";
     public static final String CHANNEL_FILTER_LASTSPEED = "filterLastSpeed";
+    public static final String CHANNEL_FILTER_WHYFILTERISON = "filterWhyFilterIsOn";
+    public static final String CHANNEL_FILTER_FPOVERRIDE = "filterFpOverride";
+    public static final String CHANNEL_FILTER_REPORTEDSPEED = "filterReportedSpeed";
+    public static final String CHANNEL_FILTER_POWER = "filterPower";
 
     public static final String PROPERTY_FILTER_SHAREDTYPE = "filterSharedType";
     public static final String PROPERTY_FILTER_FILTERTYPE = "filterType";
     public static final String PROPERTY_FILTER_PRIMINGENABLED = "primingEnabled";
-    public static final String PROPERTY_FILTER_MINSPEED = "minFilterPercent";
-    public static final String PROPERTY_FILTER_MAXSPEED = "maxFilterPercent";
-    public static final String PROPERTY_FILTER_MINRPM = "minFilterRPM";
-    public static final String PROPERTY_FILTER_MAXRPM = "maxFilterRPM";
-    public static final String PROPERTY_FILTER_LOWSPEED = "lowFilterSpeed";
-    public static final String PROPERTY_FILTER_MEDSPEED = "mediumFilterSpeed";
-    public static final String PROPERTY_FILTER_HIGHSPEED = "highFilterSpeed";
-    public static final String PROPERTY_FILTER_CUSTOMSPEED = "customFilterSpeed";
-    public static final String PROPERTY_FILTER_FREEZEPROTECTOVERRIDEINTERVAL = "freezeProtectOverrideInterval";
+    public static final String PROPERTY_FILTER_MINSPEED = "filterminPercent";
+    public static final String PROPERTY_FILTER_MAXSPEED = "filterMaxPercent";
+    public static final String PROPERTY_FILTER_MINRPM = "filterMinRPM";
+    public static final String PROPERTY_FILTER_MAXRPM = "filterMaxRPM";
+    public static final String PROPERTY_FILTER_LOWSPEED = "filterLowSpeed";
+    public static final String PROPERTY_FILTER_MEDSPEED = "filterMediumSpeed";
+    public static final String PROPERTY_FILTER_HIGHSPEED = "filterHighSpeed";
+    public static final String PROPERTY_FILTER_CUSTOMSPEED = "filterCustomSpeed";
+    public static final String PROPERTY_FILTER_FREEZEPROTECTOVERRIDEINTERVAL = "filterFreezeProtectOverrideInterval";
 
-    // List of all Channel ids (heater)
+    // Heater
     public static final String CHANNEL_HEATER_STATE = "heaterState";
     public static final String CHANNEL_HEATER_TEMP = "heaterTemp";
     public static final String CHANNEL_HEATER_ENABLE = "heaterEnable";
+    public static final String CHANNEL_PRIORITY = "heaterPriority";
+    public static final String CHANNEL_HEATER_MAINTAINFOR = "heaterMaintainFor";
 
     public static final String PROPERTY_HEATER_TYPE = "type";
     public static final String PROPERTY_HEATER_HEATERTYPE = "heaterType";
     public static final String PROPERTY_HEATER_SHAREDEQUIPID = "sharedEquipmentSystemID";
 
-    // List of all Channel ids (pump)
+    // Pump
     public static final String CHANNEL_PUMP_ENABLE = "pumpEnable";
-    public static final String CHANNEL_PUMP_SPEEDPERCENT = "pumpSpeedPercent";
-    public static final String CHANNEL_PUMP_SPEEDRPM = "pumpSpeedRpm";
-    public static final String CHANNEL_PUMP_SPEEDSELECT = "pumpSpeedSelect";
-    public static final String CHANNEL_PUMP_STATE = "pumpState";
-    public static final String CHANNEL_PUMP_LASTSPEED = "pumpLastSpeed";
+    public static final String CHANNEL_PUMP_SPEED = "pumpSpeed";
 
     public static final String PROPERTY_PUMP_TYPE = "pumpType";
     public static final String PROPERTY_PUMP_FUNCTION = "pumpFunction";
@@ -150,21 +159,24 @@ public class HaywardBindingConstants {
     public static final String PROPERTY_PUMP_HIGHSPEED = "highPumpSpeed";
     public static final String PROPERTY_PUMP_CUSTOMSPEED = "customPumpSpeed";
 
-    // List of all Channel ids (relay)
+    // Relay
     public static final String CHANNEL_RELAY_STATE = "relayState";
 
     public static final String PROPERTY_RELAY_TYPE = "relayType";
     public static final String PROPERTY_RELAY_FUNCTION = "relayFunction";
 
-    // List of all Channel ids (sensor)
+    // Sensor
     public static final String CHANNEL_SENSOR_DATA = "sensorData";
-
     public static final String PROPERTY_SENSOR_TYPE = "sensorType";
     public static final String PROPERTY_SENSOR_UNITS = "sensorUnits";
 
-    // List of all Channel ids (virtualHeater)
+    // Virtual Heater
     public static final String CHANNEL_VIRTUALHEATER_CURRENTSETPOINT = "virtualHeaterCurrentSetpoint";
     public static final String CHANNEL_VIRTUALHEATER_ENABLE = "virtualHeaterEnable";
+    public static final String CHANNEL_VIRTUALHEATER_SOLARSETPOINT = "virtualHeaterSolarSetpoint";
+    public static final String CHANNEL_VIRTUALHEATER_MODE = "virtualHeaterMode";
+    public static final String CHANNEL_VIRTUALHEATER_SILENTMODE = "virtualHeaterSilentMode";
+    public static final String CHANNEL_VIRTUALHEATER_WHYON = "virtualHeaterWhyOn";
 
     public static final String PROPERTY_VIRTUALHEATER_SHAREDTYPE = "sharedType";
     public static final String PROPERTY_VIRTUALHEATER_MINSETTABLEWATERTEMP = "minSettableWaterTemp";

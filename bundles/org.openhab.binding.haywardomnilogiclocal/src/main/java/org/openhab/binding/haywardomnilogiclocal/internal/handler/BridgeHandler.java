@@ -30,14 +30,13 @@ import javax.xml.xpath.XPathFactory;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardAccount;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardDynamicStateDescriptionProvider;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardTypeToRequest;
-import org.openhab.binding.haywardomnilogiclocal.internal.config.HaywardConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.discovery.HaywardDiscoveryService;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpClient;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpMessage;
@@ -58,15 +57,15 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 /**
- * The {@link HaywardBridgeHandler} is responsible for handling commands, which are
+ * The {@link BridgeHandler} is responsible for handling commands, which are
  * sent to one of the channels.
  *
  * @author Matt Myers - Initial contribution
  */
 
 @NonNullByDefault
-public class HaywardBridgeHandler extends BaseBridgeHandler {
-    private final Logger logger = LoggerFactory.getLogger(HaywardBridgeHandler.class);
+public class BridgeHandler extends BaseBridgeHandler {
+    private final Logger logger = LoggerFactory.getLogger(BridgeHandler.class);
     private static final int UDP_PORT = 10444;
 
     private final HaywardDynamicStateDescriptionProvider stateDescriptionProvider;
@@ -76,14 +75,18 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
     private @Nullable ScheduledFuture<?> pollAlarmsFuture;
     private int commFailureCount;
     private HaywardConfig config = getConfig().as(HaywardConfig.class);
-    private final HaywardAccount account = getConfig().as(HaywardAccount.class);
+    public String units = "Standard";
 
     public HaywardConfig getBridgeConfig() {
         return config;
     }
 
-    public HaywardAccount getAccount() {
-        return account;
+    public String getUnits() {
+        return units;
+    }
+
+    public void setUnits(String units) {
+        this.units = units;
     }
 
     @Override
@@ -91,7 +94,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         return Set.of(HaywardDiscoveryService.class);
     }
 
-    public HaywardBridgeHandler(HaywardDynamicStateDescriptionProvider stateDescriptionProvider, Bridge bridge) {
+    public BridgeHandler(HaywardDynamicStateDescriptionProvider stateDescriptionProvider, Bridge bridge) {
         super(bridge);
         this.stateDescriptionProvider = stateDescriptionProvider;
     }
@@ -237,7 +240,7 @@ public class HaywardBridgeHandler extends BaseBridgeHandler {
         for (Thing thing : getThing().getThings()) {
             Map<String, String> properties = thing.getProperties();
             if ("BACKYARD".equals(properties.get(HaywardBindingConstants.PROPERTY_TYPE))) {
-                HaywardBackyardHandler handler = (HaywardBackyardHandler) thing.getHandler();
+                BackyardHandler handler = (BackyardHandler) thing.getHandler();
                 if (handler != null) {
                     String systemID = properties.get(HaywardBindingConstants.PROPERTY_SYSTEM_ID);
                     if (systemID != null) {

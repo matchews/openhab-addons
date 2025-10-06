@@ -14,27 +14,41 @@ public class Backyard {
     private @Nullable String systemId;
 
     @XStreamAsAttribute
-    private @Nullable String airTemp;
+    private @Nullable String statusVersion;
 
     @XStreamAsAttribute
-    private @Nullable String status;
+    private @Nullable String airTemp;
 
     @XStreamAsAttribute
     private @Nullable String state;
 
+    @XStreamAsAttribute
+    private @Nullable String ConfigChksum;
+
+    @XStreamAsAttribute
+    private @Nullable String mspVersion;
+
     public @Nullable String getSystemId() {
         return systemId;
+    }
+
+    public @Nullable String getStatusVersion() {
+        return statusVersion;
     }
 
     public @Nullable String getAirTemp() {
         return airTemp;
     }
 
-    public @Nullable String getStatus() {
-        return status;
-    }
-
     public @Nullable String getState() {
         return state;
+    }
+
+    public @Nullable String getConfigChksum() {
+        return ConfigChksum;
+    }
+
+    public @Nullable String getMspVersion() {
+        return mspVersion;
     }
 }

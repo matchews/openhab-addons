@@ -21,17 +21,17 @@ import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardBackyardHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardBowHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardBridgeHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardChlorinatorHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardColorLogicHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardFilterHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardHeaterHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardPumpHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardRelayHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardValveActuatorHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardVirtualHeaterHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.handler.BackyardHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.handler.BowHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.handler.BridgeHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.handler.ChlorinatorHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.handler.ColorLogicHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.handler.FilterHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.handler.HeaterHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.handler.PumpHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.handler.RelayHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.handler.ValveActuatorHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.handler.VirtualHeaterHandler;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingTypeUID;
@@ -75,37 +75,37 @@ public class HaywardHandlerFactory extends BaseThingHandlerFactory {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
         if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_BRIDGE)) {
-            return new HaywardBridgeHandler(stateDescriptionProvider, (Bridge) thing);
+            return new BridgeHandler(stateDescriptionProvider, (Bridge) thing);
         }
         if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_BACKYARD)) {
-            return new HaywardBackyardHandler(thing);
+            return new BackyardHandler(thing);
         }
         if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_BOW)) {
-            return new HaywardBowHandler(thing);
+            return new BowHandler(thing);
         }
         if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_CHLORINATOR)) {
-            return new HaywardChlorinatorHandler(thing);
+            return new ChlorinatorHandler(thing);
         }
         if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_COLORLOGIC)) {
-            return new HaywardColorLogicHandler(thing);
+            return new ColorLogicHandler(thing);
         }
         if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_FILTER)) {
-            return new HaywardFilterHandler(thing);
+            return new FilterHandler(thing);
         }
         if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_HEATER)) {
-            return new HaywardHeaterHandler(thing);
+            return new HeaterHandler(thing);
         }
         if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_PUMP)) {
-            return new HaywardPumpHandler(thing);
+            return new PumpHandler(thing);
         }
         if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_RELAY)) {
-            return new HaywardRelayHandler(thing);
+            return new RelayHandler(thing);
         }
         if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_VALVEACTUATOR)) {
-            return new HaywardValveActuatorHandler(thing);
+            return new ValveActuatorHandler(thing);
         }
         if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_VIRTUALHEATER)) {
-            return new HaywardVirtualHeaterHandler(thing);
+            return new VirtualHeaterHandler(thing);
         }
         return null;
     }

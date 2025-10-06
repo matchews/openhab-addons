@@ -17,11 +17,19 @@ public class ValveActuator {
     @XStreamAlias("valveActuatorState")
     private @Nullable String valveActuatorState;
 
+    @XStreamAsAttribute
+    @XStreamAlias("whyOn")
+    private @Nullable String whyOn;
+
     public @Nullable String getSystemId() {
         return systemId;
     }
 
     public @Nullable String getValveActuatorState() {
         return valveActuatorState;
+    }
+
+    public @Nullable String getWhyOn() {
+        return whyOn;
     }
 }

@@ -17,7 +17,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardBridgeHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.handler.BridgeHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.OnOffType;
@@ -69,6 +69,7 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
     }
 
     public State toState(String type, String channelID, String value) throws NumberFormatException {
+
         switch (type) {
             case "Number":
                 return new DecimalType(value);
@@ -82,29 +83,29 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
                         return new QuantityType<>(Integer.parseInt(value), Units.PARTS_PER_MILLION);
                     case HaywardBindingConstants.CHANNEL_CHLORINATOR_TIMEDPERCENT:
                         return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
+                    case HaywardBindingConstants.CHANNEL_FILTER_SPEED:
+                        return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
                     case HaywardBindingConstants.CHANNEL_FILTER_LASTSPEED:
                         return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
-                    case HaywardBindingConstants.CHANNEL_FILTER_SPEEDPERCENT:
-                        return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
-                    case HaywardBindingConstants.CHANNEL_PUMP_LASTSPEED:
-                        return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
-                    case HaywardBindingConstants.CHANNEL_PUMP_SPEEDPERCENT:
+                    case HaywardBindingConstants.CHANNEL_PUMP_SPEED:
                         return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
                 }
                 return StringType.valueOf(value);
-            case "Number:Frequency":
+            case "Number:Power":
                 switch (channelID) {
-                    case HaywardBindingConstants.CHANNEL_FILTER_SPEEDRPM:
-                        return new QuantityType<>(Integer.parseInt(value), Units.RPM);
-                    case HaywardBindingConstants.CHANNEL_PUMP_SPEEDRPM:
-                        return new QuantityType<>(Integer.parseInt(value), Units.RPM);
+                    case HaywardBindingConstants.CHANNEL_FILTER_POWER:
+                        return new QuantityType<>(Integer.parseInt(value), Units.WATT);
                 }
             case "Number:Temperature":
                 Bridge bridge = getBridge();
                 if (bridge != null) {
-                    HaywardBridgeHandler bridgehandler = (HaywardBridgeHandler) bridge.getHandler();
+                    BridgeHandler bridgehandler = (BridgeHandler) bridge.getHandler();
                     if (bridgehandler != null) {
-                        if ("Standard".equals(bridgehandler.getAccount().getUnits())) {
+                        // Get units property from bridge
+                        Map<String, String> bridgeProperties = bridgehandler.getThing().getProperties();
+                        String units = bridgeProperties.get(HaywardBindingConstants.PROPERTY_BRIDGE_UNITS);
+
+                        if ("Standard".equals(units)) {
                             return new QuantityType<>(Integer.parseInt(value), ImperialUnits.FAHRENHEIT);
                         } else {
                             return new QuantityType<>(Integer.parseInt(value), SIUnits.CELSIUS);
@@ -172,7 +173,7 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
 
     protected void sendUdpCommand(String xml, HaywardMessageType msgType) {
         Bridge bridge = getBridge();
-        if (bridge != null && bridge.getHandler() instanceof HaywardBridgeHandler bridgehandler) {
+        if (bridge != null && bridge.getHandler() instanceof BridgeHandler bridgehandler) {
             try {
                 String response = bridgehandler.sendRequest(xml, msgType);
                 if (logger.isTraceEnabled()) {

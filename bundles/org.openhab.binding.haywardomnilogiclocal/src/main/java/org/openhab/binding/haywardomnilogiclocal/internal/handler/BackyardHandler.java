@@ -6,10 +6,10 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Backyard;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
@@ -22,10 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NonNullByDefault
-public class HaywardBackyardHandler extends HaywardThingHandler {
-    private final Logger logger = LoggerFactory.getLogger(HaywardBackyardHandler.class);
+public class BackyardHandler extends HaywardThingHandler {
+    private final Logger logger = LoggerFactory.getLogger(BackyardHandler.class);
 
-    public HaywardBackyardHandler(Thing thing) {
+    public BackyardHandler(Thing thing) {
         super(thing);
     }
 
@@ -60,14 +60,6 @@ public class HaywardBackyardHandler extends HaywardThingHandler {
                 }
 
                 @Nullable
-                String byStatus = by.getStatus();
-                if (byStatus != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_BACKYARD_STATUS, byStatus);
-                } else {
-                    logger.debug("Backyard status missing");
-                }
-
-                @Nullable
                 String state = by.getState();
                 if (state != null) {
                     updateData(HaywardBindingConstants.CHANNEL_BACKYARD_STATE, state);
@@ -84,13 +76,13 @@ public class HaywardBackyardHandler extends HaywardThingHandler {
         List<String> parameter1 = new ArrayList<>();
         List<String> message = new ArrayList<>();
         String alarmStr;
-
+        // todo
         Bridge bridge = getBridge();
-        if (bridge != null && bridge.getHandler() instanceof HaywardBridgeHandler bridgehandler) {
+        if (bridge != null && bridge.getHandler() instanceof BridgeHandler bridgehandler) {
             String urlParameters = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>GetAlarmList</Name><Parameters>"
-                    + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.getAccount().getToken()
+                    // + "<Parameter name=\"Token\" dataType=\"String\">" + bridgehandler.getAccount().getToken()
                     + "</Parameter><Parameter name=\"MspSystemID\" dataType=\"int\">"
-                    + bridgehandler.getAccount().getMspSystemID()
+                    // + bridgehandler.getAccount().getMspSystemID()
                     + "</Parameter><Parameter name=\"CultureInfoName\" dataType=\"String\">en-us</Parameter></Parameters></Request>";
 
             try {

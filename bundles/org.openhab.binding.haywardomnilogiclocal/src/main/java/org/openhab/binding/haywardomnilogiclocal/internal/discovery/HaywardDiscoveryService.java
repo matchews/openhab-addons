@@ -29,12 +29,13 @@ import org.openhab.binding.haywardomnilogiclocal.internal.config.ChlorinatorConf
 import org.openhab.binding.haywardomnilogiclocal.internal.config.ColorLogicLightConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.ConfigParser;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.FilterConfig;
-import org.openhab.binding.haywardomnilogiclocal.internal.config.HeaterConfig;
+import org.openhab.binding.haywardomnilogiclocal.internal.config.HeaterEquipConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.MspConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.PumpConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.RelayConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.SensorConfig;
-import org.openhab.binding.haywardomnilogiclocal.internal.handler.HaywardBridgeHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.config.VirtualHeaterConfig;
+import org.openhab.binding.haywardomnilogiclocal.internal.handler.BridgeHandler;
 import org.openhab.core.config.discovery.AbstractThingHandlerDiscoveryService;
 import org.openhab.core.config.discovery.DiscoveryResult;
 import org.openhab.core.config.discovery.DiscoveryResultBuilder;
@@ -52,11 +53,11 @@ import org.slf4j.LoggerFactory;
  */
 @Component(scope = ServiceScope.PROTOTYPE, service = HaywardDiscoveryService.class)
 @NonNullByDefault
-public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryService<HaywardBridgeHandler> {
+public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryService<BridgeHandler> {
     private final Logger logger = LoggerFactory.getLogger(HaywardDiscoveryService.class);
 
     public HaywardDiscoveryService() {
-        super(HaywardBridgeHandler.class, THING_TYPES_UIDS, 0, false);
+        super(BridgeHandler.class, THING_TYPES_UIDS, 0, false);
     }
 
     @Override
@@ -73,182 +74,280 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
 
     public synchronized void mspConfigDiscovery(String xmlResponse) {
         MspConfig config = ConfigParser.parse(xmlResponse);
+        String name = "";
+        String systemID = "";
 
-        for (BackyardConfig backyard : config.getBackyards()) {
-            Map<String, Object> backyardProps = new HashMap<>();
-            backyardProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.BACKYARD);
-            String systemId = backyard.getSystemId();
-            putIfNotNull(backyardProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, systemId);
-            onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_BACKYARD, "Backyard", backyardProps);
+        // Get bridge properties
+        List<org.openhab.binding.haywardomnilogiclocal.internal.config.SystemConfig> systems = config.getSystems();
+        Map<String, String> bridgeProps = new HashMap<>();
+        putStrStrIfNotNull(bridgeProps, HaywardBindingConstants.PROPERTY_BRIDGE_VSPSPEEDFORMAT,
+                systems.get(0).getMspVspSpeedFormat());
+        putStrStrIfNotNull(bridgeProps, HaywardBindingConstants.PROPERTY_BRIDGE_TIMEFORMAT,
+                systems.get(0).getTimeZone());
+        putStrStrIfNotNull(bridgeProps, HaywardBindingConstants.PROPERTY_BRIDGE_TIMEZONE, systems.get(0).getTimeZone());
+        putStrStrIfNotNull(bridgeProps, HaywardBindingConstants.PROPERTY_BRIDGE_DST, systems.get(0).getDst());
+        putStrStrIfNotNull(bridgeProps, HaywardBindingConstants.PROPERTY_BRIDGE_INTERNETTIME, systems.get(0).getDst());
+        putStrStrIfNotNull(bridgeProps, HaywardBindingConstants.PROPERTY_BRIDGE_UNITS, systems.get(0).getDst());
+        putStrStrIfNotNull(bridgeProps, HaywardBindingConstants.PROPERTY_BRIDGE_CHLORDISPLAY, systems.get(0).getDst());
+        putStrStrIfNotNull(bridgeProps, HaywardBindingConstants.PROPERTY_BRIDGE_LANGUAGE, systems.get(0).getDst());
+        putStrStrIfNotNull(bridgeProps, HaywardBindingConstants.PROPERTY_BRIDGE_UIDISPLAYMODE, systems.get(0).getDst());
+        putStrStrIfNotNull(bridgeProps, HaywardBindingConstants.PROPERTY_BRIDGE_UIMOODCOLORENABLED,
+                systems.get(0).getDst());
+        putStrStrIfNotNull(bridgeProps, HaywardBindingConstants.PROPERTY_BRIDGE_UIHEATERSIMPLEMODE,
+                systems.get(0).getDst());
+        putStrStrIfNotNull(bridgeProps, HaywardBindingConstants.PROPERTY_BRIDGE_UIFILTERSIMPLEMODE,
+                systems.get(0).getDst());
+        putStrStrIfNotNull(bridgeProps, HaywardBindingConstants.PROPERTY_BRIDGE_UILIGHTSSIMPLEMODE,
+                systems.get(0).getDst());
 
-            for (SensorConfig sensor : backyard.getSensors()) {
-                Map<String, Object> sensorProps = new HashMap<>();
-                sensorProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.SENSOR);
-                String sensorId = sensor.getSystemId();
-                putIfNotNull(sensorProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, sensorId);
-                putIfNotNull(sensorProps, HaywardBindingConstants.PROPERTY_SENSOR_TYPE, sensor.getType());
-                putIfNotNull(sensorProps, HaywardBindingConstants.PROPERTY_SENSOR_UNITS, sensor.getUnits());
-                String name = sensor.getName();
-                if (name == null) {
-                    name = sensorId != null ? sensorId : "Sensor";
-                }
-                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_SENSOR, name, sensorProps);
-            }
+        BridgeHandler bridgehandler = thingHandler;
+        if (bridgehandler != null) {
+            bridgehandler.getThing().setProperties(bridgeProps);
+        }
 
-            for (BodyOfWaterConfig bow : backyard.getBodiesOfWater()) {
-                Map<String, Object> bowProps = new HashMap<>();
-                bowProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.BOW);
-                String bowId = bow.getSystemId();
-                putIfNotNull(bowProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, bowId);
-                addBowContext(bowProps, bow);
-                putIfNotNull(bowProps, HaywardBindingConstants.PROPERTY_BOW_TYPE, bow.getType());
-                putIfNotNull(bowProps, HaywardBindingConstants.PROPERTY_BOW_SHAREDTYPE, bow.getSharedType());
-                putIfNotNull(bowProps, HaywardBindingConstants.PROPERTY_BOW_SHAREDPRIORITY, bow.getSharedPriority());
-                putIfNotNull(bowProps, HaywardBindingConstants.PROPERTY_BOW_SHAREDEQUIPID,
-                        bow.getSharedEquipmentSystemId());
-                putIfNotNull(bowProps, HaywardBindingConstants.PROPERTY_BOW_SUPPORTSSPILLOVER,
-                        bow.getSupportsSpillover());
-                putIfNotNull(bowProps, HaywardBindingConstants.PROPERTY_BOW_SIZEINGALLONS, bow.getSizeInGallons());
+        List<BackyardConfig> backyards = config.getBackyards();
+        if (backyards != null) {
+            for (BackyardConfig backyard : backyards) {
+                Map<String, Object> backyardProps = new HashMap<>();
+                backyardProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.BACKYARD);
+                putStrObjIfNotNull(backyardProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, backyard.getSystemId());
+                name = (backyard.getName() != null) ? backyard.getName() : "Backyard";
+                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_BACKYARD, name, backyardProps);
 
-                String bowLabel = bow.getName();
-                if (bowLabel == null) {
-                    bowLabel = bowId != null ? bowId : "BodyOfWater";
-                }
-                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_BOW, bowLabel, bowProps);
+                List<BodyOfWaterConfig> bows = backyard.getBodiesOfWater();
+                if (bows != null) {
+                    for (BodyOfWaterConfig bow : bows) {
+                        Map<String, Object> bowProps = new HashMap<>();
+                        bowProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.BOW);
+                        String bowId = bow.getSystemId();
+                        putStrObjIfNotNull(bowProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, bowId);
+                        addBowContext(bowProps, bow);
+                        putStrObjIfNotNull(bowProps, HaywardBindingConstants.PROPERTY_BOW_TYPE, bow.getType());
+                        putStrObjIfNotNull(bowProps, HaywardBindingConstants.PROPERTY_BOW_SHAREDTYPE,
+                                bow.getSharedType());
+                        putStrObjIfNotNull(bowProps, HaywardBindingConstants.PROPERTY_BOW_SHAREDPRIORITY,
+                                bow.getSharedPriority());
+                        putStrObjIfNotNull(bowProps, HaywardBindingConstants.PROPERTY_BOW_SHAREDEQUIPID,
+                                bow.getSharedEquipmentSystemId());
+                        putStrObjIfNotNull(bowProps, HaywardBindingConstants.PROPERTY_BOW_SUPPORTSSPILLOVER,
+                                bow.getSupportsSpillover());
+                        putStrObjIfNotNull(bowProps, HaywardBindingConstants.PROPERTY_BOW_SIZEINGALLONS,
+                                bow.getSizeInGallons());
 
-                for (FilterConfig filter : bow.getFilters()) {
-                    Map<String, Object> filterProps = new HashMap<>();
-                    filterProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.FILTER);
-                    String filterId = filter.getSystemId();
-                    String filterName = filter.getName();
-
-                    putIfNotNull(filterProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, filterId);
-                    addBowContext(filterProps, bow);
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_FILTER,
-                            filterName != null ? filterName : "Filter", filterProps);
-                }
-
-                for (HeaterConfig heater : bow.getHeaters()) {
-                    Map<String, Object> heaterProps = new HashMap<>();
-                    heaterProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.HEATER);
-                    String heaterId = heater.getSystemId();
-                    putIfNotNull(heaterProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, heaterId);
-                    addBowContext(heaterProps, bow);
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_HEATER, "Heater", heaterProps);
-                }
-
-                for (ChlorinatorConfig chlorinator : bow.getChlorinators()) {
-                    Map<String, Object> chlorProps = new HashMap<>();
-                    chlorProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.CHLORINATOR);
-                    String chlorId = chlorinator.getSystemId();
-                    String chlorName = chlorinator.getName();
-                    putIfNotNull(chlorProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, chlorId);
-                    addBowContext(chlorProps, bow);
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_CHLORINATOR,
-                            chlorName != null ? chlorName : "Chlorinator", chlorProps);
-                }
-
-                for (ColorLogicLightConfig light : bow.getColorLogicLights()) {
-                    Map<String, Object> lightProps = new HashMap<>();
-                    lightProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.COLORLOGIC);
-                    String lightId = light.getSystemId();
-                    String lightName = light.getName();
-                    putIfNotNull(lightProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, lightId);
-                    addBowContext(lightProps, bow);
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_COLORLOGIC,
-                            lightName != null ? lightName : "ColorLogic", lightProps);
-                }
-
-                for (RelayConfig relay : bow.getRelays()) {
-                    String relayId = relay.getSystemId();
-                    String relayType = relay.getType();
-                    if ("RLY_VALVE_ACTUATOR".equals(relayType)) {
-                        Map<String, Object> valveProps = new HashMap<>();
-                        valveProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.VALVEACTUATOR);
-                        putIfNotNull(valveProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, relayId);
-                        putIfNotNull(valveProps, HaywardBindingConstants.PROPERTY_RELAY_TYPE, relayType);
-                        putIfNotNull(valveProps, HaywardBindingConstants.PROPERTY_RELAY_FUNCTION, relay.getFunction());
-                        addBowContext(valveProps, bow);
-                        String relayName = relay.getName();
-                        if (relayName == null) {
-                            relayName = relayId != null ? relayId : "ValveActuator";
+                        String bowLabel = bow.getName();
+                        if (bowLabel == null) {
+                            bowLabel = bowId != null ? bowId : "BodyOfWater";
                         }
-                        onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_VALVEACTUATOR, relayName, valveProps);
-                        continue;
+                        onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_BOW, bowLabel, bowProps);
+
+                        List<ChlorinatorConfig> chlorinators = bow.getChlorinators();
+                        if (chlorinators != null) {
+                            for (ChlorinatorConfig chlorinator : chlorinators) {
+                                Map<String, Object> chlorProps = new HashMap<>();
+                                chlorProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.CHLORINATOR);
+                                String chlorId = chlorinator.getSystemId();
+                                String chlorName = chlorinator.getName();
+                                putStrObjIfNotNull(chlorProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, chlorId);
+                                addBowContext(chlorProps, bow);
+                                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_CHLORINATOR,
+                                        chlorName != null ? chlorName : "Chlorinator", chlorProps);
+                            }
+                        }
+
+                        List<ColorLogicLightConfig> lights = bow.getColorLogicLights();
+                        if (lights != null) {
+                            for (ColorLogicLightConfig light : lights) {
+                                Map<String, Object> lightProps = new HashMap<>();
+                                lightProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.COLORLOGIC);
+                                String lightId = light.getSystemId();
+                                String lightName = light.getName();
+                                putStrObjIfNotNull(lightProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, lightId);
+                                addBowContext(lightProps, bow);
+                                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_COLORLOGIC,
+                                        lightName != null ? lightName : "ColorLogic", lightProps);
+                            }
+                        }
+
+                        List<FilterConfig> filters = bow.getFilters();
+                        if (filters != null) {
+                            for (FilterConfig filter : filters) {
+                                Map<String, Object> filterProps = new HashMap<>();
+                                filterProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.FILTER);
+                                String filterId = filter.getSystemId();
+                                String filterName = filter.getName();
+
+                                putStrObjIfNotNull(filterProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, filterId);
+                                addBowContext(filterProps, bow);
+                                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_FILTER,
+                                        filterName != null ? filterName : "Filter", filterProps);
+                            }
+                        }
+
+                        List<RelayConfig> relays = bow.getRelays();
+                        if (relays != null) {
+                            for (RelayConfig relay : relays) {
+                                String relayId = relay.getSystemId();
+                                String relayType = relay.getType();
+                                if ("RLY_VALVE_ACTUATOR".equals(relayType)) {
+                                    Map<String, Object> valveProps = new HashMap<>();
+                                    valveProps.put(HaywardBindingConstants.PROPERTY_TYPE,
+                                            HaywardTypeToRequest.VALVEACTUATOR);
+                                    putStrObjIfNotNull(valveProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, relayId);
+                                    putStrObjIfNotNull(valveProps, HaywardBindingConstants.PROPERTY_RELAY_TYPE,
+                                            relayType);
+                                    putStrObjIfNotNull(valveProps, HaywardBindingConstants.PROPERTY_RELAY_FUNCTION,
+                                            relay.getFunction());
+                                    addBowContext(valveProps, bow);
+                                    String relayName = relay.getName();
+                                    if (relayName == null) {
+                                        relayName = relayId != null ? relayId : "ValveActuator";
+                                    }
+                                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_VALVEACTUATOR, relayName,
+                                            valveProps);
+                                    continue;
+                                }
+
+                                Map<String, Object> relayProps = new HashMap<>();
+                                relayProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.RELAY);
+                                putStrObjIfNotNull(relayProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, relayId);
+                                addBowContext(relayProps, bow);
+                                String name = relay.getName();
+                                if (name == null) {
+                                    name = relayId != null ? relayId : "Relay";
+                                }
+                                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_RELAY, name, relayProps);
+                            }
+                        }
+
+                        List<SensorConfig> sensors2 = bow.getSensors();
+                        if (sensors2 != null) {
+                            for (SensorConfig sensor : sensors2) {
+                                Map<String, Object> sensorProps = new HashMap<>();
+                                sensorProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.SENSOR);
+                                String sensorId = sensor.getSystemId();
+                                putStrObjIfNotNull(sensorProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, sensorId);
+                                addBowContext(sensorProps, bow);
+                                putStrObjIfNotNull(sensorProps, HaywardBindingConstants.PROPERTY_SENSOR_TYPE,
+                                        sensor.getType());
+                                putStrObjIfNotNull(sensorProps, HaywardBindingConstants.PROPERTY_SENSOR_UNITS,
+                                        sensor.getUnits());
+                                String name = sensor.getName();
+                                if (name == null) {
+                                    name = sensorId != null ? sensorId : "Sensor";
+                                }
+                                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_SENSOR, name, sensorProps);
+                            }
+                        }
+
+                        List<VirtualHeaterConfig> virtualHeaters = bow.getVirtualHeaters();
+                        if (virtualHeaters != null) {
+                            for (VirtualHeaterConfig virtualHeater : virtualHeaters) {
+                                Map<String, Object> virtualHeaterProps = new HashMap<>();
+                                virtualHeaterProps.put(HaywardBindingConstants.PROPERTY_TYPE,
+                                        HaywardTypeToRequest.HEATER);
+                                String virtualHeaterId = virtualHeater.getSystemId();
+                                putStrObjIfNotNull(virtualHeaterProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID,
+                                        virtualHeaterId);
+                                addBowContext(virtualHeaterProps, bow);
+                                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_VIRTUALHEATER, "Virtual Heater",
+                                        virtualHeaterProps);
+
+                                List<HeaterEquipConfig> heaters = virtualHeater.getHeaters();
+                                if (heaters != null) {
+                                    for (HeaterEquipConfig heater : heaters) {
+                                        Map<String, Object> heaterProps = new HashMap<>();
+                                        heaterProps.put(HaywardBindingConstants.PROPERTY_TYPE,
+                                                HaywardTypeToRequest.HEATER);
+                                        String heaterId = heater.getSystemId();
+                                        putStrObjIfNotNull(heaterProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID,
+                                                heaterId);
+                                        addBowContext(heaterProps, bow);
+                                        onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_HEATER,
+                                                "Heater Equipment", heaterProps);
+                                    }
+                                }
+                            }
+                        }
+
                     }
 
-                    Map<String, Object> relayProps = new HashMap<>();
-                    relayProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.RELAY);
-                    putIfNotNull(relayProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, relayId);
-                    addBowContext(relayProps, bow);
-                    String name = relay.getName();
-                    if (name == null) {
-                        name = relayId != null ? relayId : "Relay";
+                    List<PumpConfig> pumps = backyard.getPumps();
+                    if (pumps != null) {
+                        for (PumpConfig pump : pumps) {
+                            Map<String, Object> pumpProps = new HashMap<>();
+                            pumpProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.PUMP);
+                            String pumpId = pump.getSystemId();
+                            putStrObjIfNotNull(pumpProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, pumpId);
+                            String name = pump.getName() != null ? pump.getName() : pumpId;
+                            if (name == null) {
+                                name = "Pump";
+                            }
+                            onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_PUMP, name, pumpProps);
+                        }
                     }
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_RELAY, name, relayProps);
-                }
 
-                for (SensorConfig sensor : bow.getSensors()) {
-                    Map<String, Object> sensorProps = new HashMap<>();
-                    sensorProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.SENSOR);
-                    String sensorId = sensor.getSystemId();
-                    putIfNotNull(sensorProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, sensorId);
-                    addBowContext(sensorProps, bow);
-                    putIfNotNull(sensorProps, HaywardBindingConstants.PROPERTY_SENSOR_TYPE, sensor.getType());
-                    putIfNotNull(sensorProps, HaywardBindingConstants.PROPERTY_SENSOR_UNITS, sensor.getUnits());
-                    String name = sensor.getName();
-                    if (name == null) {
-                        name = sensorId != null ? sensorId : "Sensor";
+                    List<RelayConfig> relays = backyard.getRelays();
+                    if (relays != null) {
+                        for (RelayConfig relay : relays) {
+                            String relayId = relay.getSystemId();
+                            String relayType = relay.getType();
+                            if ("RLY_VALVE_ACTUATOR".equals(relayType)) {
+                                Map<String, Object> valveProps = new HashMap<>();
+                                valveProps.put(HaywardBindingConstants.PROPERTY_TYPE,
+                                        HaywardTypeToRequest.VALVEACTUATOR);
+                                putStrObjIfNotNull(valveProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, relayId);
+                                putStrObjIfNotNull(valveProps, HaywardBindingConstants.PROPERTY_RELAY_TYPE, relayType);
+                                putStrObjIfNotNull(valveProps, HaywardBindingConstants.PROPERTY_RELAY_FUNCTION,
+                                        relay.getFunction());
+                                String name = relay.getName();
+                                if (name == null) {
+                                    name = relayId != null ? relayId : "ValveActuator";
+                                }
+                                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_VALVEACTUATOR, name, valveProps);
+                                continue;
+                            }
+
+                            Map<String, Object> relayProps = new HashMap<>();
+                            relayProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.RELAY);
+                            putStrObjIfNotNull(relayProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, relayId);
+                            String name = relay.getName();
+                            if (name == null) {
+                                name = relayId != null ? relayId : "Relay";
+                            }
+                            onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_RELAY, name, relayProps);
+                        }
                     }
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_SENSOR, name, sensorProps);
-                }
-            }
 
-            List<PumpConfig> pumps = backyard.getPumps();
-            if (pumps != null) {
-                for (PumpConfig pump : pumps) {
-                    Map<String, Object> pumpProps = new HashMap<>();
-                    pumpProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.PUMP);
-                    String pumpId = pump.getSystemId();
-                    putIfNotNull(pumpProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, pumpId);
-                    String name = pump.getName() != null ? pump.getName() : pumpId;
-                    if (name == null) {
-                        name = "Pump";
+                    List<SensorConfig> sensors = backyard.getSensors();
+                    if (sensors != null) {
+                        for (SensorConfig sensor : sensors) {
+                            Map<String, Object> sensorProps = new HashMap<>();
+                            sensorProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.SENSOR);
+                            String sensorId = sensor.getSystemId();
+                            putStrObjIfNotNull(sensorProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, sensorId);
+                            putStrObjIfNotNull(sensorProps, HaywardBindingConstants.PROPERTY_SENSOR_TYPE,
+                                    sensor.getType());
+                            putStrObjIfNotNull(sensorProps, HaywardBindingConstants.PROPERTY_SENSOR_UNITS,
+                                    sensor.getUnits());
+                            String name = sensor.getName();
+                            if (name == null) {
+                                name = sensorId != null ? sensorId : "Sensor";
+                            }
+                            onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_SENSOR, name, sensorProps);
+                        }
                     }
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_PUMP, name, pumpProps);
                 }
-            }
-
-            for (RelayConfig relay : backyard.getRelays()) {
-                String id = relay.getSystemId();
-                String relayType = relay.getType();
-                if ("RLY_VALVE_ACTUATOR".equals(relayType)) {
-                    Map<String, Object> valveProps = new HashMap<>();
-                    valveProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.VALVEACTUATOR);
-                    putIfNotNull(valveProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
-                    putIfNotNull(valveProps, HaywardBindingConstants.PROPERTY_RELAY_TYPE, relayType);
-                    putIfNotNull(valveProps, HaywardBindingConstants.PROPERTY_RELAY_FUNCTION, relay.getFunction());
-                    String name = relay.getName();
-                    if (name == null) {
-                        name = id != null ? id : "ValveActuator";
-                    }
-                    onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_VALVEACTUATOR, name, valveProps);
-                    continue;
-                }
-
-                Map<String, Object> relayProps = new HashMap<>();
-                relayProps.put(HaywardBindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.RELAY);
-                putIfNotNull(relayProps, HaywardBindingConstants.PROPERTY_SYSTEM_ID, id);
-                String name = relay.getName();
-                if (name == null) {
-                    name = id != null ? id : "Relay";
-                }
-                onDeviceDiscovered(HaywardBindingConstants.THING_TYPE_RELAY, name, relayProps);
             }
         }
     }
 
-    private void putIfNotNull(Map<String, Object> properties, String key, @Nullable String value) {
+    private void putStrObjIfNotNull(Map<String, Object> properties, String key, @Nullable String value) {
+        if (value != null) {
+            properties.put(key, value);
+        }
+    }
+
+    private void putStrStrIfNotNull(Map<String, String> properties, String key, @Nullable String value) {
         if (value != null) {
             properties.put(key, value);
         }
@@ -256,13 +355,13 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
 
     private void addBowContext(Map<String, Object> properties, BodyOfWaterConfig bow) {
         String bowId = bow.getSystemId();
-        putIfNotNull(properties, HaywardBindingConstants.PROPERTY_BOWID, bowId);
+        putStrObjIfNotNull(properties, HaywardBindingConstants.PROPERTY_BOWID, bowId);
         String bowName = bow.getName();
-        putIfNotNull(properties, HaywardBindingConstants.PROPERTY_BOWNAME, bowName);
+        putStrObjIfNotNull(properties, HaywardBindingConstants.PROPERTY_BOWNAME, bowName);
     }
 
     public void onDeviceDiscovered(ThingTypeUID thingType, String label, Map<String, Object> properties) {
-        HaywardBridgeHandler bridgehandler = thingHandler;
+        BridgeHandler bridgehandler = thingHandler;
         String systemID = (String) properties.get(HaywardBindingConstants.PROPERTY_SYSTEM_ID);
         if (bridgehandler != null) {
             if (systemID != null) {

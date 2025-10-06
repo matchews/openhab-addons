@@ -107,8 +107,7 @@ public class UdpMessage {
         byte[] payload = new byte[length - UdpHeader.HEADER_LENGTH];
         System.arraycopy(data, UdpHeader.HEADER_LENGTH, payload, 0, payload.length);
 
-        boolean decompress = header.isCompressed()
-                || header.getMessageType() == HaywardMessageType.GET_TELEMETRY
+        boolean decompress = header.isCompressed() || header.getMessageType() == HaywardMessageType.GET_TELEMETRY
                 || header.getMessageType() == HaywardMessageType.MSP_TELEMETRY_UPDATE;
         if (decompress) {
             try {

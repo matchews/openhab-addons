@@ -14,12 +14,32 @@ public class Filter {
     private @Nullable String systemId;
 
     @XStreamAsAttribute
+    @XStreamAlias("filterState")
+    private @Nullable String filterState;
+
+    @XStreamAsAttribute
     @XStreamAlias("filterSpeed")
     private @Nullable String filterSpeed;
 
     @XStreamAsAttribute
-    @XStreamAlias("filterState")
-    private @Nullable String filterState;
+    @XStreamAlias("valvePosition")
+    private @Nullable String valvePosition;
+
+    @XStreamAsAttribute
+    @XStreamAlias("whyFilterIsOn")
+    private @Nullable String whyFilterIsOn;
+
+    @XStreamAsAttribute
+    @XStreamAlias("fpOverride")
+    private @Nullable String fpOverride;
+
+    @XStreamAsAttribute
+    @XStreamAlias("reportedFilterSpeed")
+    private @Nullable String reportedFilterSpeed;
+
+    @XStreamAsAttribute
+    @XStreamAlias("power")
+    private @Nullable String power;
 
     @XStreamAsAttribute
     @XStreamAlias("lastSpeed")
@@ -29,15 +49,35 @@ public class Filter {
         return systemId;
     }
 
-    public @Nullable String getFilterSpeed() {
+    public @Nullable String getState() {
+        return filterState;
+    }
+
+    public @Nullable String getSpeed() {
         return filterSpeed;
     }
 
-    public @Nullable String getFilterState() {
-        return filterState;
+    public @Nullable String getValvePosition() {
+        return valvePosition;
+    }
+
+    public @Nullable String getWhyFilterIsOn() {
+        return whyFilterIsOn;
+    }
+
+    public @Nullable String getFpOverride() {
+        return fpOverride;
+    }
+
+    public @Nullable String getReportedSpeed() {
+        return reportedFilterSpeed;
     }
 
     public @Nullable String getLastSpeed() {
         return lastSpeed;
+    }
+
+    public @Nullable String getPower() {
+        return power;
     }
 }

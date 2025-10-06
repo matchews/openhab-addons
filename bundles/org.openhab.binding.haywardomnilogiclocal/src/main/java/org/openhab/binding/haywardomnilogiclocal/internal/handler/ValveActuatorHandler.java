@@ -3,17 +3,20 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
-import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Relay;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.ValveActuator;
 import org.openhab.core.thing.Thing;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class HaywardRelayHandler extends HaywardThingHandler {
+public class ValveActuatorHandler extends HaywardThingHandler {
+    private final Logger logger = LoggerFactory.getLogger(BackyardHandler.class);
 
-    public HaywardRelayHandler(Thing thing) {
+    public ValveActuatorHandler(Thing thing) {
         super(thing);
     }
 
@@ -23,7 +26,7 @@ public class HaywardRelayHandler extends HaywardThingHandler {
             return;
         }
 
-        updateIfPresent(values, "relayState_" + sysId, "relayState");
+        updateIfPresent(values, "valveActuatorState_" + sysId, "valveActuatorState");
     }
 
     @Override
@@ -33,11 +36,12 @@ public class HaywardRelayHandler extends HaywardThingHandler {
         if (sysId == null) {
             return;
         }
-        for (Relay r : status.getRelays()) {
-            if (sysId.equals(r.getSystemId())) {
-                @Nullable String relayState = r.getRelayState();
-                if (relayState != null) {
-                    updateData("relayState", relayState);
+        for (ValveActuator valveActuator : status.getValveActuators()) {
+            if (sysId.equals(valveActuator.getSystemId())) {
+                @Nullable
+                String valveActuatorState = valveActuator.getValveActuatorState();
+                if (valveActuatorState != null) {
+                    updateData("valveActuatorState", valveActuatorState);
                 }
             }
         }

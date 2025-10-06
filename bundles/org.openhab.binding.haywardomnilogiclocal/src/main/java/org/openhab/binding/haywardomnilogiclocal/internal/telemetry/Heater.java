@@ -14,22 +14,46 @@ public class Heater {
     private @Nullable String systemId;
 
     @XStreamAsAttribute
+    @XStreamAlias("heaterState")
+    private @Nullable String heaterState;
+
+    @XStreamAsAttribute
+    @XStreamAlias("temp")
+    private @Nullable String temp;
+
+    @XStreamAsAttribute
     @XStreamAlias("enable")
     private @Nullable String enable;
 
     @XStreamAsAttribute
-    @XStreamAlias("heaterState")
-    private @Nullable String heaterState;
+    @XStreamAlias("priority")
+    private @Nullable String priority;
+
+    @XStreamAsAttribute
+    @XStreamAlias("maintainFor")
+    private @Nullable String maintainFor;
 
     public @Nullable String getSystemId() {
         return systemId;
+    }
+
+    public @Nullable String getHeaterState() {
+        return heaterState;
+    }
+
+    public @Nullable String getTemp() {
+        return temp;
     }
 
     public @Nullable String getEnable() {
         return enable;
     }
 
-    public @Nullable String getHeaterState() {
-        return heaterState;
+    public @Nullable String getPriority() {
+        return priority;
+    }
+
+    public @Nullable String getMaintainFor() {
+        return maintainFor;
     }
 }

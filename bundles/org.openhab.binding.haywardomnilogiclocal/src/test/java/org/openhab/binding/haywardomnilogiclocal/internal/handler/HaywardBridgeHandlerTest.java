@@ -13,17 +13,18 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.jupiter.api.Test;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardDynamicStateDescriptionProvider;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardDynamicStateDescriptionProvider;
 import org.openhab.core.thing.Bridge;
 
 /**
- * Tests for {@link HaywardBridgeHandler#getMspConfig()}.
+ * Tests for {@link BridgeHandler#getMspConfig()}.
  */
 @NonNullByDefault
 public class HaywardBridgeHandlerTest {
@@ -32,12 +33,10 @@ public class HaywardBridgeHandlerTest {
     public void getMspConfigReturnsXml() throws Exception {
         HaywardDynamicStateDescriptionProvider provider = mock(HaywardDynamicStateDescriptionProvider.class);
         Bridge bridge = mock(Bridge.class);
-        HaywardBridgeHandler handler = spy(new HaywardBridgeHandler(provider, bridge));
+        BridgeHandler handler = spy(new BridgeHandler(provider, bridge));
 
-        String xmlResponse =
-                "<Response><Parameters><Parameter name=\"Config\">Value</Parameter></Parameters></Response>";
-        doReturn(xmlResponse).when(handler).sendRequest(anyString(),
-                eq(HaywardMessageType.REQUEST_CONFIGURATION));
+        String xmlResponse = "<Response><Parameters><Parameter name=\"Config\">Value</Parameter></Parameters></Response>";
+        doReturn(xmlResponse).when(handler).sendRequest(anyString(), eq(HaywardMessageType.REQUEST_CONFIGURATION));
 
         String result = handler.getMspConfig();
 
@@ -51,7 +50,7 @@ public class HaywardBridgeHandlerTest {
     public void getMspConfigThrowsOnEmptyResponse() throws Exception {
         HaywardDynamicStateDescriptionProvider provider = mock(HaywardDynamicStateDescriptionProvider.class);
         Bridge bridge = mock(Bridge.class);
-        HaywardBridgeHandler handler = spy(new HaywardBridgeHandler(provider, bridge));
+        BridgeHandler handler = spy(new BridgeHandler(provider, bridge));
 
         doReturn("").when(handler).sendRequest(anyString(), eq(HaywardMessageType.REQUEST_CONFIGURATION));
 
@@ -62,14 +61,11 @@ public class HaywardBridgeHandlerTest {
     public void getMspConfigThrowsOnStatusMessage() throws Exception {
         HaywardDynamicStateDescriptionProvider provider = mock(HaywardDynamicStateDescriptionProvider.class);
         Bridge bridge = mock(Bridge.class);
-        HaywardBridgeHandler handler = spy(new HaywardBridgeHandler(provider, bridge));
+        BridgeHandler handler = spy(new BridgeHandler(provider, bridge));
 
-        String xmlResponse =
-                "<Response><Parameters><Parameter name=\"StatusMessage\">error</Parameter></Parameters></Response>";
-        doReturn(xmlResponse).when(handler).sendRequest(anyString(),
-                eq(HaywardMessageType.REQUEST_CONFIGURATION));
+        String xmlResponse = "<Response><Parameters><Parameter name=\"StatusMessage\">error</Parameter></Parameters></Response>";
+        doReturn(xmlResponse).when(handler).sendRequest(anyString(), eq(HaywardMessageType.REQUEST_CONFIGURATION));
 
         assertThrows(HaywardException.class, () -> handler.getMspConfig());
     }
 }
-

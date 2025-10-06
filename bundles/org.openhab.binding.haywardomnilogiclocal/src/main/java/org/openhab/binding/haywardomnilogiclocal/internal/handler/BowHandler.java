@@ -22,6 +22,8 @@ import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Body of Water Handler
@@ -29,9 +31,10 @@ import org.openhab.core.thing.ThingStatus;
  * @author Matt Myers - Initial contribution
  */
 @NonNullByDefault
-public class HaywardBowHandler extends HaywardThingHandler {
+public class BowHandler extends HaywardThingHandler {
+    private final Logger logger = LoggerFactory.getLogger(BackyardHandler.class);
 
-    public HaywardBowHandler(Thing thing) {
+    public BowHandler(Thing thing) {
         super(thing);
     }
 
@@ -41,14 +44,23 @@ public class HaywardBowHandler extends HaywardThingHandler {
         String sysId = getThing().getUID().getId();
         for (BodyOfWater bow : status.getBodiesOfWater()) {
             if (sysId.equals(bow.getSystemId())) {
-                @Nullable String flow = bow.getFlow();
+
+                @Nullable
+                String flow = bow.getFlow();
                 if (flow != null) {
                     updateData(HaywardBindingConstants.CHANNEL_BOW_FLOW, flow);
+                } else {
+                    logger.debug("Body of Water flow missing from Telemtry");
                 }
-                @Nullable String waterTemp = bow.getWaterTemp();
+
+                @Nullable
+                String waterTemp = bow.getWaterTemp();
                 if (waterTemp != null) {
                     updateData(HaywardBindingConstants.CHANNEL_BOW_WATERTEMP, waterTemp);
+                } else {
+                    logger.debug("Body of Water temp missing from Telemtry");
                 }
+
             }
         }
         updateStatus(ThingStatus.ONLINE);

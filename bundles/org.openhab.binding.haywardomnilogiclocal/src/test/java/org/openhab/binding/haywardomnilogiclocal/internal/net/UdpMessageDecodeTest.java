@@ -52,4 +52,3 @@ public class UdpMessageDecodeTest {
         assertEquals(RESPONSE_XML, response.getXml());
     }
 }
-

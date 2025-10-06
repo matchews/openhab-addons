@@ -30,4 +30,3 @@ public class TelemetryParserTest {
         assertNotNull(status);
     }
 }
-

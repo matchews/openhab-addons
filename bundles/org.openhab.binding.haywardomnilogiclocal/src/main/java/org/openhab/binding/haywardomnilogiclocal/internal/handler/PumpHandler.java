@@ -3,22 +3,23 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Pump;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.types.Command;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class HaywardPumpHandler extends HaywardThingHandler {
+public class PumpHandler extends HaywardThingHandler {
+    private final Logger logger = LoggerFactory.getLogger(BackyardHandler.class);
 
-    public HaywardPumpHandler(Thing thing) {
+    public PumpHandler(Thing thing) {
         super(thing);
     }
 
@@ -26,22 +27,22 @@ public class HaywardPumpHandler extends HaywardThingHandler {
     public void handleCommand(ChannelUID channelUID, Command command) {
         String sysId = getThing().getProperties().get("systemID");
         Bridge bridge = getBridge();
-        if (sysId == null || bridge == null || !(bridge.getHandler() instanceof HaywardBridgeHandler bridgehandler)) {
+        if (sysId == null || bridge == null || !(bridge.getHandler() instanceof BridgeHandler bridgehandler)) {
             return;
         }
 
         switch (channelUID.getId()) {
             case "pumpEnable":
-                sendUdpCommand(CommandBuilder.setEquipmentEnable(bridgehandler.getAccount().getToken(),
-                        bridgehandler.getAccount().getMspSystemID(), sysId, "ON".equalsIgnoreCase(command.toString())),
-                        HaywardMessageType.SET_EQUIPMENT);
+                /// sendUdpCommand(CommandBuilder.setEquipmentEnable(bridgehandler.getAccount().getToken(),
+                // bridgehandler.getAccount().getMspSystemID(), sysId, "ON".equalsIgnoreCase(command.toString())),
+                // HaywardMessageType.SET_EQUIPMENT);
                 break;
             case "pumpSpeed":
                 int speedVal = ((Number) command).intValue();
-                sendUdpCommand(
-                        CommandBuilder.setPumpSpeed(bridgehandler.getAccount().getToken(),
-                                bridgehandler.getAccount().getMspSystemID(), sysId, speedVal),
-                        HaywardMessageType.SET_EQUIPMENT);
+                // sendUdpCommand(
+                // CommandBuilder.setPumpSpeed(bridgehandler.getAccount().getToken(),
+                // bridgehandler.getAccount().getMspSystemID(), sysId, speedVal),
+                // HaywardMessageType.SET_EQUIPMENT);
                 break;
             default:
                 break;
@@ -69,20 +70,17 @@ public class HaywardPumpHandler extends HaywardThingHandler {
         }
         for (Pump p : status.getPumps()) {
             if (sysId.equals(p.getSystemId())) {
-                @Nullable String pumpState = p.getPumpState();
+                @Nullable
+                String pumpState = p.getPumpState();
                 if (pumpState != null) {
                     updateData("pumpEnable", pumpState);
                     updateData("pumpState", pumpState);
                 }
 
-                @Nullable String pumpSpeed = p.getPumpSpeed();
+                @Nullable
+                String pumpSpeed = p.getPumpSpeed();
                 if (pumpSpeed != null) {
                     updateData("pumpSpeed", pumpSpeed);
-                }
-
-                @Nullable String lastSpeed = p.getLastSpeed();
-                if (lastSpeed != null) {
-                    updateData("pumpLastSpeed", lastSpeed);
                 }
             }
         }

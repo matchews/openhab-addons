@@ -34,4 +34,3 @@ public class UdpHeaderTest {
         assertEquals(header.getMessageType(), parsed.getMessageType());
     }
 }
-
