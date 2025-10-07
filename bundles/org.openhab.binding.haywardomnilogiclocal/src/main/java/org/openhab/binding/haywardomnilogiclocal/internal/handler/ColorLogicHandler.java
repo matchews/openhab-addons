@@ -85,19 +85,19 @@ public class ColorLogicHandler extends HaywardThingHandler {
                 }
 
                 @Nullable
-                String brightness = cl.getBrightness();
-                if (brightness != null) {
-                    updateData(BindingConstants.CHANNEL_COLORLOGIC_BRIGHTNESS, brightness);
-                } else {
-                    logger.debug("Colorlogic light brightness missing from Telemtry");
-                }
-
-                @Nullable
                 String speed = cl.getSpeed();
                 if (speed != null) {
                     updateData(BindingConstants.CHANNEL_COLORLOGIC_SPEED, speed);
                 } else {
                     logger.debug("Colorlogic light speed missing from Telemtry");
+                }
+
+                @Nullable
+                String brightness = cl.getBrightness();
+                if (brightness != null) {
+                    updateData(BindingConstants.CHANNEL_COLORLOGIC_BRIGHTNESS, brightness);
+                } else {
+                    logger.debug("Colorlogic light brightness missing from Telemtry");
                 }
 
                 @Nullable

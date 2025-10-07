@@ -22,7 +22,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardTypeToRequest;
+import org.openhab.binding.haywardomnilogiclocal.internal.TypeToRequest;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.BackyardConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.BodyOfWaterConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.ChlorinatorConfig;
@@ -113,7 +113,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                 }
 
                 Map<String, Object> backyardProps = new HashMap<>();
-                backyardProps.put(BindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.BACKYARD);
+                backyardProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.BACKYARD);
                 putStrObjIfNotNull(backyardProps, BindingConstants.PROPERTY_SYSTEM_ID, backyard.getSystemId());
                 putStrObjIfNotNull(backyardProps, BindingConstants.PROPERTY_BACKYARDSERVICEMODETIMEOUT,
                         backyard.getServiceModeTimeout());
@@ -130,7 +130,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                         }
 
                         Map<String, Object> bowProps = new HashMap<>();
-                        bowProps.put(BindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.BOW);
+                        bowProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.BOW);
                         putStrObjIfNotNull(bowProps, BindingConstants.PROPERTY_SYSTEM_ID, bow.getSystemId());
 
                         putStrObjIfNotNull(bowProps, BindingConstants.PROPERTY_BOW_TYPE, bow.getType());
@@ -159,7 +159,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                                 }
 
                                 Map<String, Object> chlorProps = new HashMap<>();
-                                chlorProps.put(BindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.CHLORINATOR);
+                                chlorProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.CHLORINATOR);
                                 putStrObjIfNotNull(chlorProps, BindingConstants.PROPERTY_SYSTEM_ID,
                                         chlorinator.getSystemId());
                                 putStrObjIfNotNull(chlorProps, BindingConstants.PROPERTY_CHLORINATOR_SHAREDTYPE,
@@ -197,7 +197,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                                 }
 
                                 Map<String, Object> lightProps = new HashMap<>();
-                                lightProps.put(BindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.COLORLOGIC);
+                                lightProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.COLORLOGIC);
                                 putStrObjIfNotNull(lightProps, BindingConstants.PROPERTY_SYSTEM_ID,
                                         light.getSystemId());
                                 putStrObjIfNotNull(lightProps, BindingConstants.PROPERTY_COLORLOGIC_TYPE,
@@ -222,7 +222,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                                 }
 
                                 Map<String, Object> filterProps = new HashMap<>();
-                                filterProps.put(BindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.FILTER);
+                                filterProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.FILTER);
                                 putStrObjIfNotNull(filterProps, BindingConstants.PROPERTY_SYSTEM_ID,
                                         filter.getSystemId());
                                 putStrObjIfNotNull(filterProps, BindingConstants.PROPERTY_FILTER_SHAREDTYPE,
@@ -296,7 +296,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                                     }
 
                                     Map<String, Object> valveProps = new HashMap<>();
-                                    valveProps.put(BindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.VALVEACTUATOR);
+                                    valveProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.VALVEACTUATOR);
                                     putStrObjIfNotNull(valveProps, BindingConstants.PROPERTY_SYSTEM_ID,
                                             relay.getSystemId());
                                     putStrObjIfNotNull(valveProps, BindingConstants.PROPERTY_RELAY_TYPE, relayType);
@@ -320,7 +320,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                                     }
 
                                     Map<String, Object> relayProps = new HashMap<>();
-                                    relayProps.put(BindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.RELAY);
+                                    relayProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.RELAY);
                                     putStrObjIfNotNull(relayProps, BindingConstants.PROPERTY_SYSTEM_ID,
                                             relay.getSystemId());
                                     putStrObjIfNotNull(relayProps, BindingConstants.PROPERTY_RELAY_FREEZEPROTECTENABLE,
@@ -346,7 +346,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                                 }
 
                                 Map<String, Object> sensorProps = new HashMap<>();
-                                sensorProps.put(BindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.SENSOR);
+                                sensorProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.SENSOR);
                                 putStrObjIfNotNull(sensorProps, BindingConstants.PROPERTY_SYSTEM_ID,
                                         sensor.getSystemId());
                                 putStrObjIfNotNull(sensorProps, BindingConstants.PROPERTY_SENSOR_TYPE,
@@ -363,7 +363,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                         if (virtualHeaters != null) {
                             for (VirtualHeaterConfig virtualHeater : virtualHeaters) {
                                 Map<String, Object> virtualHeaterProps = new HashMap<>();
-                                virtualHeaterProps.put(BindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.HEATER);
+                                virtualHeaterProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.HEATER);
                                 putStrObjIfNotNull(virtualHeaterProps, BindingConstants.PROPERTY_SYSTEM_ID,
                                         virtualHeater.getSystemId());
                                 putStrObjIfNotNull(virtualHeaterProps,
@@ -409,7 +409,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                                     }
 
                                     Map<String, Object> heaterProps = new HashMap<>();
-                                    heaterProps.put(BindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.HEATER);
+                                    heaterProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.HEATER);
                                     putStrObjIfNotNull(heaterProps, BindingConstants.PROPERTY_SYSTEM_ID,
                                             heater.getSystemId());
                                     putStrObjIfNotNull(heaterProps, BindingConstants.PROPERTY_HEATER_TYPE,
@@ -460,7 +460,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                             }
 
                             Map<String, Object> pumpProps = new HashMap<>();
-                            pumpProps.put(BindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.PUMP);
+                            pumpProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.PUMP);
                             putStrObjIfNotNull(pumpProps, BindingConstants.PROPERTY_SYSTEM_ID, pump.getSystemId());
 
                             onDeviceDiscovered(BindingConstants.THING_TYPE_PUMP, pumpName, pumpProps);
@@ -480,7 +480,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                                 }
 
                                 Map<String, Object> valveProps = new HashMap<>();
-                                valveProps.put(BindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.VALVEACTUATOR);
+                                valveProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.VALVEACTUATOR);
                                 putStrObjIfNotNull(valveProps, BindingConstants.PROPERTY_SYSTEM_ID,
                                         relay.getSystemId());
                                 putStrObjIfNotNull(valveProps, BindingConstants.PROPERTY_RELAY_TYPE, relayType);
@@ -502,7 +502,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                                 }
 
                                 Map<String, Object> relayProps = new HashMap<>();
-                                relayProps.put(BindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.RELAY);
+                                relayProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.RELAY);
                                 putStrObjIfNotNull(relayProps, BindingConstants.PROPERTY_SYSTEM_ID,
                                         relay.getSystemId());
                                 putStrObjIfNotNull(relayProps, BindingConstants.PROPERTY_RELAY_FREEZEPROTECTENABLE,
@@ -527,7 +527,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                             }
 
                             Map<String, Object> sensorProps = new HashMap<>();
-                            sensorProps.put(BindingConstants.PROPERTY_TYPE, HaywardTypeToRequest.SENSOR);
+                            sensorProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.SENSOR);
                             putStrObjIfNotNull(sensorProps, BindingConstants.PROPERTY_SYSTEM_ID, sensor.getSystemId());
                             putStrObjIfNotNull(sensorProps, BindingConstants.PROPERTY_SENSOR_TYPE, sensor.getType());
                             putStrObjIfNotNull(sensorProps, BindingConstants.PROPERTY_SENSOR_UNITS, sensor.getUnits());

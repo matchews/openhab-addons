@@ -15,7 +15,6 @@
 			<channel id="pumpEnable" typeId="system.power"/>
 			<channel id="pumpSpeed" typeId="speed"/>
 			<channel id="pumpState" typeId="state"/>
-			<channel id="pumpLastSpeed" typeId="lastSpeed"/>
 		</channels>
 
 		<representation-property>systemID</representation-property>
@@ -26,12 +25,6 @@
 		<label>Pump Speed</label>
 		<description>Dynamic units (% or rpm from config)</description>
 		<state readOnly="false"/>
-	</channel-type>
-
-	<channel-type id="lastSpeed">
-        <item-type unitHint="%">Number:Dimensionless</item-type>
-		<label>Last Speed</label>
-		<state readOnly="true"/>
 	</channel-type>
 
 </thing:thing-descriptions>

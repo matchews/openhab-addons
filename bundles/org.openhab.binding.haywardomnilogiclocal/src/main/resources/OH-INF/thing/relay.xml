@@ -13,7 +13,7 @@
 		<channels>
 			<channel id="relayState" typeId="system.power"/>
 		</channels>
-
+    
 		<representation-property>systemID</representation-property>
 	</thing-type>
 

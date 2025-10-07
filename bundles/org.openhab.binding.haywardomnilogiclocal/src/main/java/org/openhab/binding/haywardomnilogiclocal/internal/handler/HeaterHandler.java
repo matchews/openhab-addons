@@ -3,6 +3,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
@@ -39,30 +40,45 @@ public class HeaterHandler extends HaywardThingHandler {
         }
         for (Heater h : status.getHeaters()) {
             if (sysId.equals(h.getSystemId())) {
+
                 @Nullable
-                String heaterState = h.getHeaterState();
-                if (heaterState != null) {
-                    updateData("heaterState", heaterState);
+                String state = h.getState();
+                if (state != null) {
+                    updateData(BindingConstants.CHANNEL_HEATER_STATE, state);
+                } else {
+                    logger.debug("Heater state missing from Telemtry");
                 }
+
                 @Nullable
-                String temp = h.getTemp();
-                if (temp != null) {
-                    updateData("temp", temp);
+                String heaterTemp = h.getTemp();
+                if (heaterTemp != null) {
+                    updateData(BindingConstants.CHANNEL_HEATER_TEMP, heaterTemp);
+                } else {
+                    logger.debug("Heater temp missing from Telemtry");
                 }
+
                 @Nullable
-                String enable = h.getEnable();
-                if (enable != null) {
-                    updateData("enable", enable);
+                String heaterEnable = h.getEnable();
+                if (heaterEnable != null) {
+                    updateData(BindingConstants.CHANNEL_HEATER_ENABLE, heaterEnable);
+                } else {
+                    logger.debug("Heater temp missing from Telemtry");
                 }
+
                 @Nullable
-                String priority = h.getPriority();
-                if (priority != null) {
-                    updateData("priority", priority);
+                String heaterPriority = h.getPriority();
+                if (heaterPriority != null) {
+                    updateData(BindingConstants.CHANNEL_HEATER_PRIORITY, heaterPriority);
+                } else {
+                    logger.debug("Heater priority missing from Telemtry");
                 }
+
                 @Nullable
-                String maintainFor = h.getMaintainFor();
-                if (maintainFor != null) {
-                    updateData("maintainFor", maintainFor);
+                String heaterMaintainFor = h.getMaintainFor();
+                if (heaterMaintainFor != null) {
+                    updateData(BindingConstants.CHANNEL_HEATER_MAINTAINFOR, heaterMaintainFor);
+                } else {
+                    logger.debug("Heater maintain for missing from Telemtry");
                 }
             }
         }

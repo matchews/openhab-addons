@@ -66,6 +66,22 @@ public class BackyardHandler extends HaywardThingHandler {
                 } else {
                     logger.debug("Backyard state missing");
                 }
+
+                @Nullable
+                String configChecksum = by.getConfigChksum();
+                if (configChecksum != null) {
+                    updateData(BindingConstants.CHANNEL_BACKYARD_CONFIGCHKSUM, configChecksum);
+                } else {
+                    logger.debug("Backyard config checksum missing");
+                }
+
+                @Nullable
+                String mspVersion = by.getMspVersion();
+                if (mspVersion != null) {
+                    updateData(BindingConstants.CHANNEL_BACKYARD_MSPVERSION, mspVersion);
+                } else {
+                    logger.debug("Backyard MSP version missing");
+                }
             }
         }
         updateStatus(ThingStatus.ONLINE);

@@ -3,6 +3,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
@@ -36,12 +37,23 @@ public class ValveActuatorHandler extends HaywardThingHandler {
         if (sysId == null) {
             return;
         }
-        for (ValveActuator valveActuator : status.getValveActuators()) {
-            if (sysId.equals(valveActuator.getSystemId())) {
+        for (ValveActuator valve : status.getValveActuators()) {
+            if (sysId.equals(valve.getSystemId())) {
+
                 @Nullable
-                String valveActuatorState = valveActuator.getValveActuatorState();
-                if (valveActuatorState != null) {
-                    updateData("valveActuatorState", valveActuatorState);
+                String valveState = valve.getValveActuatorState();
+                if (valveState != null) {
+                    updateData(BindingConstants.CHANNEL_VALVEACTUATOR_STATE, valveState);
+                } else {
+                    logger.debug("Valve actuator state missing from Telemtry");
+                }
+
+                @Nullable
+                String valveWhyOn = valve.getWhyOn();
+                if (valveWhyOn != null) {
+                    updateData(BindingConstants.CHANNEL_VALVEACTUATOR_WHYON, valveWhyOn);
+                } else {
+                    logger.debug("Valve actuator state missing from Telemtry");
                 }
             }
         }

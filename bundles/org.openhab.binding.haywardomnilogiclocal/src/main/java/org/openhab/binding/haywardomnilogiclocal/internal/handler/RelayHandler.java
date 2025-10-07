@@ -3,6 +3,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
@@ -36,12 +37,15 @@ public class RelayHandler extends HaywardThingHandler {
         if (sysId == null) {
             return;
         }
-        for (Relay r : status.getRelays()) {
-            if (sysId.equals(r.getSystemId())) {
+        for (Relay relay : status.getRelays()) {
+            if (sysId.equals(relay.getSystemId())) {
+
                 @Nullable
-                String relayState = r.getRelayState();
+                String relayState = relay.getRelayState();
                 if (relayState != null) {
-                    updateData("relayState", relayState);
+                    updateData(BindingConstants.CHANNEL_RELAY_STATE, relayState);
+                } else {
+                    logger.debug("Relay state missing from Telemtry");
                 }
             }
         }

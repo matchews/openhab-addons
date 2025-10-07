@@ -12,9 +12,16 @@
 		<label>Valve Actuator</label>
 		<channels>
 			<channel id="valveActuatorState" typeId="system.power"/>
+			<channel id="valveActuatorWhyOn" typeId="valveActuatorWhyOn"/>
 		</channels>
-
+    
 		<representation-property>systemID</representation-property>
 	</thing-type>
 
+    <channel-type id="valveActuatorWhyOn">
+        <item-type>String</item-type>
+        <label>Why On</label>
+        <state readOnly="true"/>
+    </channel-type>
+    
 </thing:thing-descriptions>

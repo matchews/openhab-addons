@@ -68,6 +68,8 @@ public class BindingConstants {
     // Backyard
     public static final String CHANNEL_BACKYARD_AIRTEMP = "backyardAirTemp";
     public static final String CHANNEL_BACKYARD_STATE = "backyardState";
+    public static final String CHANNEL_BACKYARD_CONFIGCHKSUM = "backyardConfigChksum";
+    public static final String CHANNEL_BACKYARD_MSPVERSION = "backyardMspVersion";
 
     public static final String PROPERTY_BACKYARDSERVICEMODETIMEOUT = "Service Mode Timeout";
 
@@ -157,7 +159,7 @@ public class BindingConstants {
     public static final String CHANNEL_HEATER_STATE = "heaterState";
     public static final String CHANNEL_HEATER_TEMP = "heaterTemp";
     public static final String CHANNEL_HEATER_ENABLE = "heaterEnable";
-    public static final String CHANNEL_PRIORITY = "heaterPriority";
+    public static final String CHANNEL_HEATER_PRIORITY = "heaterPriority";
     public static final String CHANNEL_HEATER_MAINTAINFOR = "heaterMaintainFor";
 
     public static final String PROPERTY_HEATER_TYPE = "Type";
@@ -177,6 +179,7 @@ public class BindingConstants {
     // Pump
     public static final String CHANNEL_PUMP_ENABLE = "pumpEnable";
     public static final String CHANNEL_PUMP_SPEED = "pumpSpeed";
+    public static final String CHANNEL_PUMP_STATE = "pumpState";
 
     public static final String PROPERTY_PUMP_TYPE = "pumpType";
     public static final String PROPERTY_PUMP_FUNCTION = "pumpFunction";
@@ -192,6 +195,7 @@ public class BindingConstants {
 
     // Relay
     public static final String CHANNEL_RELAY_STATE = "relayState";
+    public static final String CHANNEL_RELAY_WHYON = "relayWhyOn";
 
     public static final String PROPERTY_RELAY_TYPE = "Type";
     public static final String PROPERTY_RELAY_FUNCTION = "Function";
@@ -203,6 +207,10 @@ public class BindingConstants {
     public static final String CHANNEL_SENSOR_DATA = "sensorData";
     public static final String PROPERTY_SENSOR_TYPE = "sensorType";
     public static final String PROPERTY_SENSOR_UNITS = "sensorUnits";
+
+    // Valve Actuator
+    public static final String CHANNEL_VALVEACTUATOR_STATE = "valveActuatorState";
+    public static final String CHANNEL_VALVEACTUATOR_WHYON = "valveActuatorWhyOn";
 
     // Virtual Heater
     public static final String CHANNEL_VIRTUALHEATER_CURRENTSETPOINT = "virtualHeaterCurrentSetpoint";

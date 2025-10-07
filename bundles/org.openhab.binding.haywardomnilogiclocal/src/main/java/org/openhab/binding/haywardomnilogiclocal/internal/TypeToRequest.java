@@ -15,13 +15,22 @@ package org.openhab.binding.haywardomnilogiclocal.internal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * The {@link HaywardThingProperties} class contains fields mapping thing configuration parameters.
+ * The type to request.
  *
  * @author Matt Myers - Initial contribution
  */
-
 @NonNullByDefault
-public class HaywardThingProperties {
-    public String systemID = "";
-    public String poolID = "";
+public enum TypeToRequest {
+    BACKYARD,
+    BOW,
+    CHLORINATOR,
+    COLORLOGIC,
+    CSAD,
+    FILTER,
+    HEATER,
+    PUMP,
+    RELAY,
+    VALVEACTUATOR,
+    SENSOR,
+    VIRTUALHEATER
 }

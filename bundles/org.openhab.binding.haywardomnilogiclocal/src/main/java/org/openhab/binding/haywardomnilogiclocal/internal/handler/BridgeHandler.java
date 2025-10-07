@@ -35,7 +35,7 @@ import org.openhab.binding.haywardomnilogiclocal.internal.Config;
 import org.openhab.binding.haywardomnilogiclocal.internal.DynamicStateDescriptionProvider;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardTypeToRequest;
+import org.openhab.binding.haywardomnilogiclocal.internal.TypeToRequest;
 import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.discovery.HaywardDiscoveryService;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpClient;
@@ -290,7 +290,7 @@ public class BridgeHandler extends BaseBridgeHandler {
     }
 
     @Nullable
-    Thing getThingForType(HaywardTypeToRequest type, int num) {
+    Thing getThingForType(TypeToRequest type, int num) {
         for (Thing thing : getThing().getThings()) {
             Map<String, String> properties = thing.getProperties();
             if (Integer.toString(num).equals(properties.get(BindingConstants.PROPERTY_SYSTEM_ID))) {

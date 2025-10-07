@@ -86,14 +86,6 @@ public class FilterHandler extends HaywardThingHandler {
                 }
 
                 @Nullable
-                String valvePosition = f.getValvePosition();
-                if (valvePosition != null) {
-                    updateData(BindingConstants.CHANNEL_FILTER_VALVEPOSITION, valvePosition);
-                } else {
-                    logger.debug("Filter valve position missing from Telemtry");
-                }
-
-                @Nullable
                 String speed = f.getSpeed();
                 if (speed != null) {
                     updateData(BindingConstants.CHANNEL_FILTER_SPEED, speed);
@@ -102,11 +94,11 @@ public class FilterHandler extends HaywardThingHandler {
                 }
 
                 @Nullable
-                String lastSpeed = f.getLastSpeed();
-                if (lastSpeed != null) {
-                    updateData(BindingConstants.CHANNEL_FILTER_LASTSPEED, lastSpeed);
+                String valvePosition = f.getValvePosition();
+                if (valvePosition != null) {
+                    updateData(BindingConstants.CHANNEL_FILTER_VALVEPOSITION, valvePosition);
                 } else {
-                    logger.debug("Filter last speed missing from Telemtry");
+                    logger.debug("Filter valve position missing from Telemtry");
                 }
 
                 @Nullable
@@ -139,6 +131,14 @@ public class FilterHandler extends HaywardThingHandler {
                     updateData(BindingConstants.CHANNEL_FILTER_POWER, power);
                 } else {
                     logger.debug("Filter power missing from Telemtry");
+                }
+
+                @Nullable
+                String lastSpeed = f.getLastSpeed();
+                if (lastSpeed != null) {
+                    updateData(BindingConstants.CHANNEL_FILTER_LASTSPEED, lastSpeed);
+                } else {
+                    logger.debug("Filter last speed missing from Telemtry");
                 }
             }
         }

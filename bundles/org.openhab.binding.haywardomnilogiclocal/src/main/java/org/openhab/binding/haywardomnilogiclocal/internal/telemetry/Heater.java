@@ -37,7 +37,7 @@ public class Heater {
         return systemId;
     }
 
-    public @Nullable String getHeaterState() {
+    public @Nullable String getState() {
         return heaterState;
     }
 

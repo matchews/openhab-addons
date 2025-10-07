@@ -3,6 +3,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
@@ -70,17 +71,28 @@ public class PumpHandler extends HaywardThingHandler {
         }
         for (Pump p : status.getPumps()) {
             if (sysId.equals(p.getSystemId())) {
-                @Nullable
-                String pumpState = p.getPumpState();
-                if (pumpState != null) {
-                    updateData("pumpEnable", pumpState);
-                    updateData("pumpState", pumpState);
-                }
 
                 @Nullable
                 String pumpSpeed = p.getPumpSpeed();
                 if (pumpSpeed != null) {
-                    updateData("pumpSpeed", pumpSpeed);
+                    updateData(BindingConstants.CHANNEL_PUMP_SPEED, pumpSpeed);
+
+                    if (Integer.parseInt(pumpSpeed) > 0) {
+                        updateData(BindingConstants.CHANNEL_PUMP_ENABLE, "1");
+                    } else {
+                        updateData(BindingConstants.CHANNEL_PUMP_ENABLE, "0");
+                    }
+
+                } else {
+                    logger.debug("Pump speed missing from Telemtry");
+                }
+
+                @Nullable
+                String pumpState = p.getPumpState();
+                if (pumpState != null) {
+                    updateData(BindingConstants.CHANNEL_PUMP_STATE, pumpState);
+                } else {
+                    logger.debug("Pump state missing from Telemtry");
                 }
             }
         }

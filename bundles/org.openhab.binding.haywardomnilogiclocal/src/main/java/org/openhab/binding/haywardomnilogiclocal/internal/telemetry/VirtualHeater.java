@@ -34,7 +34,7 @@ public class VirtualHeater {
     private @Nullable String silentMode;
 
     @XStreamAsAttribute
-    @XStreamAlias("whyOn")
+    @XStreamAlias("whyHeaterIsOn")
     private @Nullable String whyOn;
 
     public @Nullable String getSystemId() {
