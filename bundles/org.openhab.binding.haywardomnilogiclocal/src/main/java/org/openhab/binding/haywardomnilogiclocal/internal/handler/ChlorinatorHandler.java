@@ -3,7 +3,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
+import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
@@ -73,7 +73,7 @@ public class ChlorinatorHandler extends HaywardThingHandler {
             @Nullable
             String statusVal = c.getStatus();
             if (statusVal != null) {
-                updateData(HaywardBindingConstants.CHANNEL_CHLORINATOR_STATUS, statusVal);
+                updateData(BindingConstants.CHANNEL_CHLORINATOR_STATUS, statusVal);
             } else {
                 logger.debug("Chlorinator status missing from Telemtry");
             }
@@ -81,7 +81,7 @@ public class ChlorinatorHandler extends HaywardThingHandler {
             @Nullable
             String instantSaltLevel = c.getInstantSaltLevel();
             if (instantSaltLevel != null) {
-                updateData(HaywardBindingConstants.CHANNEL_CHLORINATOR_INSTANTSALTLEVEL, instantSaltLevel);
+                updateData(BindingConstants.CHANNEL_CHLORINATOR_INSTANTSALTLEVEL, instantSaltLevel);
             } else {
                 logger.debug("Chlorinator instant salt level missing from Telemtry");
             }
@@ -89,7 +89,7 @@ public class ChlorinatorHandler extends HaywardThingHandler {
             @Nullable
             String avgSaltLevel = c.getAvgSaltLevel();
             if (avgSaltLevel != null) {
-                updateData(HaywardBindingConstants.CHANNEL_CHLORINATOR_AVGSALTLEVEL, avgSaltLevel);
+                updateData(BindingConstants.CHANNEL_CHLORINATOR_AVGSALTLEVEL, avgSaltLevel);
             } else {
                 logger.debug("Chlorinator avgerage salt level missing from Telemtry");
             }
@@ -97,7 +97,7 @@ public class ChlorinatorHandler extends HaywardThingHandler {
             @Nullable
             String alert = c.getChlorAlert();
             if (alert != null) {
-                updateData(HaywardBindingConstants.CHANNEL_CHLORINATOR_ALERT, alert);
+                updateData(BindingConstants.CHANNEL_CHLORINATOR_ALERT, alert);
             } else {
                 logger.debug("Chlorinator alert missing from Telemtry");
             }
@@ -105,7 +105,7 @@ public class ChlorinatorHandler extends HaywardThingHandler {
             @Nullable
             String error = c.getChlorError();
             if (error != null) {
-                updateData(HaywardBindingConstants.CHANNEL_CHLORINATOR_ERROR, error);
+                updateData(BindingConstants.CHANNEL_CHLORINATOR_ERROR, error);
             } else {
                 logger.debug("Chlorinator error missing from Telemtry");
             }
@@ -113,7 +113,7 @@ public class ChlorinatorHandler extends HaywardThingHandler {
             @Nullable
             String scMode = c.getScMode();
             if (scMode != null) {
-                updateData(HaywardBindingConstants.CHANNEL_CHLORINATOR_SCMODE, scMode);
+                updateData(BindingConstants.CHANNEL_CHLORINATOR_SCMODE, scMode);
             } else {
                 logger.debug("Chlorinator SC Mode missing from Telemtry");
             }
@@ -121,7 +121,7 @@ public class ChlorinatorHandler extends HaywardThingHandler {
             @Nullable
             String operatingState = c.getOperatingState();
             if (operatingState != null) {
-                updateData(HaywardBindingConstants.CHANNEL_CHLORINATOR_OPERATINGSTATE, operatingState);
+                updateData(BindingConstants.CHANNEL_CHLORINATOR_OPERATINGSTATE, operatingState);
             } else {
                 logger.debug("Chlorinator operating state missing from Telemtry");
             }
@@ -129,7 +129,7 @@ public class ChlorinatorHandler extends HaywardThingHandler {
             @Nullable
             String timedPercent = c.getTimedPercent();
             if (timedPercent != null) {
-                updateData(HaywardBindingConstants.CHANNEL_CHLORINATOR_TIMEDPERCENT, timedPercent);
+                updateData(BindingConstants.CHANNEL_CHLORINATOR_TIMEDPERCENT, timedPercent);
             } else {
                 logger.debug("Chlorinator timed percent missing from Telemtry");
             }
@@ -137,7 +137,7 @@ public class ChlorinatorHandler extends HaywardThingHandler {
             @Nullable
             String operatingMode = c.getOperatingMode();
             if (operatingMode != null) {
-                updateData(HaywardBindingConstants.CHANNEL_CHLORINATOR_OPERATINGMODE, operatingMode);
+                updateData(BindingConstants.CHANNEL_CHLORINATOR_OPERATINGMODE, operatingMode);
             } else {
                 logger.debug("Chlorinator operating mode missing from Telemtry");
             }
@@ -145,7 +145,7 @@ public class ChlorinatorHandler extends HaywardThingHandler {
             @Nullable
             String enable = c.getEnable();
             if (enable != null) {
-                updateData(HaywardBindingConstants.CHANNEL_CHLORINATOR_ENABLE, enable);
+                updateData(BindingConstants.CHANNEL_CHLORINATOR_ENABLE, enable);
             } else {
                 logger.debug("Chlorinator enable missing from Telemtry");
             }

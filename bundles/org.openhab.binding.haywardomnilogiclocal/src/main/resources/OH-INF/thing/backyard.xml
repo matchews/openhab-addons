@@ -14,9 +14,6 @@
 			<channel id="backyardState" typeId="backyardState"/>
 		</channels>
 
-		<properties>
-			<property name="vendor">Hayward</property>
-		</properties>
 		<representation-property>systemID</representation-property>
 	</thing-type>
 

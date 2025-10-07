@@ -3,7 +3,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
+import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
@@ -76,11 +76,11 @@ public class FilterHandler extends HaywardThingHandler {
                 String state = f.getState();
                 if (state != null) {
                     if (Integer.parseInt(state) > 0) {
-                        updateData(HaywardBindingConstants.CHANNEL_FILTER_ENABLE, "1");
+                        updateData(BindingConstants.CHANNEL_FILTER_ENABLE, "1");
                     } else {
-                        updateData(HaywardBindingConstants.CHANNEL_FILTER_ENABLE, "0");
+                        updateData(BindingConstants.CHANNEL_FILTER_ENABLE, "0");
                     }
-                    updateData(HaywardBindingConstants.CHANNEL_FILTER_STATE, state);
+                    updateData(BindingConstants.CHANNEL_FILTER_STATE, state);
                 } else {
                     logger.debug("Filter state missing from Telemtry");
                 }
@@ -88,7 +88,7 @@ public class FilterHandler extends HaywardThingHandler {
                 @Nullable
                 String valvePosition = f.getValvePosition();
                 if (valvePosition != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_FILTER_VALVEPOSITION, valvePosition);
+                    updateData(BindingConstants.CHANNEL_FILTER_VALVEPOSITION, valvePosition);
                 } else {
                     logger.debug("Filter valve position missing from Telemtry");
                 }
@@ -96,7 +96,7 @@ public class FilterHandler extends HaywardThingHandler {
                 @Nullable
                 String speed = f.getSpeed();
                 if (speed != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_FILTER_SPEED, speed);
+                    updateData(BindingConstants.CHANNEL_FILTER_SPEED, speed);
                 } else {
                     logger.debug("Filter speed missing from Telemtry");
                 }
@@ -104,7 +104,7 @@ public class FilterHandler extends HaywardThingHandler {
                 @Nullable
                 String lastSpeed = f.getLastSpeed();
                 if (lastSpeed != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_FILTER_LASTSPEED, lastSpeed);
+                    updateData(BindingConstants.CHANNEL_FILTER_LASTSPEED, lastSpeed);
                 } else {
                     logger.debug("Filter last speed missing from Telemtry");
                 }
@@ -112,7 +112,7 @@ public class FilterHandler extends HaywardThingHandler {
                 @Nullable
                 String whyFilterIsOn = f.getWhyFilterIsOn();
                 if (whyFilterIsOn != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_FILTER_WHYFILTERISON, whyFilterIsOn);
+                    updateData(BindingConstants.CHANNEL_FILTER_WHYFILTERISON, whyFilterIsOn);
                 } else {
                     logger.debug("Filter why filter is on missing from Telemtry");
                 }
@@ -120,7 +120,7 @@ public class FilterHandler extends HaywardThingHandler {
                 @Nullable
                 String fpOverride = f.getFpOverride();
                 if (fpOverride != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_FILTER_FPOVERRIDE, fpOverride);
+                    updateData(BindingConstants.CHANNEL_FILTER_FPOVERRIDE, fpOverride);
                 } else {
                     logger.debug("Filter fpOverride missing from Telemtry");
                 }
@@ -128,7 +128,7 @@ public class FilterHandler extends HaywardThingHandler {
                 @Nullable
                 String reportedSpeed = f.getReportedSpeed();
                 if (reportedSpeed != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_FILTER_REPORTEDSPEED, reportedSpeed);
+                    updateData(BindingConstants.CHANNEL_FILTER_REPORTEDSPEED, reportedSpeed);
                 } else {
                     logger.debug("Filter reported speed missing from Telemtry");
                 }
@@ -136,7 +136,7 @@ public class FilterHandler extends HaywardThingHandler {
                 @Nullable
                 String power = f.getPower();
                 if (power != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_FILTER_POWER, power);
+                    updateData(BindingConstants.CHANNEL_FILTER_POWER, power);
                 } else {
                     logger.debug("Filter power missing from Telemtry");
                 }

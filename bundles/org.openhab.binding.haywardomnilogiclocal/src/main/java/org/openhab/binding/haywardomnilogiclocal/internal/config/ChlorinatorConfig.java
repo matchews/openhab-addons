@@ -76,15 +76,15 @@ public class ChlorinatorConfig {
         return cellType;
     }
 
+    public @Nullable String getDispenserType() {
+        return dispenserType;
+    }
+
     public @Nullable String getOrpTimeout() {
         return orpTimeout;
     }
 
-    public @Nullable String dispenserType() {
-        return dispenserType;
-    }
-
-    public @Nullable String orpSensorId() {
+    public @Nullable String getOrpSensorId() {
         return orpSensorId;
     }
 }

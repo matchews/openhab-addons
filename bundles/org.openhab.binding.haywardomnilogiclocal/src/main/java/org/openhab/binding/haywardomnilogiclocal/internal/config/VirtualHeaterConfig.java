@@ -48,8 +48,8 @@ public class VirtualHeaterConfig {
     @XStreamAlias("Heater-Become-Valid-Timeout")
     private @Nullable String heaterBecomeValidTimeout;
 
-    @XStreamImplicit(itemFieldName = "Heater-Equipment")
-    private final List<HeaterEquipConfig> heaters = new ArrayList<>();
+    @XStreamImplicit(itemFieldName = "Operation")
+    private final List<OperationConfig> operations = new ArrayList<>();
 
     public @Nullable String getSystemId() {
         return systemId;
@@ -95,8 +95,20 @@ public class VirtualHeaterConfig {
         return heaterBecomeValidTimeout;
     }
 
-    public List<HeaterEquipConfig> getHeaters() {
-        return heaters;
+    public List<OperationConfig> getOperations() {
+        return operations;
+    }
+
+    public @Nullable List<HeaterEquipConfig> getHeaters() {
+        List<HeaterEquipConfig> heaterEquip = new ArrayList<>();
+
+        for (OperationConfig operation : operations) {
+            if (operation.getHeaterEquips() != null) {
+                heaterEquip.addAll(operation.getHeaterEquips());
+            }
+        }
+
+        return heaterEquip;
     }
 
 }

@@ -20,9 +20,6 @@
             <channel id="virtualHeaterWhyOn" typeId="virtualHeaterWhyOn"/>
         </channels>
 
-        <properties>
-            <property name="vendor">Hayward</property>
-        </properties>
         <representation-property>systemID</representation-property>
     </thing-type>
 

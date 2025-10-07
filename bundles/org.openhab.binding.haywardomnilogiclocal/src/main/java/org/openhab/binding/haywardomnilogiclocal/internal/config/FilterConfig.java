@@ -180,10 +180,6 @@ public class FilterConfig {
         return filterValvePosition;
     }
 
-    public @Nullable String getFreezeProtectOverrideInterval() {
-        return freezeProtectOverrideInterval;
-    }
-
     public @Nullable String getVspLowPumpSpeed() {
         return vspLowPumpSpeed;
     }
@@ -198,5 +194,9 @@ public class FilterConfig {
 
     public @Nullable String getVspCustomPumpSpeed() {
         return vspCustomPumpSpeed;
+    }
+
+    public @Nullable String getFreezeProtectOverrideInterval() {
+        return freezeProtectOverrideInterval;
     }
 }

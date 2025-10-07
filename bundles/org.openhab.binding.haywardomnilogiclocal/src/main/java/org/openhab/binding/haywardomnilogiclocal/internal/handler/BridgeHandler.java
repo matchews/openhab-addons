@@ -30,7 +30,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
+import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardDynamicStateDescriptionProvider;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
@@ -239,10 +239,10 @@ public class BridgeHandler extends BaseBridgeHandler {
         // TODO
         for (Thing thing : getThing().getThings()) {
             Map<String, String> properties = thing.getProperties();
-            if ("BACKYARD".equals(properties.get(HaywardBindingConstants.PROPERTY_TYPE))) {
+            if ("BACKYARD".equals(properties.get(BindingConstants.PROPERTY_TYPE))) {
                 BackyardHandler handler = (BackyardHandler) thing.getHandler();
                 if (handler != null) {
-                    String systemID = properties.get(HaywardBindingConstants.PROPERTY_SYSTEM_ID);
+                    String systemID = properties.get(BindingConstants.PROPERTY_SYSTEM_ID);
                     if (systemID != null) {
                         return handler.getAlarmList(systemID);
                     }
@@ -293,8 +293,8 @@ public class BridgeHandler extends BaseBridgeHandler {
     Thing getThingForType(HaywardTypeToRequest type, int num) {
         for (Thing thing : getThing().getThings()) {
             Map<String, String> properties = thing.getProperties();
-            if (Integer.toString(num).equals(properties.get(HaywardBindingConstants.PROPERTY_SYSTEM_ID))) {
-                if (type.toString().equals(properties.get(HaywardBindingConstants.PROPERTY_TYPE))) {
+            if (Integer.toString(num).equals(properties.get(BindingConstants.PROPERTY_SYSTEM_ID))) {
+                if (type.toString().equals(properties.get(BindingConstants.PROPERTY_TYPE))) {
                     return thing;
                 }
             }

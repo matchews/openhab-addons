@@ -18,13 +18,13 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.core.thing.ThingTypeUID;
 
 /**
- * The {@link HaywardBindingConstants} class defines common constants, which are
+ * The {@link BindingConstants} class defines common constants, which are
  * used across the whole binding.
  *
  * @author Matt Myers - Initial contribution
  */
 @NonNullByDefault
-public class HaywardBindingConstants {
+public class BindingConstants {
 
     public static final String BINDING_ID = "haywardomnilogiclocal";
 
@@ -43,16 +43,14 @@ public class HaywardBindingConstants {
     public static final ThingTypeUID THING_TYPE_VIRTUALHEATER = new ThingTypeUID(BINDING_ID, "virtualHeater");
     public static final Set<ThingTypeUID> BRIDGE_THING_TYPES_UIDS = Set.of(THING_TYPE_BRIDGE);
 
-    public static final Set<ThingTypeUID> THING_TYPES_UIDS = Set.of(HaywardBindingConstants.THING_TYPE_BACKYARD,
-            HaywardBindingConstants.THING_TYPE_BOW, HaywardBindingConstants.THING_TYPE_BRIDGE,
-            HaywardBindingConstants.THING_TYPE_CHLORINATOR, HaywardBindingConstants.THING_TYPE_COLORLOGIC,
-            HaywardBindingConstants.THING_TYPE_FILTER, HaywardBindingConstants.THING_TYPE_HEATER,
-            HaywardBindingConstants.THING_TYPE_PUMP, HaywardBindingConstants.THING_TYPE_RELAY,
-            HaywardBindingConstants.THING_TYPE_SENSOR, HaywardBindingConstants.THING_TYPE_VALVEACTUATOR,
-            HaywardBindingConstants.THING_TYPE_VIRTUALHEATER);
+    public static final Set<ThingTypeUID> THING_TYPES_UIDS = Set.of(BindingConstants.THING_TYPE_BACKYARD,
+            BindingConstants.THING_TYPE_BOW, BindingConstants.THING_TYPE_BRIDGE,
+            BindingConstants.THING_TYPE_CHLORINATOR, BindingConstants.THING_TYPE_COLORLOGIC,
+            BindingConstants.THING_TYPE_FILTER, BindingConstants.THING_TYPE_HEATER, BindingConstants.THING_TYPE_PUMP,
+            BindingConstants.THING_TYPE_RELAY, BindingConstants.THING_TYPE_SENSOR,
+            BindingConstants.THING_TYPE_VALVEACTUATOR, BindingConstants.THING_TYPE_VIRTUALHEATER);
 
     // Bridge
-
     public static final String PROPERTY_BRIDGE_VSPSPEEDFORMAT = "VSP Speed Format";
     public static final String PROPERTY_BRIDGE_TIMEFORMAT = "Time Format";
     public static final String PROPERTY_BRIDGE_TIMEZONE = "Timezone";
@@ -60,27 +58,30 @@ public class HaywardBindingConstants {
     public static final String PROPERTY_BRIDGE_INTERNETTIME = "Internet Time";
     public static final String PROPERTY_BRIDGE_UNITS = "MSP Units";
     public static final String PROPERTY_BRIDGE_CHLORDISPLAY = "Chlor Display";
-    public static final String PROPERTY_BRIDGE_LANGUAGE = "MSP Units";
-    public static final String PROPERTY_BRIDGE_UIDISPLAYMODE = "MSP Units";
-    public static final String PROPERTY_BRIDGE_UIMOODCOLORENABLED = "MSP Units";
-    public static final String PROPERTY_BRIDGE_UIHEATERSIMPLEMODE = "MSP Units";
-    public static final String PROPERTY_BRIDGE_UIFILTERSIMPLEMODE = "MSP Units";
-    public static final String PROPERTY_BRIDGE_UILIGHTSSIMPLEMODE = "MSP Units";
+    public static final String PROPERTY_BRIDGE_LANGUAGE = "Language";
+    public static final String PROPERTY_BRIDGE_UIDISPLAYMODE = "UI Display Mode";
+    public static final String PROPERTY_BRIDGE_UIMOODCOLORENABLED = "UI Mood Color Enabled";
+    public static final String PROPERTY_BRIDGE_UIHEATERSIMPLEMODE = "UI Heater Simple Mode";
+    public static final String PROPERTY_BRIDGE_UIFILTERSIMPLEMODE = "UI Filter Simple Mode";
+    public static final String PROPERTY_BRIDGE_UILIGHTSSIMPLEMODE = "UL Lights Simple Mode";
 
     // Backyard
     public static final String CHANNEL_BACKYARD_AIRTEMP = "backyardAirTemp";
     public static final String CHANNEL_BACKYARD_STATE = "backyardState";
 
+    public static final String PROPERTY_BACKYARDSERVICEMODETIMEOUT = "Service Mode Timeout";
+
     // Body of Water
     public static final String CHANNEL_BOW_WATERTEMP = "bowWaterTemp";
     public static final String CHANNEL_BOW_FLOW = "bowFlow";
 
-    public static final String PROPERTY_BOW_TYPE = "type";
-    public static final String PROPERTY_BOW_SHAREDTYPE = "sharedType";
-    public static final String PROPERTY_BOW_SHAREDPRIORITY = "sharedPriority";
-    public static final String PROPERTY_BOW_SHAREDEQUIPID = "sharedEquipmentSystemID";
-    public static final String PROPERTY_BOW_SUPPORTSSPILLOVER = "supportsSpillover";
-    public static final String PROPERTY_BOW_SIZEINGALLONS = "sizeInGallons";
+    public static final String PROPERTY_BOW_TYPE = "Type";
+    public static final String PROPERTY_BOW_SHAREDTYPE = "Shared Type";
+    public static final String PROPERTY_BOW_SHAREDPRIORITY = "Shared Priority";
+    public static final String PROPERTY_BOW_SHAREDEQUIPID = "Shared Equipment SystemID";
+    public static final String PROPERTY_BOW_SUPPORTSSPILLOVER = "Supports Spillover";
+    public static final String PROPERTY_BOW_USESPILLOVERFORFILTEROPERATIONS = "Use Spillover for Filter Operations";
+    public static final String PROPERTY_BOW_SIZEINGALLONS = "Size In Gallons";
 
     // Chlorinator
     public static final String CHANNEL_CHLORINATOR_STATUS = "chlorStatus";
@@ -94,10 +95,15 @@ public class HaywardBindingConstants {
     public static final String CHANNEL_CHLORINATOR_OPERATINGMODE = "chlorOperatingMode";
     public static final String CHANNEL_CHLORINATOR_ENABLE = "chlorEnable";
 
-    public static final String PROPERTY_CHLORINATOR_SHAREDTYPE = "chlorSharedType";
-    public static final String PROPERTY_CHLORINATOR_MODE = "chlorMode";
-    public static final String PROPERTY_CHLORINATOR_CELLTYPE = "cellType";
-    public static final String PROPERTY_CHLORINATOR_DISPENSERTYPE = "dispenserType";
+    public static final String PROPERTY_CHLORINATOR_SHAREDTYPE = "Shared Type";
+    public static final String PROPERTY_CHLORINATOR_ENABLED = "Enabled";
+    public static final String PROPERTY_CHLORINATOR_MODE = "Mode";
+    public static final String PROPERTY_CHLORINATOR_TIMEDPERCENT = "Timed Percent";
+    public static final String PROPERTY_CHLORINATOR_SUPERCHLORTIMEOUT = "Super Chlor Timeout";
+    public static final String PROPERTY_CHLORINATOR_CELLTYPE = "Cell Type";
+    public static final String PROPERTY_CHLORINATOR_DISPENSERTYPE = "Dispenser Type";
+    public static final String PROPERTY_CHLORINATOR_ORPTIMEOUT = "ORP Timeout";
+    public static final String PROPERTY_CHLORINATOR_ORPSENSORID = "ORP Sensor ID";
 
     // Colorlogic
     public static final String CHANNEL_COLORLOGIC_ENABLE = "enable";
@@ -106,7 +112,9 @@ public class HaywardBindingConstants {
     public static final String CHANNEL_COLORLOGIC_SPEED = "speed";
     public static final String CHANNEL_COLORLOGIC_SPECIALEFFECT = "specialEffect";
 
-    public static final String PROPERTY_COLORLOGIC_TYPE = "colorlogicType";
+    public static final String PROPERTY_COLORLOGIC_TYPE = "Type";
+    public static final String PROPERTY_COLORLOGIC_NODEID = "Node ID";
+    public static final String PROPERTY_COLORLOGIC_NETWORKED = "Networked";
 
     // Filter
     public static final String CHANNEL_FILTER_ENABLE = "filterEnable";
@@ -119,18 +127,31 @@ public class HaywardBindingConstants {
     public static final String CHANNEL_FILTER_REPORTEDSPEED = "filterReportedSpeed";
     public static final String CHANNEL_FILTER_POWER = "filterPower";
 
-    public static final String PROPERTY_FILTER_SHAREDTYPE = "filterSharedType";
-    public static final String PROPERTY_FILTER_FILTERTYPE = "filterType";
-    public static final String PROPERTY_FILTER_PRIMINGENABLED = "primingEnabled";
-    public static final String PROPERTY_FILTER_MINSPEED = "filterminPercent";
-    public static final String PROPERTY_FILTER_MAXSPEED = "filterMaxPercent";
-    public static final String PROPERTY_FILTER_MINRPM = "filterMinRPM";
-    public static final String PROPERTY_FILTER_MAXRPM = "filterMaxRPM";
-    public static final String PROPERTY_FILTER_LOWSPEED = "filterLowSpeed";
-    public static final String PROPERTY_FILTER_MEDSPEED = "filterMediumSpeed";
-    public static final String PROPERTY_FILTER_HIGHSPEED = "filterHighSpeed";
-    public static final String PROPERTY_FILTER_CUSTOMSPEED = "filterCustomSpeed";
-    public static final String PROPERTY_FILTER_FREEZEPROTECTOVERRIDEINTERVAL = "filterFreezeProtectOverrideInterval";
+    public static final String PROPERTY_FILTER_SHAREDTYPE = "Shared Type";
+    public static final String PROPERTY_FILTER_FILTERTYPE = "Filter Type";
+    public static final String PROPERTY_FILTER_MAXSPEED = "Maximum Speed (%)";
+    public static final String PROPERTY_FILTER_MINSPEED = "Minimum Speed (%)";
+    public static final String PROPERTY_FILTER_MAXRPM = "Maximum Speed (RPM)";
+    public static final String PROPERTY_FILTER_MINRPM = "Minimum Speed (RPM)";
+    public static final String PROPERTY_FILTER_MINPRIMINGINTERVAL = "Minimum Priming Interval";
+    public static final String PROPERTY_FILTER_PRIMINGENABLED = "Priming Enabled";
+    public static final String PROPERTY_FILTER_PRIMINGDURATION = "Priming Duration";
+    public static final String PROPERTY_FILTER_COOLDOWNDURATION = "Cooldown Duration";
+    public static final String PROPERTY_FILTER_SHUTDOWNREQUESTTIMEOUT = "Shutdown Request Timeout";
+    public static final String PROPERTY_FILTER_NOWATERFLOWTIMEOUTENABLE = "No Water Flow Timeout Enable";
+    public static final String PROPERTY_FILTER_NOWATERFLOWTIMEOUT = "No Water Flow Timeout";
+    public static final String PROPERTY_FILTER_VALVECHANGEOFFENABLE = "Valve Change Off Enable";
+    public static final String PROPERTY_FILTER_VALVECHANGEOFFDURATION = "Valve Change Off Duration";
+    public static final String PROPERTY_FILTER_FREEZEPROTECTENABLE = "Freeze Protect Enable";
+    public static final String PROPERTY_FILTER_FREEZEPROTECTTEMP = "Freeze Protect Temp";
+    public static final String PROPERTY_FILTER_FREEZEPROTECTSPEED = "Freeze Protect Speed";
+    public static final String PROPERTY_FILTER_SHAREDFITLERTIMEOUT = "Shared Filter Timeout";
+    public static final String PROPERTY_FILTER_FILTERVALVEPOSITION = "Filter Valve Position";
+    public static final String PROPERTY_FILTER_LOWSPEED = "Low Speed %";
+    public static final String PROPERTY_FILTER_MEDSPEED = "Medium Speed %";
+    public static final String PROPERTY_FILTER_HIGHSPEED = "High Speed %";
+    public static final String PROPERTY_FILTER_CUSTOMSPEED = "Custom Speed %";
+    public static final String PROPERTY_FILTER_FREEZEPROTECTOVERRIDEINTERVAL = "Freeze Protect Override Interval";
 
     // Heater
     public static final String CHANNEL_HEATER_STATE = "heaterState";
@@ -139,9 +160,19 @@ public class HaywardBindingConstants {
     public static final String CHANNEL_PRIORITY = "heaterPriority";
     public static final String CHANNEL_HEATER_MAINTAINFOR = "heaterMaintainFor";
 
-    public static final String PROPERTY_HEATER_TYPE = "type";
-    public static final String PROPERTY_HEATER_HEATERTYPE = "heaterType";
-    public static final String PROPERTY_HEATER_SHAREDEQUIPID = "sharedEquipmentSystemID";
+    public static final String PROPERTY_HEATER_TYPE = "Type";
+    public static final String PROPERTY_HEATER_HEATERTYPE = "Heater Type";
+    public static final String PROPERTY_HEATER_ENABLED = "Enabled";
+    public static final String PROPERTY_HEATER_PRIORITY = "Priority";
+    public static final String PROPERTY_HEATER_RUNFORPRIORITY = "Run For Priority";
+    public static final String PROPERTY_HEATER_ALLOWLOWSPEEDOPERATION = "Allow Low Speed Operation";
+    public static final String PROPERTY_HEATER_MINSPEEDFOROPERATION = "Minimum Speed for Operation";
+    public static final String PROPERTY_HEATER_REQUIRESPRIMING = "Requires Priming";
+    public static final String PROPERTY_HEATER_MINPRIMINGINTERVAL = "Minimum Priming Interval";
+    public static final String PROPERTY_HEATER_TEMPDIFFINITIAL = "Temp Difference Initial";
+    public static final String PROPERTY_HEATER_TEMPDIFFRUNNING = "Tmep Difference Running";
+    public static final String PROPERTY_HEATER_SENSORSYSTEMID = "Sensor System ID";
+    public static final String PROPERTY_HEATER_SHAREDEQUIPMENTSYSTEMID = "Shared Equipment System ID";
 
     // Pump
     public static final String CHANNEL_PUMP_ENABLE = "pumpEnable";
@@ -162,8 +193,11 @@ public class HaywardBindingConstants {
     // Relay
     public static final String CHANNEL_RELAY_STATE = "relayState";
 
-    public static final String PROPERTY_RELAY_TYPE = "relayType";
-    public static final String PROPERTY_RELAY_FUNCTION = "relayFunction";
+    public static final String PROPERTY_RELAY_TYPE = "Type";
+    public static final String PROPERTY_RELAY_FUNCTION = "Function";
+    public static final String PROPERTY_RELAY_FREEZEPROTECTENABLE = "Freeze Protect Enable";
+    public static final String PROPERTY_RELAY_VALVECYCLEENABLE = "Valve Cycle Enable";
+    public static final String PROPERTY_RELAY_VALVECYCLETIME = "Valve Cycle Time";
 
     // Sensor
     public static final String CHANNEL_SENSOR_DATA = "sensorData";
@@ -178,10 +212,16 @@ public class HaywardBindingConstants {
     public static final String CHANNEL_VIRTUALHEATER_SILENTMODE = "virtualHeaterSilentMode";
     public static final String CHANNEL_VIRTUALHEATER_WHYON = "virtualHeaterWhyOn";
 
-    public static final String PROPERTY_VIRTUALHEATER_SHAREDTYPE = "sharedType";
-    public static final String PROPERTY_VIRTUALHEATER_MINSETTABLEWATERTEMP = "minSettableWaterTemp";
-    public static final String PROPERTY_VIRTUALHEATER_MAXSETTABLEWATERTEMP = "maxSettableWaterTemp";
-    public static final String PROPERTY_VIRTUALHEATER_MAXWATERTEMP = "maxWaterTemp";
+    public static final String PROPERTY_VIRTUALHEATER_SHAREDTYPE = "Shared Type";
+    public static final String PROPERTY_VIRTUALHEATER_ENABLED = "Enabled";
+    public static final String PROPERTY_VIRTUALHEATER_CURRENTSETPOINT = "Current Setpoint";
+    public static final String PROPERTY_VIRTUALHEATER_MAXWATERTEMP = "Max Water Temp";
+    public static final String PROPERTY_VIRTUALHEATER_MINSETTABLEWATERTEMP = "Min Settable Water Temp";
+    public static final String PROPERTY_VIRTUALHEATER_MAXSETTABLEWATERTEMP = "Max Settable Water Temp";
+    public static final String PROPERTY_VIRTUALHEATER_COOLDOWNENABLED = "Cooldown Enabled";
+    public static final String PROPERTY_VIRTUALHEATER_EXTENDENABLED = "Extend Enabled";
+    public static final String PROPERTY_VIRTUALHEATER_BOOSTTIMEINTERVAL = "Boost Time Interval";
+    public static final String PROPERTY_VIRTUALHEATER_HEATERBECOMEVALIDTIMEOUT = "Becomes Valid Timeout";
 
     // The properties associated with all things
     public static final String PROPERTY_SYSTEM_ID = "systemID";

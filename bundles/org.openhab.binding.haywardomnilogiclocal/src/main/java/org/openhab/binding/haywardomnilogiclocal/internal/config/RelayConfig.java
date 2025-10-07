@@ -48,15 +48,15 @@ public class RelayConfig {
         return function;
     }
 
-    public @Nullable String freezeProtectEnable() {
+    public @Nullable String getFreezeProtectEnable() {
         return freezeProtectEnable;
     }
 
-    public @Nullable String valveCycleEnable() {
+    public @Nullable String getValveCycleEnable() {
         return valveCycleEnable;
     }
 
-    public @Nullable String valveCycleTime() {
+    public @Nullable String getValveCycleTime() {
         return valveCycleTime;
     }
 }

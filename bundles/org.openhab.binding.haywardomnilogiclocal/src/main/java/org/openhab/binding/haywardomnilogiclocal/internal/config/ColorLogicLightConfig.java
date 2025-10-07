@@ -24,7 +24,7 @@ public class ColorLogicLightConfig {
     private @Nullable String nodeId;
 
     @XStreamAlias("Networked")
-    private @Nullable String Networked;
+    private @Nullable String networked;
 
     public @Nullable String getSystemId() {
         return systemId;
@@ -38,11 +38,11 @@ public class ColorLogicLightConfig {
         return type;
     }
 
-    public @Nullable String nodeId() {
-        return name;
+    public @Nullable String getNodeId() {
+        return nodeId;
     }
 
-    public @Nullable String Networked() {
-        return type;
+    public @Nullable String getNetworked() {
+        return networked;
     }
 }

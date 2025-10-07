@@ -1,7 +1,7 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.net;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
+import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 
 /**
  * Helper for building XML command strings sent to the Hayward controller.
@@ -126,33 +126,33 @@ public class CommandBuilder {
     }
 
     public static String setEquipmentEnable(String token, String mspSystemID, String equipmentID, boolean enabled) {
-        String prefix = HaywardBindingConstants.COMMAND_PARAMETERS;
+        String prefix = BindingConstants.COMMAND_PARAMETERS;
         return prefix + String.format(SET_EQUIPMENT_ENABLE, token, mspSystemID, equipmentID, enabled ? "True" : "False")
                 + closingTag(prefix);
     }
 
     public static String setPumpSpeed(String token, String mspSystemID, String equipmentID, int speed) {
-        String prefix = HaywardBindingConstants.COMMAND_PARAMETERS;
+        String prefix = BindingConstants.COMMAND_PARAMETERS;
         return prefix + String.format(SET_PUMP_SPEED, token, mspSystemID, equipmentID, speed) + closingTag(prefix);
     }
 
     public static String setColorMode(String token, String mspSystemID, String equipmentID, String mode) {
-        String prefix = HaywardBindingConstants.COMMAND_PARAMETERS;
+        String prefix = BindingConstants.COMMAND_PARAMETERS;
         return prefix + String.format(SET_COLOR_MODE, token, mspSystemID, equipmentID, mode) + closingTag(prefix);
     }
 
     public static String setBrightness(String token, String mspSystemID, String equipmentID, int brightness) {
-        String prefix = HaywardBindingConstants.COMMAND_PARAMETERS;
+        String prefix = BindingConstants.COMMAND_PARAMETERS;
         return prefix + String.format(SET_BRIGHTNESS, token, mspSystemID, equipmentID, brightness) + closingTag(prefix);
     }
 
     public static String setFilterSpeed(String token, String mspSystemID, String equipmentID, int speed) {
-        String prefix = HaywardBindingConstants.COMMAND_PARAMETERS;
+        String prefix = BindingConstants.COMMAND_PARAMETERS;
         return prefix + String.format(SET_FILTER_SPEED, token, mspSystemID, equipmentID, speed) + closingTag(prefix);
     }
 
     public static String setChlorinatorOutput(String token, String mspSystemID, String equipmentID, int output) {
-        String prefix = HaywardBindingConstants.COMMAND_PARAMETERS;
+        String prefix = BindingConstants.COMMAND_PARAMETERS;
         return prefix + String.format(SET_CHLORINATOR_OUTPUT, token, mspSystemID, equipmentID, output)
                 + closingTag(prefix);
     }

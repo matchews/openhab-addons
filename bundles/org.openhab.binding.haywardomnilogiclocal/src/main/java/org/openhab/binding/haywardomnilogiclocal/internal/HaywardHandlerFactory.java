@@ -12,7 +12,7 @@
  */
 package org.openhab.binding.haywardomnilogiclocal.internal;
 
-import static org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants.*;
+import static org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants.*;
 
 import java.util.Collections;
 import java.util.Set;
@@ -74,37 +74,37 @@ public class HaywardHandlerFactory extends BaseThingHandlerFactory {
     protected @Nullable ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
-        if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_BRIDGE)) {
+        if (thingTypeUID.equals(BindingConstants.THING_TYPE_BRIDGE)) {
             return new BridgeHandler(stateDescriptionProvider, (Bridge) thing);
         }
-        if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_BACKYARD)) {
+        if (thingTypeUID.equals(BindingConstants.THING_TYPE_BACKYARD)) {
             return new BackyardHandler(thing);
         }
-        if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_BOW)) {
+        if (thingTypeUID.equals(BindingConstants.THING_TYPE_BOW)) {
             return new BowHandler(thing);
         }
-        if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_CHLORINATOR)) {
+        if (thingTypeUID.equals(BindingConstants.THING_TYPE_CHLORINATOR)) {
             return new ChlorinatorHandler(thing);
         }
-        if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_COLORLOGIC)) {
+        if (thingTypeUID.equals(BindingConstants.THING_TYPE_COLORLOGIC)) {
             return new ColorLogicHandler(thing);
         }
-        if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_FILTER)) {
+        if (thingTypeUID.equals(BindingConstants.THING_TYPE_FILTER)) {
             return new FilterHandler(thing);
         }
-        if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_HEATER)) {
+        if (thingTypeUID.equals(BindingConstants.THING_TYPE_HEATER)) {
             return new HeaterHandler(thing);
         }
-        if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_PUMP)) {
+        if (thingTypeUID.equals(BindingConstants.THING_TYPE_PUMP)) {
             return new PumpHandler(thing);
         }
-        if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_RELAY)) {
+        if (thingTypeUID.equals(BindingConstants.THING_TYPE_RELAY)) {
             return new RelayHandler(thing);
         }
-        if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_VALVEACTUATOR)) {
+        if (thingTypeUID.equals(BindingConstants.THING_TYPE_VALVEACTUATOR)) {
             return new ValveActuatorHandler(thing);
         }
-        if (thingTypeUID.equals(HaywardBindingConstants.THING_TYPE_VIRTUALHEATER)) {
+        if (thingTypeUID.equals(BindingConstants.THING_TYPE_VIRTUALHEATER)) {
             return new VirtualHeaterHandler(thing);
         }
         return null;

@@ -77,23 +77,23 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
                 return OnOffType.from(Integer.parseInt(value) > 0);
             case "Number:Dimensionless":
                 switch (channelID) {
-                    case HaywardBindingConstants.CHANNEL_CHLORINATOR_AVGSALTLEVEL:
+                    case BindingConstants.CHANNEL_CHLORINATOR_AVGSALTLEVEL:
                         return new QuantityType<>(Integer.parseInt(value), Units.PARTS_PER_MILLION);
-                    case HaywardBindingConstants.CHANNEL_CHLORINATOR_INSTANTSALTLEVEL:
+                    case BindingConstants.CHANNEL_CHLORINATOR_INSTANTSALTLEVEL:
                         return new QuantityType<>(Integer.parseInt(value), Units.PARTS_PER_MILLION);
-                    case HaywardBindingConstants.CHANNEL_CHLORINATOR_TIMEDPERCENT:
+                    case BindingConstants.CHANNEL_CHLORINATOR_TIMEDPERCENT:
                         return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
-                    case HaywardBindingConstants.CHANNEL_FILTER_SPEED:
+                    case BindingConstants.CHANNEL_FILTER_SPEED:
                         return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
-                    case HaywardBindingConstants.CHANNEL_FILTER_LASTSPEED:
+                    case BindingConstants.CHANNEL_FILTER_LASTSPEED:
                         return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
-                    case HaywardBindingConstants.CHANNEL_PUMP_SPEED:
+                    case BindingConstants.CHANNEL_PUMP_SPEED:
                         return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
                 }
                 return StringType.valueOf(value);
             case "Number:Power":
                 switch (channelID) {
-                    case HaywardBindingConstants.CHANNEL_FILTER_POWER:
+                    case BindingConstants.CHANNEL_FILTER_POWER:
                         return new QuantityType<>(Integer.parseInt(value), Units.WATT);
                 }
             case "Number:Temperature":
@@ -103,7 +103,7 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
                     if (bridgehandler != null) {
                         // Get units property from bridge
                         Map<String, String> bridgeProperties = bridgehandler.getThing().getProperties();
-                        String units = bridgeProperties.get(HaywardBindingConstants.PROPERTY_BRIDGE_UNITS);
+                        String units = bridgeProperties.get(BindingConstants.PROPERTY_BRIDGE_UNITS);
 
                         if ("Standard".equals(units)) {
                             return new QuantityType<>(Integer.parseInt(value), ImperialUnits.FAHRENHEIT);

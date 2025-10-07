@@ -3,7 +3,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
+import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
@@ -71,7 +71,7 @@ public class ColorLogicHandler extends HaywardThingHandler {
                 @Nullable
                 String lightState = cl.getlightState();
                 if (lightState != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_COLORLOGIC_ENABLE, lightState);
+                    updateData(BindingConstants.CHANNEL_COLORLOGIC_ENABLE, lightState);
                 } else {
                     logger.debug("Colorlogic light state missing from Telemtry");
                 }
@@ -79,7 +79,7 @@ public class ColorLogicHandler extends HaywardThingHandler {
                 @Nullable
                 String currentShow = cl.getCurrentShow();
                 if (currentShow != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_COLORLOGIC_CURRENTSHOW, currentShow);
+                    updateData(BindingConstants.CHANNEL_COLORLOGIC_CURRENTSHOW, currentShow);
                 } else {
                     logger.debug("Colorlogic light current show missing from Telemtry");
                 }
@@ -87,7 +87,7 @@ public class ColorLogicHandler extends HaywardThingHandler {
                 @Nullable
                 String brightness = cl.getBrightness();
                 if (brightness != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_COLORLOGIC_BRIGHTNESS, brightness);
+                    updateData(BindingConstants.CHANNEL_COLORLOGIC_BRIGHTNESS, brightness);
                 } else {
                     logger.debug("Colorlogic light brightness missing from Telemtry");
                 }
@@ -95,7 +95,7 @@ public class ColorLogicHandler extends HaywardThingHandler {
                 @Nullable
                 String speed = cl.getSpeed();
                 if (speed != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_COLORLOGIC_SPEED, speed);
+                    updateData(BindingConstants.CHANNEL_COLORLOGIC_SPEED, speed);
                 } else {
                     logger.debug("Colorlogic light speed missing from Telemtry");
                 }
@@ -103,7 +103,7 @@ public class ColorLogicHandler extends HaywardThingHandler {
                 @Nullable
                 String specialEffect = cl.getSpecialEffect();
                 if (speed != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_COLORLOGIC_SPECIALEFFECT, specialEffect);
+                    updateData(BindingConstants.CHANNEL_COLORLOGIC_SPECIALEFFECT, specialEffect);
                 } else {
                     logger.debug("Colorlogic light special effect missing from Telemtry");
                 }

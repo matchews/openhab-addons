@@ -10,7 +10,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  */
 @NonNullByDefault
 @XStreamAlias("Heater-Equipment")
-public  class HeaterEquipConfig {
+public class HeaterEquipConfig {
     @XStreamAlias("System-Id")
     private @Nullable String systemId;
 
@@ -22,6 +22,9 @@ public  class HeaterEquipConfig {
 
     @XStreamAlias("Heater-Type")
     private @Nullable String heaterType;
+
+    @XStreamAlias("Enabled")
+    private @Nullable String enabled;
 
     @XStreamAlias("Priority")
     private @Nullable String priority;
@@ -69,6 +72,10 @@ public  class HeaterEquipConfig {
         return heaterType;
     }
 
+    public @Nullable String getEnabled() {
+        return enabled;
+    }
+
     public @Nullable String getPriority() {
         return priority;
     }
@@ -97,7 +104,7 @@ public  class HeaterEquipConfig {
         return tempDifferencetInitial;
     }
 
-    public @Nullable String getTempDifferencetRunning() {
+    public @Nullable String getTempDifferenceRunning() {
         return tempDifferencetRunning;
     }
 

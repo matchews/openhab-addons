@@ -14,7 +14,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
+import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.BodyOfWater;
@@ -48,7 +48,7 @@ public class BowHandler extends HaywardThingHandler {
                 @Nullable
                 String flow = bow.getFlow();
                 if (flow != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_BOW_FLOW, flow);
+                    updateData(BindingConstants.CHANNEL_BOW_FLOW, flow);
                 } else {
                     logger.debug("Body of Water flow missing from Telemtry");
                 }
@@ -56,7 +56,7 @@ public class BowHandler extends HaywardThingHandler {
                 @Nullable
                 String waterTemp = bow.getWaterTemp();
                 if (waterTemp != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_BOW_WATERTEMP, waterTemp);
+                    updateData(BindingConstants.CHANNEL_BOW_WATERTEMP, waterTemp);
                 } else {
                     logger.debug("Body of Water temp missing from Telemtry");
                 }

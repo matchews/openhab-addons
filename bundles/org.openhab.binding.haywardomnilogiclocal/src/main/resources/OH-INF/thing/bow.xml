@@ -15,16 +15,6 @@
 			<channel id="bowWaterTemp" typeId="waterTemp"/>
 		</channels>
 
-		<properties>
-			<property name="vendor">Hayward</property>
-			<property name="type"></property>
-			<property name="sharedType"></property>
-			<property name="sharedPriority"></property>
-			<property name="sharedEquipmentSystemID"></property>
-			<property name="supportsSpillover"></property>
-			<property name="sizeInGallons"></property>
-
-		</properties>
 		<representation-property>systemID</representation-property>
 
 	</thing-type>

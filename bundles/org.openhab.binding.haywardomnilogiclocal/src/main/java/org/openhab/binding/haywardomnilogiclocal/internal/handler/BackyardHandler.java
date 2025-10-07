@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardBindingConstants;
+import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
@@ -54,7 +54,7 @@ public class BackyardHandler extends HaywardThingHandler {
                 @Nullable
                 String airTemp = by.getAirTemp();
                 if (airTemp != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_BACKYARD_AIRTEMP, airTemp);
+                    updateData(BindingConstants.CHANNEL_BACKYARD_AIRTEMP, airTemp);
                 } else {
                     logger.debug("Backyard air temperature missing");
                 }
@@ -62,7 +62,7 @@ public class BackyardHandler extends HaywardThingHandler {
                 @Nullable
                 String state = by.getState();
                 if (state != null) {
-                    updateData(HaywardBindingConstants.CHANNEL_BACKYARD_STATE, state);
+                    updateData(BindingConstants.CHANNEL_BACKYARD_STATE, state);
                 } else {
                     logger.debug("Backyard state missing");
                 }

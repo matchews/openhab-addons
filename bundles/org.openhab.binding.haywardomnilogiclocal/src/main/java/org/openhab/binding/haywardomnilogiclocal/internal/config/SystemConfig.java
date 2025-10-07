@@ -35,6 +35,21 @@ public class SystemConfig {
     @XStreamAlias("Msp-Language")
     private @Nullable String mspLanguage;
 
+    @XStreamAlias("UI-Display-Mode")
+    private @Nullable String uiDisplayMode;
+
+    @XStreamAlias("UI-MoodColor-Enabled")
+    private @Nullable String uiMoodColorEnabled;
+
+    @XStreamAlias("UI-Heater-SimpleMode")
+    private @Nullable String uiHeaterSimpleMode;
+
+    @XStreamAlias("UI-Filter-SimpleMode")
+    private @Nullable String uiFilterSimpleMode;
+
+    @XStreamAlias("UI-Lights-SimpleMode")
+    private @Nullable String uiLightsSimpleMode;
+
     public @Nullable String getMspVspSpeedFormat() {
         return mspVspSpeedFormat;
     }
@@ -66,4 +81,25 @@ public class SystemConfig {
     public @Nullable String getMspLanguage() {
         return mspLanguage;
     }
+
+    public @Nullable String getUiDisplayMode() {
+        return uiDisplayMode;
+    }
+
+    public @Nullable String getUiMoodColorEnabled() {
+        return uiMoodColorEnabled;
+    }
+
+    public @Nullable String getUiHeaterSimpleMode() {
+        return uiHeaterSimpleMode;
+    }
+
+    public @Nullable String getUiFilterSimpleMode() {
+        return uiFilterSimpleMode;
+    }
+
+    public @Nullable String getUiLightsSimpleMode() {
+        return uiLightsSimpleMode;
+    }
+
 }

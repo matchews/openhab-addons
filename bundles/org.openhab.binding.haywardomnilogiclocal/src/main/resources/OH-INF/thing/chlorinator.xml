@@ -24,9 +24,6 @@
 			<channel id="chlorEnable" typeId="system.power"/>
 		</channels>
 
-		<properties>
-			<property name="vendor">Hayward</property>
-		</properties>
 		<representation-property>systemID</representation-property>
 	</thing-type>
 
