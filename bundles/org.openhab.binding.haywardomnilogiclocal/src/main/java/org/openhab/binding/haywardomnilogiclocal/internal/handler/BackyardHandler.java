@@ -8,8 +8,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Backyard;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
@@ -86,7 +86,7 @@ public class BackyardHandler extends HaywardThingHandler {
                     + "</Parameter><Parameter name=\"CultureInfoName\" dataType=\"String\">en-us</Parameter></Parameters></Request>";
 
             try {
-                String xmlResponse = bridgehandler.sendRequest(urlParameters, HaywardMessageType.MSP_ALARM_LIST);
+                String xmlResponse = bridgehandler.sendRequest(urlParameters, MessageType.MSP_ALARM_LIST);
 
                 if (xmlResponse.isEmpty()) {
                     logger.debug("Hayward getAlarmList XML response was empty");

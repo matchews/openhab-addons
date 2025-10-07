@@ -173,14 +173,14 @@ public class VirtualHeaterHandler extends HaywardThingHandler {
      * }
      *
      * // *****Send Command to Hayward server
-     * String xmlResponse = bridgehandler.sendRequest(cmdURL, HaywardMessageType.SET_HEATER_COMMAND);
+     * String xmlResponse = bridgehandler.sendRequest(cmdURL, MessageType.SET_HEATER_COMMAND);
      * String status = bridgehandler.evaluateXPath("//Parameter[@name='Status']/text()", xmlResponse).get(0);
      *
      * if (!("0".equals(status))) {
      * logger.debug("haywardCommand XML response: {}", xmlResponse);
      * return;
      * }
-     * } catch (HaywardException e) {
+     * } catch (Exception e) {
      * logger.debug("Unable to send command to Hayward's server {}:{}",
      * bridgehandler.getBridgeConfig().getEndpointUrl(), e.getMessage());
      * }

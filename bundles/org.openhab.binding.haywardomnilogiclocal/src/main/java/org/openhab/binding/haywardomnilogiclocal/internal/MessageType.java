@@ -9,7 +9,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author Matt Myers - Initial contribution
  */
 @NonNullByDefault
-public enum HaywardMessageType {
+public enum MessageType {
 
     XML_ACK(0000),
     REQUEST_CONFIGURATION(1),
@@ -42,7 +42,7 @@ public enum HaywardMessageType {
 
     private final int msgInt;
 
-    private HaywardMessageType(int msgInt) {
+    private MessageType(int msgInt) {
         this.msgInt = msgInt;
     }
 
@@ -50,8 +50,8 @@ public enum HaywardMessageType {
         return this.msgInt;
     }
 
-    public static @Nullable HaywardMessageType fromMsgInt(int msgInt) {
-        for (HaywardMessageType type : values()) {
+    public static @Nullable MessageType fromMsgInt(int msgInt) {
+        for (MessageType type : values()) {
             if (type.msgInt == msgInt) {
                 return type;
             }

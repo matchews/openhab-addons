@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
+import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.QNameMap;
@@ -59,7 +59,7 @@ public class MessageAssembler {
         compressed = isCompressed;
         if (obj instanceof LeadMessageResponse lead) {
             remainingBlocks = lead.getMsgBlockCount();
-            if (lead.getType() == HaywardMessageType.GET_TELEMETRY.getMsgInt()) {
+            if (lead.getType() == MessageType.GET_TELEMETRY.getMsgInt()) {
                 compressed = true;
             }
         }

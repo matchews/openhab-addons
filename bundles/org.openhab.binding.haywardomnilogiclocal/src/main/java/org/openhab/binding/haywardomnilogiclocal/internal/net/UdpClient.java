@@ -23,7 +23,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
+import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.BridgeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +48,10 @@ public class UdpClient {
         DONE
     }
 
-    public UdpMessage send(HaywardMessageType requestType, String xml) throws IOException {
-        byte clientType = (requestType == HaywardMessageType.GET_TELEMETRY
-                || requestType == HaywardMessageType.GET_ALARM_LIST) ? (byte) 0 : (byte) 1;
+    public UdpMessage send(MessageType requestType, String xml) throws IOException {
+        byte clientType = (requestType == MessageType.GET_TELEMETRY || requestType == MessageType.GET_ALARM_LIST)
+                ? (byte) 0
+                : (byte) 1;
         byte[] out = UdpMessage.encodeRequest(requestType, xml, clientType);
         UdpMessage response = null;
         try (DatagramSocket socket = new DatagramSocket()) {
@@ -59,7 +60,7 @@ public class UdpClient {
 
             State state = State.SEND;
             DatagramPacket responsePacket = null;
-            HaywardMessageType msgType = HaywardMessageType.ACK;
+            MessageType msgType = MessageType.ACK;
             int msgId = 0;
 
             while (state != State.DONE) {
@@ -78,24 +79,24 @@ public class UdpClient {
                         msgType = hdr.getMessageType();
                         logger.trace("Received UDP packet with messageID = {}", msgId);
 
-                        if (msgType != HaywardMessageType.ACK) {
+                        if (msgType != MessageType.ACK) {
                             ackHandler.sendAck(socket, msgId);
                         }
 
-                        if (msgType == HaywardMessageType.ACK) {
+                        if (msgType == MessageType.ACK) {
                             state = State.RECEIVE;
-                        } else if (msgType == HaywardMessageType.MSP_LEADMESSAGE) {
-                            boolean compressed = hdr.isCompressed() || requestType == HaywardMessageType.GET_TELEMETRY;
+                        } else if (msgType == MessageType.MSP_LEADMESSAGE) {
+                            boolean compressed = hdr.isCompressed() || requestType == MessageType.GET_TELEMETRY;
                             handleLead(data, assembler, compressed);
                             state = State.RECEIVE;
-                        } else if (msgType == HaywardMessageType.MSP_BLOCKMESSAGE) {
+                        } else if (msgType == MessageType.MSP_BLOCKMESSAGE) {
                             if (handleBlock(data, assembler)) {
                                 response = finishResponse(msgType, msgId, assembler);
                                 state = State.DONE;
                             } else {
                                 state = State.RECEIVE;
                             }
-                        } else if (msgType == HaywardMessageType.MSP_TELEMETRY_UPDATE) {
+                        } else if (msgType == MessageType.MSP_TELEMETRY_UPDATE) {
                             response = finishResponse(data);
                             state = State.DONE;
                         } else {
@@ -140,8 +141,7 @@ public class UdpClient {
         return assembler.handleBlock(data);
     }
 
-    private UdpMessage finishResponse(HaywardMessageType msgType, int msgId, MessageAssembler assembler)
-            throws IOException {
+    private UdpMessage finishResponse(MessageType msgType, int msgId, MessageAssembler assembler) throws IOException {
         byte[] payload = assembler.assemblePayload();
         String xml = new String(payload, StandardCharsets.UTF_8).trim();
         UdpHeader header = new UdpHeader(msgType, msgId);

@@ -17,7 +17,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
+import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
 
 /**
  * Represents the 24 byte UDP header used by the OmniLogic protocol.
@@ -30,11 +30,11 @@ public class UdpHeader {
     private final int messageId;
     private final long timeStamp;
     private final String version;
-    private final HaywardMessageType messageType;
+    private final MessageType messageType;
     private final byte clientType;
     private final boolean compressed;
 
-    public UdpHeader(int messageId, long timeStamp, String version, HaywardMessageType messageType, byte clientType,
+    public UdpHeader(int messageId, long timeStamp, String version, MessageType messageType, byte clientType,
             boolean compressed) {
         this.messageId = messageId;
         this.timeStamp = timeStamp;
@@ -44,11 +44,11 @@ public class UdpHeader {
         this.compressed = compressed;
     }
 
-    public UdpHeader(HaywardMessageType messageType, int messageId) {
+    public UdpHeader(MessageType messageType, int messageId) {
         this(messageId, System.currentTimeMillis(), "1.22", messageType, (byte) 1, false);
     }
 
-    public UdpHeader(HaywardMessageType messageType, int messageId, byte clientType) {
+    public UdpHeader(MessageType messageType, int messageId, byte clientType) {
         this(messageId, System.currentTimeMillis(), "1.22", messageType, clientType, false);
     }
 
@@ -64,7 +64,7 @@ public class UdpHeader {
         return version;
     }
 
-    public HaywardMessageType getMessageType() {
+    public MessageType getMessageType() {
         return messageType;
     }
 
@@ -110,7 +110,7 @@ public class UdpHeader {
         buffer.get(versionBytes);
         String ver = new String(versionBytes, StandardCharsets.US_ASCII);
         int msgTypeInt = buffer.getInt();
-        HaywardMessageType msgType = HaywardMessageType.fromMsgInt(msgTypeInt);
+        MessageType msgType = MessageType.fromMsgInt(msgTypeInt);
         if (msgType == null) {
             throw new IllegalArgumentException("Unknown message type: " + msgTypeInt);
         }

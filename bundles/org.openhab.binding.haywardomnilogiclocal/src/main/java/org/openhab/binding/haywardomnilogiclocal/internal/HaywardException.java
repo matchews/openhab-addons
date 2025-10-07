@@ -15,7 +15,7 @@ package org.openhab.binding.haywardomnilogiclocal.internal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * The {@link HaywardException} is thrown during the getMspConfig, mspConfigDiscovery, getTelemetry,
+ * The {@link Exception} is thrown during the getMspConfig, mspConfigDiscovery, getTelemetry,
  * evaluateXPath and httpXmlResponse methods
  *
  * @author Matt Myers - Initial contribution
@@ -24,7 +24,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 public class HaywardException extends Exception {
 
     /**
-     * The {@link HaywardException} is thrown by getMspConfig() and mspConfigDiscovery()
+     * The {@link Exception} is thrown by getMspConfig() and mspConfigDiscovery()
      *
      */
     private static final long serialVersionUID = 1L;

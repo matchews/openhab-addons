@@ -26,7 +26,6 @@ import org.openhab.core.thing.binding.BaseDynamicStateDescriptionProvider;
 import org.openhab.core.thing.events.ThingEventFactory;
 import org.openhab.core.thing.i18n.ChannelTypeI18nLocalizationService;
 import org.openhab.core.thing.link.ItemChannelLinkRegistry;
-import org.openhab.core.thing.type.DynamicStateDescriptionProvider;
 import org.openhab.core.types.StateDescription;
 import org.openhab.core.types.StateDescriptionFragment;
 import org.osgi.service.component.annotations.Activate;
@@ -39,14 +38,14 @@ import org.osgi.service.component.annotations.Reference;
  *
  * @author Matt Myers - Initial contribution
  */
-@Component(service = { DynamicStateDescriptionProvider.class, HaywardDynamicStateDescriptionProvider.class })
+@Component(service = { DynamicStateDescriptionProvider.class, DynamicStateDescriptionProvider.class })
 @NonNullByDefault
-public class HaywardDynamicStateDescriptionProvider extends BaseDynamicStateDescriptionProvider {
+public class DynamicStateDescriptionProvider extends BaseDynamicStateDescriptionProvider {
 
     private final Map<ChannelUID, StateDescriptionFragment> stateDescriptionFragments = new ConcurrentHashMap<>();
 
     @Activate
-    public HaywardDynamicStateDescriptionProvider(final @Reference EventPublisher eventPublisher, //
+    public DynamicStateDescriptionProvider(final @Reference EventPublisher eventPublisher, //
             final @Reference ItemChannelLinkRegistry itemChannelLinkRegistry, //
             final @Reference ChannelTypeI18nLocalizationService channelTypeI18nLocalizationService) {
         this.eventPublisher = eventPublisher;

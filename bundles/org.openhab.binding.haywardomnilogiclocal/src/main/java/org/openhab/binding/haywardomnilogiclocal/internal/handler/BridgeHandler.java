@@ -31,12 +31,12 @@ import javax.xml.xpath.XPathFactory;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardConfig;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardDynamicStateDescriptionProvider;
+import org.openhab.binding.haywardomnilogiclocal.internal.Config;
+import org.openhab.binding.haywardomnilogiclocal.internal.DynamicStateDescriptionProvider;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
-import org.openhab.binding.haywardomnilogiclocal.internal.HaywardMessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardTypeToRequest;
+import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.discovery.HaywardDiscoveryService;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpClient;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpMessage;
@@ -68,16 +68,16 @@ public class BridgeHandler extends BaseBridgeHandler {
     private final Logger logger = LoggerFactory.getLogger(BridgeHandler.class);
     private static final int UDP_PORT = 10444;
 
-    private final HaywardDynamicStateDescriptionProvider stateDescriptionProvider;
+    private final DynamicStateDescriptionProvider stateDescriptionProvider;
     private @Nullable UdpClient udpClient;
     private @Nullable ScheduledFuture<?> initializeFuture;
     private @Nullable ScheduledFuture<?> pollTelemetryFuture;
     private @Nullable ScheduledFuture<?> pollAlarmsFuture;
     private int commFailureCount;
-    private HaywardConfig config = getConfig().as(HaywardConfig.class);
+    private Config config = getConfig().as(Config.class);
     public String units = "Standard";
 
-    public HaywardConfig getBridgeConfig() {
+    public Config getBridgeConfig() {
         return config;
     }
 
@@ -94,7 +94,7 @@ public class BridgeHandler extends BaseBridgeHandler {
         return Set.of(HaywardDiscoveryService.class);
     }
 
-    public BridgeHandler(HaywardDynamicStateDescriptionProvider stateDescriptionProvider, Bridge bridge) {
+    public BridgeHandler(DynamicStateDescriptionProvider stateDescriptionProvider, Bridge bridge) {
         super(bridge);
         this.stateDescriptionProvider = stateDescriptionProvider;
     }
@@ -124,7 +124,7 @@ public class BridgeHandler extends BaseBridgeHandler {
     }
 
     public void scheduledInitialize() throws UnknownHostException {
-        config = getConfigAs(HaywardConfig.class);
+        config = getConfigAs(Config.class);
         udpClient = new UdpClient(config.getEndpointUrl(), UDP_PORT);
 
         try {
@@ -165,7 +165,7 @@ public class BridgeHandler extends BaseBridgeHandler {
 
     public String getMspConfig() throws HaywardException, InterruptedException {
         String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>RequestConfiguration</Name></Request>";
-        String xmlResponse = sendRequest(xmlRequest, HaywardMessageType.REQUEST_CONFIGURATION);
+        String xmlResponse = sendRequest(xmlRequest, MessageType.REQUEST_CONFIGURATION);
 
         if (xmlResponse.isEmpty()) {
             logger.error("Hayward Connection thing: getMspConfig XML response was null");
@@ -181,7 +181,7 @@ public class BridgeHandler extends BaseBridgeHandler {
 
     public synchronized boolean requestConfiguration() throws HaywardException {
         String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>RequestConfiguration</Name></Request>";
-        String xmlResponse = sendRequest(xmlRequest, HaywardMessageType.REQUEST_CONFIGURATION);
+        String xmlResponse = sendRequest(xmlRequest, MessageType.REQUEST_CONFIGURATION);
 
         if (xmlResponse.isEmpty()) {
             logger.debug("Hayward Connection thing: RequestConfiguration XML response was null");
@@ -199,7 +199,7 @@ public class BridgeHandler extends BaseBridgeHandler {
 
     public synchronized boolean requestTelemetryData() throws HaywardException {
         String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>RequestTelemetryData</Name></Request>";
-        String xmlResponse = sendRequest(xmlRequest, HaywardMessageType.GET_TELEMETRY);
+        String xmlResponse = sendRequest(xmlRequest, MessageType.GET_TELEMETRY);
 
         if (xmlResponse.isEmpty()) {
             logger.debug("Hayward Connection thing: RequestTelemetryData XML response was null");
@@ -224,7 +224,7 @@ public class BridgeHandler extends BaseBridgeHandler {
 
     public synchronized boolean getAlarmList() throws HaywardException {
         String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>GetAllAlarmList</Name><Parameters/></Request>";
-        String xmlResponse = sendRequest(xmlRequest, HaywardMessageType.GET_ALARM_LIST);
+        String xmlResponse = sendRequest(xmlRequest, MessageType.GET_ALARM_LIST);
 
         if (xmlResponse.isEmpty()) {
             logger.debug("Hayward Connection thing: GetAllAlarmList XML response was null");
@@ -318,7 +318,7 @@ public class BridgeHandler extends BaseBridgeHandler {
         return values;
     }
 
-    public synchronized String sendRequest(String xmlRequest, HaywardMessageType msgType) throws HaywardException {
+    public synchronized String sendRequest(String xmlRequest, MessageType msgType) throws HaywardException {
         if (logger.isTraceEnabled()) {
             logger.trace("Hayward Connection thing:  {} Hayward UDP command: {}", getCallingMethod(), xmlRequest);
         } else if (logger.isDebugEnabled()) {

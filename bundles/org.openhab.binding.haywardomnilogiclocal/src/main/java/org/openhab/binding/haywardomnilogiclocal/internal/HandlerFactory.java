@@ -43,7 +43,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * The {@link HaywardHandlerFactory} is responsible for creating things and thing
+ * The {@link HandlerFactory} is responsible for creating things and thing
  * handlers.
  *
  * @author Matt Myers - Initial contribution
@@ -51,11 +51,11 @@ import org.osgi.service.component.annotations.Reference;
 
 @Component(service = ThingHandlerFactory.class, configurationPid = "binding.haywardomnilogic")
 @NonNullByDefault
-public class HaywardHandlerFactory extends BaseThingHandlerFactory {
+public class HandlerFactory extends BaseThingHandlerFactory {
 
     private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.unmodifiableSet(
             Stream.concat(BRIDGE_THING_TYPES_UIDS.stream(), THING_TYPES_UIDS.stream()).collect(Collectors.toSet()));
-    private final HaywardDynamicStateDescriptionProvider stateDescriptionProvider;
+    private final DynamicStateDescriptionProvider stateDescriptionProvider;
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -63,7 +63,7 @@ public class HaywardHandlerFactory extends BaseThingHandlerFactory {
     }
 
     @Activate
-    public HaywardHandlerFactory(final @Reference HaywardDynamicStateDescriptionProvider stateDescriptionProvider) {
+    public HandlerFactory(final @Reference DynamicStateDescriptionProvider stateDescriptionProvider) {
         this.stateDescriptionProvider = stateDescriptionProvider;
     }
 

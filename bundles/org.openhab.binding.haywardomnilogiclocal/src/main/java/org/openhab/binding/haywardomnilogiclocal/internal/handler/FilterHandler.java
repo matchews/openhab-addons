@@ -36,14 +36,14 @@ public class FilterHandler extends HaywardThingHandler {
             case "filterEnable":
                 // sendUdpCommand(CommandBuilder.setEquipmentEnable(bridgehandler.getAccount().getToken(),
                 // bridgehandler.getAccount().getMspSystemID(), sysId, "ON".equalsIgnoreCase(command.toString())),
-                // HaywardMessageType.SET_FILTER_SPEED);
+                // MessageType.SET_FILTER_SPEED);
                 break;
             case "filterSpeed":
                 int speedVal = ((Number) command).intValue();
                 // sendUdpCommand(
                 // CommandBuilder.setFilterSpeed(bridgehandler.getAccount().getToken(),
                 // bridgehandler.getAccount().getMspSystemID(), sysId, speedVal),
-                // HaywardMessageType.SET_FILTER_SPEED);
+                // MessageType.SET_FILTER_SPEED);
                 break;
             default:
                 break;

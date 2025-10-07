@@ -171,7 +171,7 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
         }
     }
 
-    protected void sendUdpCommand(String xml, HaywardMessageType msgType) {
+    protected void sendUdpCommand(String xml, MessageType msgType) {
         Bridge bridge = getBridge();
         if (bridge != null && bridge.getHandler() instanceof BridgeHandler bridgehandler) {
             try {

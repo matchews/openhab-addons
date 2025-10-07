@@ -36,14 +36,14 @@ public class ChlorinatorHandler extends HaywardThingHandler {
             case "chlorEnable":
                 // sendUdpCommand(CommandBuilder.setEquipmentEnable(bridgehandler.getUnits(),
                 // bridgehandler.getU(), sysId, "ON".equalsIgnoreCase(command.toString())),
-                // HaywardMessageType.SET_CHLOR_ENABLED);
+                // MessageType.SET_CHLOR_ENABLED);
                 break;
             case "chlorTimedPercent":
                 int val = ((Number) command).intValue();
                 // sendUdpCommand(
                 // CommandBuilder.setChlorinatorOutput(bridgehandler.getAccount().getToken(),
                 // bridgehandler.getAccount().getMspSystemID(), sysId, val),
-                // HaywardMessageType.SET_CHLOR_PARAMS);
+                // MessageType.SET_CHLOR_PARAMS);
                 break;
             default:
                 break;

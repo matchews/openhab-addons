@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2010-2025 Contributors to the openHAB project
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -15,18 +15,18 @@ package org.openhab.binding.haywardomnilogiclocal.internal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * The {@link HaywardConfig} class contains fields mapping thing configuration parameters.
+ * The {@link Config} class contains fields mapping thing configuration parameters.
  *
  * @author Matt Myers - Initial contribution
  */
 
 @NonNullByDefault
-public class HaywardConfig {
+public class Config {
     private String host = "";
     private int alarmPollTime = 60;
     private int telemetryPollTime = 10;
 
-    public HaywardConfig() {
+    public Config() {
     }
 
     public String getEndpointUrl() {

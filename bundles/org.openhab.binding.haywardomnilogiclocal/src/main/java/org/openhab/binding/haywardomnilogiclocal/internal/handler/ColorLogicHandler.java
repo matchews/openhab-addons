@@ -37,13 +37,13 @@ public class ColorLogicHandler extends HaywardThingHandler {
             // sendUdpCommand(
             // CommandBuilder.setColorMode(bridgehandler.getAccount().getToken(),
             // bridgehandler.getAccount().getMspSystemID(), sysId, command.toString()),
-            // HaywardMessageType.SET_CHLOR_ENABLED);
+            // MessageType.SET_CHLOR_ENABLED);
         } else if ("brightness".equals(channelUID.getId())) {
             int val = ((Number) command).intValue();
             // sendUdpCommand(
             // CommandBuilder.setBrightness(bridgehandler.getAccount().getToken(),
             // bridgehandler.getAccount().getMspSystemID(), sysId, val),
-            // HaywardMessageType.SET_CHLOR_ENABLED);
+            // MessageType.SET_CHLOR_ENABLED);
         }
     }
 
