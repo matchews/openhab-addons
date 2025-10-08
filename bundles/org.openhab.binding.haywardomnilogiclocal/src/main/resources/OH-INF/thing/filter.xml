@@ -68,6 +68,8 @@
                 <option value="1">Pool Only</option>
                 <option value="2">Spa Only</option>
                 <option value="3">Spillover</option>
+                <option value="4">Low Priority Heat</option>
+                <option value="5">High Priority Heat</option>  
             </options>
         </state>
     </channel-type>
@@ -98,9 +100,9 @@
         </state>
     </channel-type>
 
-    <channel-type id="filterFpOveride">
+    <channel-type id="filterFpOverride">
         <item-type>String</item-type>
-        <label>fpOveride</label>
+        <label>fpOverride</label>
         <state readOnly="true"/>
     </channel-type>
 

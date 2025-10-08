@@ -1,12 +1,9 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
-import java.util.Map;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.ValveActuator;
@@ -19,15 +16,6 @@ public class ValveActuatorHandler extends HaywardThingHandler {
 
     public ValveActuatorHandler(Thing thing) {
         super(thing);
-    }
-
-    public void updateFromConfig(Map<String, ParameterValue> values) {
-        String sysId = getThing().getProperties().get("systemID");
-        if (sysId == null) {
-            return;
-        }
-
-        updateIfPresent(values, "valveActuatorState_" + sysId, "valveActuatorState");
     }
 
     @Override

@@ -1,12 +1,9 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
-import java.util.Map;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Filter;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
@@ -48,18 +45,6 @@ public class FilterHandler extends HaywardThingHandler {
             default:
                 break;
         }
-    }
-
-    public void updateFromConfig(Map<String, ParameterValue> values) {
-        String sysId = getThing().getProperties().get("systemID");
-        if (sysId == null) {
-            return;
-        }
-
-        updateIfPresent(values, "filterEnable_" + sysId, "filterEnable");
-        updateIfPresent(values, "filterSpeed_" + sysId, "filterSpeed");
-        putIfPresent(values, "filterState_" + sysId, getThing().getProperties(), "filterState");
-        updateIfPresent(values, "filterLastSpeed_" + sysId, "filterLastSpeed");
     }
 
     @Override

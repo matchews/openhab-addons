@@ -2,7 +2,6 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -10,7 +9,6 @@ import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
-import org.openhab.binding.haywardomnilogiclocal.internal.protocol.ParameterValue;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Backyard;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
@@ -27,18 +25,6 @@ public class BackyardHandler extends HaywardThingHandler {
 
     public BackyardHandler(Thing thing) {
         super(thing);
-    }
-
-    public void updateFromConfig(Map<String, ParameterValue> values) {
-        String sysId = getThing().getProperties().get("systemID");
-        if (sysId == null) {
-            return;
-        }
-
-        updateIfPresent(values, "backyardAirTemp_" + sysId, "backyardAirTemp");
-        putIfPresent(values, "backyardStatus_" + sysId, getThing().getProperties(), "backyardStatus");
-        putIfPresent(values, "backyardState_" + sysId, getThing().getProperties(), "backyardState");
-        updateIfPresent(values, "backyardAlarm1_" + sysId, "backyardAlarm1");
     }
 
     @Override

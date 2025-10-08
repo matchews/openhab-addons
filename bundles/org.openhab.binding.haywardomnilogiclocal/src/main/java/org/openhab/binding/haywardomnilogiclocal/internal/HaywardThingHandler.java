@@ -160,7 +160,7 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
         }
     }
 
-    protected void putIfPresent(Map<String, ParameterValue> values, String key, Map<String, String> properties,
+    protected void putIsfPresent(Map<String, ParameterValue> values, String key, Map<String, String> properties,
             String propertyName) {
         @Nullable
         ParameterValue parameter = values.get(key);
