@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -92,6 +92,7 @@ public class ThingDiscoveryService extends AbstractThingHandlerDiscoveryService<
             new AbstractMap.SimpleEntry<>("LEDVANCE_LIGHT", BoschSHCBindingConstants.THING_TYPE_SMART_BULB),
             new AbstractMap.SimpleEntry<>("SWD", BoschSHCBindingConstants.THING_TYPE_WINDOW_CONTACT),
             new AbstractMap.SimpleEntry<>("SWD2", BoschSHCBindingConstants.THING_TYPE_WINDOW_CONTACT_2),
+            new AbstractMap.SimpleEntry<>("SWD2_PLUS", BoschSHCBindingConstants.THING_TYPE_WINDOW_CONTACT_2_PLUS),
             new AbstractMap.SimpleEntry<>("TRV", BoschSHCBindingConstants.THING_TYPE_THERMOSTAT),
             new AbstractMap.SimpleEntry<>("WRC2", BoschSHCBindingConstants.THING_TYPE_UNIVERSAL_SWITCH),
             new AbstractMap.SimpleEntry<>("SWITCH2", BoschSHCBindingConstants.THING_TYPE_UNIVERSAL_SWITCH_2),
@@ -101,10 +102,10 @@ public class ThingDiscoveryService extends AbstractThingHandlerDiscoveryService<
             new AbstractMap.SimpleEntry<>("MICROMODULE_LIGHT_CONTROL", BoschSHCBindingConstants.THING_TYPE_LIGHT_CONTROL_2),
             new AbstractMap.SimpleEntry<>("MICROMODULE_DIMMER", BoschSHCBindingConstants.THING_TYPE_DIMMER),
             new AbstractMap.SimpleEntry<>("WLS", BoschSHCBindingConstants.THING_TYPE_WATER_DETECTOR),
-            new AbstractMap.SimpleEntry<>("MICROMODULE_RELAY", BoschSHCBindingConstants.THING_TYPE_RELAY)
+            new AbstractMap.SimpleEntry<>("MICROMODULE_RELAY", BoschSHCBindingConstants.THING_TYPE_RELAY),
+            new AbstractMap.SimpleEntry<>("PRESENCE_SIMULATION_SERVICE", BoschSHCBindingConstants.THING_TYPE_PRESENCE_SIMULATION)
 // Future Extension: map deviceModel names to BoschSHC Thing Types when they are supported
 //            new AbstractMap.SimpleEntry<>("SMOKE_DETECTION_SYSTEM", BoschSHCBindingConstants.),
-//            new AbstractMap.SimpleEntry<>("PRESENCE_SIMULATION_SERVICE", BoschSHCBindingConstants.),
 //            new AbstractMap.SimpleEntry<>("VENTILATION_SERVICE", BoschSHCBindingConstants.),
 //            new AbstractMap.SimpleEntry<>("HUE_BRIDGE", BoschSHCBindingConstants.)
 //            new AbstractMap.SimpleEntry<>("HUE_BRIDGE_MANAGER*", BoschSHCBindingConstants.)
@@ -127,7 +128,7 @@ public class ThingDiscoveryService extends AbstractThingHandlerDiscoveryService<
     public void dispose() {
         super.dispose();
         logger.trace("dispose");
-        removeOlderResults(Instant.now().toEpochMilli(), thingHandler.getThing().getUID());
+        removeOlderResults(Instant.now(), thingHandler.getThing().getUID());
         thingHandler.unregisterDiscoveryListener();
 
         super.deactivate();
@@ -242,7 +243,7 @@ public class ThingDiscoveryService extends AbstractThingHandlerDiscoveryService<
         discoveryResult.withBridge(thingHandler.getThing().getUID());
 
         if (!roomName.isEmpty()) {
-            discoveryResult.withProperty("Location", roomName);
+            discoveryResult.withProperty(BoschSHCBindingConstants.PROPERTY_LOCATION, roomName);
         }
         thingDiscovered(discoveryResult.build());
 

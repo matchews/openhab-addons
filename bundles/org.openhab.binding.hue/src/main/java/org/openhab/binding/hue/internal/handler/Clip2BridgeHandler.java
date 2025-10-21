@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -786,8 +786,8 @@ public class Clip2BridgeHandler extends BaseBridgeHandler {
                 }
                 getThing().getThings().forEach(thing -> {
                     ThingHandler handler = thing.getHandler();
-                    if (handler instanceof Clip2ThingHandler) {
-                        ((Clip2ThingHandler) handler).onResourcesList(resourceType, resourceList);
+                    if (handler instanceof Clip2ThingHandler clip2ThingHandler) {
+                        clip2ThingHandler.onResourcesList(resourceType, resourceList);
                     }
                 });
             }

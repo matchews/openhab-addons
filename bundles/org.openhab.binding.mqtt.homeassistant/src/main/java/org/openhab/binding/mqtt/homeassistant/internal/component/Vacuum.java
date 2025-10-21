@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -13,8 +13,9 @@
 package org.openhab.binding.mqtt.homeassistant.internal.component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -24,11 +25,7 @@ import org.openhab.binding.mqtt.generic.values.TextValue;
 import org.openhab.binding.mqtt.generic.values.Value;
 import org.openhab.binding.mqtt.homeassistant.internal.ComponentChannel;
 import org.openhab.binding.mqtt.homeassistant.internal.ComponentChannelType;
-import org.openhab.binding.mqtt.homeassistant.internal.config.dto.AbstractChannelConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.gson.annotations.SerializedName;
+import org.openhab.binding.mqtt.homeassistant.internal.config.dto.EntityConfiguration;
 
 /**
  * A MQTT vacuum, following the https://www.home-assistant.io/components/vacuum.mqtt/ specification.
@@ -37,7 +34,7 @@ import com.google.gson.annotations.SerializedName;
  * @author Anton Kharuzhyi - Make it compilant with the Specification
  */
 @NonNullByDefault
-public class Vacuum extends AbstractComponent<Vacuum.ChannelConfiguration> {
+public class Vacuum extends AbstractComponent<Vacuum.Configuration> {
     public static final String FEATURE_START = "start";
     public static final String FEATURE_STOP = "stop";
     public static final String FEATURE_PAUSE = "pause";
@@ -49,6 +46,18 @@ public class Vacuum extends AbstractComponent<Vacuum.ChannelConfiguration> {
     public static final String FEATURE_FAN_SPEED = "fan_speed";
     public static final String FEATURE_SEND_COMMAND = "send_command";
 
+    public static final String PAYLOAD_CLEAN_SPOT = "clean_spot";
+    public static final String PAYLOAD_LOCATE = "locate";
+    public static final String PAYLOAD_PAUSE = "pause";
+    public static final String PAYLOAD_RETURN_TO_BASE = "return_to_base";
+    public static final String PAYLOAD_START = "start";
+    public static final String PAYLOAD_STOP = "stop";
+
+    private static final Map<String, String> COMMAND_LABELS = Map.of(PAYLOAD_CLEAN_SPOT,
+            "@text/command.vacuum.clean-spot", PAYLOAD_LOCATE, "@text/command.vacuum.locate", PAYLOAD_PAUSE,
+            "@text/command.vacuum.pause", PAYLOAD_RETURN_TO_BASE, "@text/command.vacuum.return-to-base", PAYLOAD_START,
+            "@text/command.vacuum.start", PAYLOAD_STOP, "@text/command.vacuum.stop");
+
     public static final String STATE_CLEANING = "cleaning";
     public static final String STATE_DOCKED = "docked";
     public static final String STATE_PAUSED = "paused";
@@ -56,156 +65,167 @@ public class Vacuum extends AbstractComponent<Vacuum.ChannelConfiguration> {
     public static final String STATE_RETURNING = "returning";
     public static final String STATE_ERROR = "error";
 
+    private static final Map<String, String> STATE_LABELS = Map.of(STATE_CLEANING, "@text/state.vacuum.cleaning",
+            STATE_DOCKED, "@text/state.vacuum.docked", STATE_PAUSED, "@text/state.vacuum.paused", STATE_IDLE,
+            "@text/state.vacuum.idle", STATE_RETURNING, "@text/state.vacuum.returning", STATE_ERROR,
+            "@text/state.vacuum.error");
+
     public static final String COMMAND_CH_ID = "command";
     public static final String FAN_SPEED_CH_ID = "fan-speed";
-    public static final String FAN_SPEED_CH_ID_DEPRECATED = "fanSpeed";
     public static final String CUSTOM_COMMAND_CH_ID = "custom-command";
-    public static final String CUSTOM_COMMAND_CH_ID_DEPRECATED = "customCommand";
     public static final String BATTERY_LEVEL_CH_ID = "battery-level";
-    public static final String BATTERY_LEVEL_CH_ID_DEPRECATED = "batteryLevel";
     public static final String JSON_ATTRIBUTES_CH_ID = "json-attributes";
-    public static final String JSON_ATTRIBUTES_CH_ID_DEPRECATED = "jsonAttributes";
     public static final String STATE_CH_ID = "state";
 
     private static final String STATE_TEMPLATE = "{{ value_json.state }}";
     private static final String OFF = "off";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Vacuum.class);
-
-    /**
-     * Configuration class for MQTT component
-     */
-    static class ChannelConfiguration extends AbstractChannelConfiguration {
-        ChannelConfiguration() {
-            super("MQTT Vacuum");
+    public static class Configuration extends EntityConfiguration {
+        public Configuration(Map<String, @Nullable Object> config) {
+            super(config, "MQTT State Vacuum");
         }
 
-        @SerializedName("command_topic")
-        protected @Nullable String commandTopic;
+        List<String> getFanSpeedList() {
+            return getStringList("fan_speed_list");
+        }
 
-        @SerializedName("fan_speed_list")
-        protected @Nullable List<String> fanSpeedList;
-        @SerializedName("fan_speed_template")
-        protected @Nullable String fanSpeedTemplate;
-        @SerializedName("fan_speed_topic")
-        protected @Nullable String fanSpeedTopic;
+        String getPayloadCleanSpot() {
+            return getString("payload_clean_spot");
+        }
 
-        @SerializedName("payload_clean_spot")
-        protected String payloadCleanSpot = "clean_spot";
-        @SerializedName("payload_locate")
-        protected String payloadLocate = "locate";
-        @SerializedName("payload_pause")
-        protected String payloadPause = "pause";
-        @SerializedName("payload_return_to_base")
-        protected String payloadReturnToBase = "return_to_base";
-        @SerializedName("payload_start")
-        protected String payloadStart = "start";
-        @SerializedName("payload_stop")
-        protected String payloadStop = "stop";
+        String getPayloadLocate() {
+            return getString("payload_locate");
+        }
 
-        @SerializedName("send_command_topic")
-        protected @Nullable String sendCommandTopic;
+        String getPayloadReturnToBase() {
+            return getString("payload_return_to_base");
+        }
 
-        @SerializedName("set_fan_speed_topic")
-        protected @Nullable String setFanSpeedTopic;
+        String getPayloadStart() {
+            return getString("payload_start");
+        }
 
-        @SerializedName("supported_features")
-        protected List<String> supportedFeatures = List.of(FEATURE_START, FEATURE_STOP, FEATURE_RETURN_HOME,
-                FEATURE_STATUS, FEATURE_BATTERY, FEATURE_CLEAN_SPOT);
+        String getPayloadPause() {
+            return getString("payload_pause");
+        }
 
-        @SerializedName("state_topic")
-        protected @Nullable String stateTopic;
+        String getPayloadStop() {
+            return getString("payload_stop");
+        }
+
+        @Nullable
+        String getSendCommandTopic() {
+            return getOptionalString("send_command_topic");
+        }
+
+        @Nullable
+        String getSetFanSpeedTopic() {
+            return getOptionalString("set_fan_speed_topic");
+        }
+
+        @Nullable
+        String getStateTopic() {
+            return getOptionalString("state_topic");
+        }
+
+        List<String> getSupportedFeatures() {
+            return getStringList("supported_features");
+        }
+
+        @Nullable
+        String getCommandTopic() {
+            return getOptionalString("command_topic");
+        }
+
+        boolean isRetain() {
+            return getBoolean("retain");
+        }
     }
 
     /**
      * Creates component based on generic configuration and component configuration type.
      *
-     * @param componentConfiguration generic componentConfiguration with not parsed JSON config
+     * @param componentContext generic componentContext with not parsed JSON config
      */
-    public Vacuum(ComponentFactory.ComponentConfiguration componentConfiguration, boolean newStyleChannels) {
-        super(componentConfiguration, ChannelConfiguration.class, newStyleChannels);
-        final ChannelStateUpdateListener updateListener = componentConfiguration.getUpdateListener();
+    public Vacuum(ComponentFactory.ComponentContext componentContext) {
+        super(componentContext, Configuration.class);
+        final ChannelStateUpdateListener updateListener = componentContext.getUpdateListener();
 
-        final var supportedFeatures = channelConfiguration.supportedFeatures;
+        final List<String> supportedFeatures = config.getSupportedFeatures();
 
-        final List<String> commands = new ArrayList<>();
-        addPayloadToList(supportedFeatures, FEATURE_CLEAN_SPOT, channelConfiguration.payloadCleanSpot, commands);
-        addPayloadToList(supportedFeatures, FEATURE_LOCATE, channelConfiguration.payloadLocate, commands);
-        addPayloadToList(supportedFeatures, FEATURE_RETURN_HOME, channelConfiguration.payloadReturnToBase, commands);
-        addPayloadToList(supportedFeatures, FEATURE_START, channelConfiguration.payloadStart, commands);
-        addPayloadToList(supportedFeatures, FEATURE_STOP, channelConfiguration.payloadStop, commands);
-        addPayloadToList(supportedFeatures, FEATURE_PAUSE, channelConfiguration.payloadPause, commands);
+        final Map<String, String> commands = new LinkedHashMap<>();
+        addPayloadToList(supportedFeatures, FEATURE_CLEAN_SPOT, PAYLOAD_CLEAN_SPOT, config.getPayloadCleanSpot(),
+                commands);
+        addPayloadToList(supportedFeatures, FEATURE_LOCATE, PAYLOAD_LOCATE, config.getPayloadLocate(), commands);
+        addPayloadToList(supportedFeatures, FEATURE_RETURN_HOME, PAYLOAD_RETURN_TO_BASE,
+                config.getPayloadReturnToBase(), commands);
+        addPayloadToList(supportedFeatures, FEATURE_START, PAYLOAD_START, config.getPayloadStart(), commands);
+        addPayloadToList(supportedFeatures, FEATURE_STOP, PAYLOAD_STOP, config.getPayloadStop(), commands);
+        addPayloadToList(supportedFeatures, FEATURE_PAUSE, PAYLOAD_PAUSE, config.getPayloadPause(), commands);
 
-        buildOptionalChannel(COMMAND_CH_ID, ComponentChannelType.STRING, new TextValue(commands.toArray(new String[0])),
-                updateListener, null, channelConfiguration.commandTopic, null, null);
+        buildOptionalChannel(COMMAND_CH_ID, ComponentChannelType.STRING,
+                new TextValue(Map.of(), commands, Map.of(), COMMAND_LABELS), updateListener, null,
+                config.getCommandTopic(), null, null, "Command");
 
-        final var fanSpeedList = channelConfiguration.fanSpeedList;
-        if (supportedFeatures.contains(FEATURE_FAN_SPEED) && fanSpeedList != null && !fanSpeedList.isEmpty()) {
+        final List<String> fanSpeedList = config.getFanSpeedList();
+        if (supportedFeatures.contains(FEATURE_FAN_SPEED) && !fanSpeedList.isEmpty()) {
             var fanSpeedCommandList = fanSpeedList.toArray(new String[0]);
             if (!fanSpeedList.contains(OFF)) {
                 fanSpeedList.add(OFF); // Off value is used when cleaning if OFF
             }
             var fanSpeedValue = new TextValue(fanSpeedList.toArray(new String[0]), fanSpeedCommandList);
             if (supportedFeatures.contains(FEATURE_STATUS)) {
-                buildOptionalChannel(newStyleChannels ? FAN_SPEED_CH_ID : FAN_SPEED_CH_ID_DEPRECATED,
-                        ComponentChannelType.STRING, fanSpeedValue, updateListener, null,
-                        channelConfiguration.setFanSpeedTopic, "{{ value_json.fan_speed }}",
-                        channelConfiguration.stateTopic);
+                buildOptionalChannel(FAN_SPEED_CH_ID, ComponentChannelType.STRING, fanSpeedValue, updateListener, null,
+                        config.getSetFanSpeedTopic(),
+                        componentContext.getPython().newRawTemplate("{{ value_json.fan_speed }}"),
+                        config.getStateTopic(), "Fan Speed");
             } else {
-                buildOptionalChannel(newStyleChannels ? FAN_SPEED_CH_ID : FAN_SPEED_CH_ID_DEPRECATED,
-                        ComponentChannelType.STRING, fanSpeedValue, updateListener, null,
-                        channelConfiguration.setFanSpeedTopic, null, null);
+                buildOptionalChannel(FAN_SPEED_CH_ID, ComponentChannelType.STRING, fanSpeedValue, updateListener, null,
+                        config.getSetFanSpeedTopic(), null, null, "Fan Speed");
             }
         }
 
         if (supportedFeatures.contains(FEATURE_SEND_COMMAND)) {
-            buildOptionalChannel(newStyleChannels ? CUSTOM_COMMAND_CH_ID : CUSTOM_COMMAND_CH_ID_DEPRECATED,
-                    ComponentChannelType.STRING, new TextValue(), updateListener, null,
-                    channelConfiguration.sendCommandTopic, null, null);
+            buildOptionalChannel(CUSTOM_COMMAND_CH_ID, ComponentChannelType.STRING, new TextValue(), updateListener,
+                    null, config.getSendCommandTopic(), null, null, "Custom Command");
         }
 
         if (supportedFeatures.contains(FEATURE_STATUS)) {
             // state key is mandatory
-            buildOptionalChannel(STATE_CH_ID, ComponentChannelType.STRING,
-                    new TextValue(new String[] { STATE_CLEANING, STATE_DOCKED, STATE_PAUSED, STATE_IDLE,
-                            STATE_RETURNING, STATE_ERROR }),
-                    updateListener, null, null, STATE_TEMPLATE, channelConfiguration.stateTopic);
+            buildOptionalChannel(STATE_CH_ID, ComponentChannelType.STRING, new TextValue(
+                    Map.of(STATE_CLEANING, STATE_CLEANING, STATE_DOCKED, STATE_DOCKED, STATE_PAUSED, STATE_PAUSED,
+                            STATE_IDLE, STATE_IDLE, STATE_RETURNING, STATE_RETURNING, STATE_ERROR, STATE_ERROR),
+                    Map.of(), STATE_LABELS, Map.of()), updateListener, null, null,
+                    componentContext.getPython().newRawTemplate(STATE_TEMPLATE), config.getStateTopic(), "State");
             if (supportedFeatures.contains(FEATURE_BATTERY)) {
-                buildOptionalChannel(newStyleChannels ? BATTERY_LEVEL_CH_ID : BATTERY_LEVEL_CH_ID_DEPRECATED,
-                        ComponentChannelType.DIMMER,
+                buildOptionalChannel(BATTERY_LEVEL_CH_ID, ComponentChannelType.DIMMER,
                         new PercentageValue(BigDecimal.ZERO, BigDecimal.valueOf(100), BigDecimal.ONE, null, null, null),
-                        updateListener, null, null, "{{ value_json.battery_level }}", channelConfiguration.stateTopic);
+                        updateListener, null, null,
+                        componentContext.getPython().newRawTemplate("{{ value_json.battery_level }}"),
+                        config.getStateTopic(), "Battery Level");
             }
         }
 
         finalizeChannels();
     }
 
-    // Overridden to use deprecated channel ID
-    @Override
-    protected void addJsonAttributesChannel() {
-        buildOptionalChannel(newStyleChannels ? JSON_ATTRIBUTES_CH_ID : JSON_ATTRIBUTES_CH_ID_DEPRECATED,
-                ComponentChannelType.STRING, new TextValue(), componentConfiguration.getUpdateListener(), null, null,
-                channelConfiguration.getJsonAttributesTemplate(), channelConfiguration.getJsonAttributesTopic());
-    }
-
     @Nullable
     private ComponentChannel buildOptionalChannel(String channelId, ComponentChannelType channelType, Value valueState,
-            ChannelStateUpdateListener channelStateUpdateListener, @Nullable String commandTemplate,
-            @Nullable String commandTopic, @Nullable String stateTemplate, @Nullable String stateTopic) {
+            ChannelStateUpdateListener channelStateUpdateListener, org.graalvm.polyglot.@Nullable Value commandTemplate,
+            @Nullable String commandTopic, org.graalvm.polyglot.@Nullable Value stateTemplate,
+            @Nullable String stateTopic, String label) {
         if ((commandTopic != null && !commandTopic.isBlank()) || (stateTopic != null && !stateTopic.isBlank())) {
-            return buildChannel(channelId, channelType, valueState, getName(), channelStateUpdateListener)
-                    .stateTopic(stateTopic, stateTemplate, channelConfiguration.getValueTemplate())
-                    .commandTopic(commandTopic, channelConfiguration.isRetain(), channelConfiguration.getQos(),
-                            commandTemplate)
-                    .build();
+            return buildChannel(channelId, channelType, valueState, label, channelStateUpdateListener)
+                    .stateTopic(stateTopic, stateTemplate)
+                    .commandTopic(commandTopic, config.isRetain(), config.getQos(), commandTemplate).build();
         }
         return null;
     }
 
-    private void addPayloadToList(List<String> supportedFeatures, String feature, String payload, List<String> list) {
+    private void addPayloadToList(List<String> supportedFeatures, String feature, String command, String payload,
+            Map<String, String> commands) {
         if (supportedFeatures.contains(feature) && !payload.isEmpty()) {
-            list.add(payload);
+            commands.put(command, payload);
         }
     }
 }

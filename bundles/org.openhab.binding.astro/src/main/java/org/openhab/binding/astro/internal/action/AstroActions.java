@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -99,7 +99,7 @@ public class AstroActions implements ThingActions {
         if (theHandler != null) {
             if (theHandler instanceof SunHandler sunHandler) {
                 Radiation radiation = sunHandler.getRadiationAt(date != null ? date : ZonedDateTime.now());
-                return radiation.getTotal();
+                return radiation == null ? null : radiation.getTotal();
             } else {
                 logger.info("Astro Action service ThingHandler is not a SunHandler!");
             }

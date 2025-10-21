@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -60,7 +60,6 @@ public class D2_50 extends _VLDMessage {
     protected static final byte THRESHOLD_NOACTION = 127;
 
     public D2_50() {
-        super();
     }
 
     public D2_50(ERP1Message packet) {

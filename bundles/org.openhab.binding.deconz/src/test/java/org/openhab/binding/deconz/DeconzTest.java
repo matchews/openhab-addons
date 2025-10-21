@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -14,13 +14,12 @@ package org.openhab.binding.deconz;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -99,7 +98,7 @@ public class DeconzTest {
         discoveryService.initialize();
         discoveryService.addDiscoveryListener(discoveryListener);
         discoveryService.startScan();
-        Mockito.verify(discoveryListener, times(20)).thingDiscovered(any(), any());
+        Mockito.verify(discoveryListener, timeout(1000L).times(20)).thingDiscovered(any(), any());
     }
 
     public static <T> T getObjectFromJson(String filename, Class<T> clazz, Gson gson) throws IOException {
@@ -119,10 +118,9 @@ public class DeconzTest {
     @Test
     public void dateTimeConversionTest() {
         DateTimeType dateTime = Util.convertTimestampToDateTime("2020-08-22T11:09Z");
-        assertEquals(new DateTimeType(ZonedDateTime.parse("2020-08-22T11:09:00Z")), dateTime);
+        assertEquals(new DateTimeType(Instant.parse("2020-08-22T11:09:00Z")), dateTime);
 
         dateTime = Util.convertTimestampToDateTime("2020-08-22T11:09:47");
-        assertEquals(new DateTimeType(ZonedDateTime.parse("2020-08-22T11:09:47Z")).toZone(ZoneId.systemDefault()),
-                dateTime);
+        assertEquals(new DateTimeType(Instant.parse("2020-08-22T11:09:47Z")), dateTime);
     }
 }

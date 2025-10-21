@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -278,8 +278,7 @@ public enum AmplifierModel {
     }
 
     public String getZoneName(String zoneId) {
-        final String zoneName = zoneIdMap.get(zoneId);
-        return zoneName != null ? zoneName : "";
+        return zoneIdMap.getOrDefault(zoneId, "");
     }
 
     public String getCmdPrefix() {

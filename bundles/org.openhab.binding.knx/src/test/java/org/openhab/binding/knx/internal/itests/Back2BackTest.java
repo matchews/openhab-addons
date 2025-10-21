@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -935,7 +935,6 @@ public class Back2BackTest {
                 new StringType("R increase 7 steps G increase 6 steps B increase 5 steps"));
     }
 
-    @Test
     @AfterAll
     static void checkForMissingMainTypes() {
         // checks if we have itests for all main DPT types supported by Calimero library,
