@@ -31,7 +31,7 @@
 			<property name="Vendor">Intellifire</property>
 		</properties>
 
-		<representation-property>uniqueId
+		<representation-property>Unique ID
 		</representation-property>
 
 	</thing-type>
@@ -80,7 +80,7 @@
 	</channel-type>
 
 	<channel-type id="timer">
-		<item-type>Number:Time</item-type>
+		<item-type unitHint="min">Number:Time</item-type>
 		<label>Timer</label>
 		<category>Time</category>
 		<state min="0" max="180" step="1.0" pattern="%d min" readOnly="false"/>

@@ -36,7 +36,7 @@
 			<property name="Vendor">Intellifire</property>
 		</properties>
 
-		<representation-property>uniqueId
+		<representation-property>Unique ID
 		</representation-property>
 
 	</thing-type>

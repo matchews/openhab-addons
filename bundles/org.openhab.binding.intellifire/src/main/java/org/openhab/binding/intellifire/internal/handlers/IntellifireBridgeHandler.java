@@ -277,6 +277,9 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                     IntellifirePollData cloudPollData = cloudPollFireplace(serialNumber);
                     if (cloudPollData != null) {
                         account.locations.get(i).fireplaces.fireplaces.get(j).pollData = cloudPollData;
+                        if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.ipv4Address.equals("")) {
+                            logger.warn("Intellifire cloud poll returned null local IP for {}.", serialNumber);
+                        }
                     } else {
                         failureFlag = true;
                     }
@@ -313,6 +316,7 @@ public class IntellifireBridgeHandler extends BaseBridgeHandler {
                     if (pollData != null && cloudPoll) {
                         handler.poll(pollData);
                     } else if (pollData != null && !cloudPoll && lastPollSuccessful) {
+                        handler.poll(pollData);
                         handler.updateStatus(ThingStatus.ONLINE, ThingStatusDetail.NONE, "");
                         failureFlag = false;
                     } else if (pollData != null && !cloudPoll && !lastPollSuccessful) {

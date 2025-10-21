@@ -31,15 +31,12 @@ public class IntellifireBindingConstants {
 
     // Thing Type UIDs
     public static final ThingTypeUID THING_TYPE_ACCOUNT_BRIDGE = new ThingTypeUID(BINDING_ID, "account");
-    public static final ThingTypeUID THING_TYPE_FAN = new ThingTypeUID(BINDING_ID, "fan");
     public static final ThingTypeUID THING_TYPE_FIREPLACE = new ThingTypeUID(BINDING_ID, "fireplace");
-    public static final ThingTypeUID THING_TYPE_LIGHT = new ThingTypeUID(BINDING_ID, "light");
     public static final ThingTypeUID THING_TYPE_REMOTE = new ThingTypeUID(BINDING_ID, "remote");
 
     public static final Set<ThingTypeUID> BRIDGE_THING_TYPES_UIDS = Set.of(THING_TYPE_ACCOUNT_BRIDGE);
 
-    public static final Set<ThingTypeUID> THING_TYPES_UIDS = Set.of(IntellifireBindingConstants.THING_TYPE_FAN,
-            IntellifireBindingConstants.THING_TYPE_FIREPLACE, IntellifireBindingConstants.THING_TYPE_LIGHT,
+    public static final Set<ThingTypeUID> THING_TYPES_UIDS = Set.of(IntellifireBindingConstants.THING_TYPE_FIREPLACE,
             IntellifireBindingConstants.THING_TYPE_REMOTE);
 
     // Channel typeIDs

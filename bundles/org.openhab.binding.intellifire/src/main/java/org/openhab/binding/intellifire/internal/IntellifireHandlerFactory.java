@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 public class IntellifireHandlerFactory extends BaseThingHandlerFactory {
 
     private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Set.of(THING_TYPE_ACCOUNT_BRIDGE,
-            THING_TYPE_FAN, THING_TYPE_FIREPLACE, THING_TYPE_LIGHT, THING_TYPE_REMOTE);
+            THING_TYPE_FIREPLACE, THING_TYPE_REMOTE);
     private final HttpClient httpClient;
 
     @Override

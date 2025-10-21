@@ -111,13 +111,16 @@ public class IntellifireDiscoveryService extends AbstractThingHandlerDiscoverySe
                     // Remote
                     if (account.locations.get(i).fireplaces.fireplaces.get(j).pollData.featureThermostat == 1) {
                         properties.clear();
+
+                        // Construct representative property
+                        uniqueId = String.format("%s-%s-%s", locationID, serialNumber, "remote");
+
                         properties.put(IntellifireBindingConstants.PROPERTY_APIKEY,
                                 account.locations.get(i).fireplaces.fireplaces.get(j).apiKey);
                         properties.put(IntellifireBindingConstants.PROPERTY_IPADDRESS,
                                 account.locations.get(i).fireplaces.fireplaces.get(j).pollData.ipv4Address);
                         properties.put(IntellifireBindingConstants.PROPERTY_LOCATIONID, locationID);
                         properties.put(IntellifireBindingConstants.PROPERTY_SERIALNUMBER, serialNumber);
-                        uniqueId = String.format("%s-%s-%s", locationID, serialNumber, "thermostat");
                         properties.put(IntellifireBindingConstants.PROPERTY_UNIQUEID, uniqueId);
                         onDeviceDiscovered(IntellifireBindingConstants.THING_TYPE_REMOTE, thingName + " Remote",
                                 properties);
