@@ -109,6 +109,7 @@ public class BindingConstants {
 
     // Colorlogic
     public static final String CHANNEL_COLORLOGIC_ENABLE = "enable";
+    public static final String CHANNEL_COLORLOGIC_STATE = "lightState";
     public static final String CHANNEL_COLORLOGIC_CURRENTSHOW = "currentShow";
     public static final String CHANNEL_COLORLOGIC_BRIGHTNESS = "brightness";
     public static final String CHANNEL_COLORLOGIC_SPEED = "speed";
@@ -238,15 +239,18 @@ public class BindingConstants {
     public static final String PROPERTY_BOWID = "bowID";
 
     // Hayward Command html
-    public static final String COMMAND_PARAMETERS = "<?xml version=\"1.0\" encoding=\"utf-8\"?><GetTelemetry>";
-
-    public static final String COMMAND_SCHEDULE = """
-            <Parameter name="IsCountDownTimer" dataType="bool">false</Parameter>\
-            <Parameter name="StartTimeHours" dataType="int">0</Parameter>\
-            <Parameter name="StartTimeMinutes" dataType="int">0</Parameter>\
-            <Parameter name="EndTimeHours" dataType="int">0</Parameter>\
-            <Parameter name="EndTimeMinutes" dataType="int">0</Parameter>\
-            <Parameter name="DaysActive" dataType="int">0</Parameter>\
-            <Parameter name="Recurring" dataType="bool">false</Parameter>\
+    public static final String COMMAND_PREFIX = """
+            <?xml version=\"1.0\" encoding=\"utf-8\"?>
+            """;
+    public static final String COMMAND_SUFFIX = """
+                    <Parameter name="IsCountDownTimer" dataType="bool">false</Parameter>
+                    <Parameter name="StartTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="StartTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="DaysActive" dataType="int">0</Parameter>
+                    <Parameter name="Recurring" dataType="bool">false</Parameter>
+                </Parameters>
+            </Request>
             """;
 }

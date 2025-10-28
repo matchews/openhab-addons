@@ -19,13 +19,16 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.VirtualHeater;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Channel;
+import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
+import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescriptionFragment;
 import org.openhab.core.types.StateDescriptionFragmentBuilder;
 import org.slf4j.Logger;
@@ -111,6 +114,35 @@ public class VirtualHeaterHandler extends HaywardThingHandler {
             }
         }
         updateStatus(ThingStatus.ONLINE);
+    }
+
+    @Override
+    public void handleCommand(ChannelUID channelUID, Command command) {
+        String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+        String bowId = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
+
+        Bridge bridge = getBridge();
+        if (sysId == null || bowId == null || bridge == null
+                || !(bridge.getHandler() instanceof BridgeHandler bridgehandler)) {
+            return;
+        }
+
+        /*
+         * public static final String CHANNEL_VIRTUALHEATER_CURRENTSETPOINT = "virtualHeaterCurrentSetpoint";
+         * public static final String CHANNEL_VIRTUALHEATER_ENABLE = "virtualHeaterEnable";
+         * public static final String CHANNEL_VIRTUALHEATER_SOLARSETPOINT = "virtualHeaterSolarSetpoint";
+         */
+
+        if (BindingConstants.CHANNEL_VIRTUALHEATER_ENABLE.equals(channelUID.getId())) {
+            // sendUdpCommand(CommandBuilder.setStandaloneLightShow(bowId, sysId, command.toString()),
+            // MessageType.SET_STANDALONE_LIGHT_SHOW);
+
+            String xmlStr = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>SetHeaterEnable</Name>"
+                    + "<Parameters><Parameter name=\"PoolID\" dataType=\"int\">30</Parameter><Parameter name=\"HeaterID\" dataType=\"int\">32</Parameter><Parameter name=\"Enabled\" dataType=\"bool\">1</Parameter></Parameters></Request>";
+
+            sendUdpCommand(xmlStr, MessageType.SET_HEATER_ENABLED);
+        }
+
     }
     /*
      * @Override

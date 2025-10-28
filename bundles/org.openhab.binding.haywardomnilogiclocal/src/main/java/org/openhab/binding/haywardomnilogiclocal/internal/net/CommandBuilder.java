@@ -62,15 +62,14 @@ public class CommandBuilder {
             </Parameters>
             """;
 
-    private static final String SET_COLOR_MODE = """
-            <Name>SetColorMode</Name>
-            <Parameters>
-                <Parameter name=\"Token\" dataType=\"String\">%s</Parameter>
-                <Parameter name=\"MspSystemID\" dataType=\"int\">%s</Parameter>
-                <Parameter name=\"EquipmentID\" dataType=\"int\">%s</Parameter>
-                <Parameter name=\"ColorMode\" dataType=\"String\">%s</Parameter>
-            </Parameters>
-            """;
+    private static final String SET_STANDALONE_LIGHTSHOW = """
+            <Request>
+                <Name>SetStandAloneLightShow</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">%s</Parameter>
+                    <Parameter name="LightID" dataType="int">%s</Parameter>
+                    <Parameter name="Show" dataType="int">%s</Parameter>
+             """;
 
     private static final String SET_BRIGHTNESS = """
             <Name>SetBrightness</Name>
@@ -125,38 +124,41 @@ public class CommandBuilder {
                 + closingTag(prefix);
     }
 
-    public static String setEquipmentEnable(String token, String mspSystemID, String equipmentID, boolean enabled) {
-        String prefix = BindingConstants.COMMAND_PARAMETERS;
-        return prefix + String.format(SET_EQUIPMENT_ENABLE, token, mspSystemID, equipmentID, enabled ? "True" : "False")
-                + closingTag(prefix);
+    public static String setStandaloneLightShow(String bowID, String equipmentID, String mode) {
+        return BindingConstants.COMMAND_PREFIX + String.format(SET_STANDALONE_LIGHTSHOW, bowID, equipmentID, mode)
+                + BindingConstants.COMMAND_SUFFIX;
     }
 
-    public static String setPumpSpeed(String token, String mspSystemID, String equipmentID, int speed) {
-        String prefix = BindingConstants.COMMAND_PARAMETERS;
-        return prefix + String.format(SET_PUMP_SPEED, token, mspSystemID, equipmentID, speed) + closingTag(prefix);
-    }
-
-    public static String setColorMode(String token, String mspSystemID, String equipmentID, String mode) {
-        String prefix = BindingConstants.COMMAND_PARAMETERS;
-        return prefix + String.format(SET_COLOR_MODE, token, mspSystemID, equipmentID, mode) + closingTag(prefix);
-    }
-
-    public static String setBrightness(String token, String mspSystemID, String equipmentID, int brightness) {
-        String prefix = BindingConstants.COMMAND_PARAMETERS;
-        return prefix + String.format(SET_BRIGHTNESS, token, mspSystemID, equipmentID, brightness) + closingTag(prefix);
-    }
-
-    public static String setFilterSpeed(String token, String mspSystemID, String equipmentID, int speed) {
-        String prefix = BindingConstants.COMMAND_PARAMETERS;
-        return prefix + String.format(SET_FILTER_SPEED, token, mspSystemID, equipmentID, speed) + closingTag(prefix);
-    }
-
-    public static String setChlorinatorOutput(String token, String mspSystemID, String equipmentID, int output) {
-        String prefix = BindingConstants.COMMAND_PARAMETERS;
-        return prefix + String.format(SET_CHLORINATOR_OUTPUT, token, mspSystemID, equipmentID, output)
-                + closingTag(prefix);
-    }
-
+    /*
+     * public static String setEquipmentEnable(String token, String mspSystemID, String equipmentID, boolean enabled) {
+     * String prefix = BindingConstants.COMMAND_PARAMETERS;
+     * return prefix + String.format(SET_EQUIPMENT_ENABLE, token, mspSystemID, equipmentID, enabled ? "True" : "False")
+     * + closingTag(prefix);
+     * }
+     *
+     * public static String setPumpSpeed(String token, String mspSystemID, String equipmentID, int speed) {
+     * String prefix = BindingConstants.COMMAND_PARAMETERS;
+     * return prefix + String.format(SET_PUMP_SPEED, token, mspSystemID, equipmentID, speed) + closingTag(prefix);
+     * }
+     *
+     *
+     *
+     * public static String setBrightness(String token, String mspSystemID, String equipmentID, int brightness) {
+     * String prefix = BindingConstants.COMMAND_PARAMETERS;
+     * return prefix + String.format(SET_BRIGHTNESS, token, mspSystemID, equipmentID, brightness) + closingTag(prefix);
+     * }
+     *
+     * public static String setFilterSpeed(String token, String mspSystemID, String equipmentID, int speed) {
+     * String prefix = BindingConstants.COMMAND_PARAMETERS;
+     * return prefix + String.format(SET_FILTER_SPEED, token, mspSystemID, equipmentID, speed) + closingTag(prefix);
+     * }
+     *
+     * public static String setChlorinatorOutput(String token, String mspSystemID, String equipmentID, int output) {
+     * String prefix = BindingConstants.COMMAND_PARAMETERS;
+     * return prefix + String.format(SET_CHLORINATOR_OUTPUT, token, mspSystemID, equipmentID, output)
+     * + closingTag(prefix);
+     * }
+     */
     private static String closingTag(String prefix) {
         if (prefix.contains("<Request>")) {
             return "</Request>";

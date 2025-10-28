@@ -35,6 +35,14 @@ public class RelayHandler extends HaywardThingHandler {
                 } else {
                     logger.debug("Relay state missing from Telemtry");
                 }
+
+                @Nullable
+                String whyOn = relay.getWhyOn();
+                if (whyOn != null) {
+                    updateData(BindingConstants.CHANNEL_RELAY_WHYON, whyOn);
+                } else {
+                    logger.debug("Relay why on missing from Telemtry");
+                }
             }
         }
     }

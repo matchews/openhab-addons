@@ -36,10 +36,12 @@ public class UdpClient {
     private final Logger logger = LoggerFactory.getLogger(BridgeHandler.class);
     private final InetAddress address;
     private final int port;
+    private int sendingMsgId = 0;
 
     public UdpClient(String host, int port) throws UnknownHostException {
         this.address = InetAddress.getByName(host);
         this.port = port;
+        this.sendingMsgId = sendingMsgId;
     }
 
     private enum State {
@@ -49,10 +51,19 @@ public class UdpClient {
     }
 
     public UdpMessage send(MessageType requestType, String xml) throws IOException {
-        byte clientType = (requestType == MessageType.GET_TELEMETRY || requestType == MessageType.GET_ALARM_LIST)
-                ? (byte) 0
-                : (byte) 1;
-        byte[] out = UdpMessage.encodeRequest(requestType, xml, clientType);
+        byte clientType;
+
+        if (requestType == MessageType.GET_TELEMETRY || requestType == MessageType.GET_ALARM_LIST
+                || requestType == MessageType.ACK) {
+            clientType = (byte) 0;
+        } else if (requestType == MessageType.SET_HEATER_ENABLED) {
+            clientType = (byte) 0;
+        } else {
+            clientType = (byte) 1;
+        }
+
+        sendingMsgId = sendingMsgId + 1;
+        byte[] out = UdpMessage.encodeRequest(requestType, xml, clientType, sendingMsgId);
         UdpMessage response = null;
         try (DatagramSocket socket = new DatagramSocket()) {
             AckHandler ackHandler = new AckHandler(address, port);
@@ -60,14 +71,13 @@ public class UdpClient {
 
             State state = State.SEND;
             DatagramPacket responsePacket = null;
-            MessageType msgType = MessageType.ACK;
-            int msgId = 0;
 
             while (state != State.DONE) {
                 switch (state) {
                     case SEND:
                         sendPacket(socket, out);
-                        logger.trace("Sent UDP packet to {}:{} with messageID = {}", address, port, msgId);
+                        logger.trace("Sent UDP packet with message type {} to {}:{} with messageID = {}", requestType,
+                                address, port, sendingMsgId);
                         state = State.RECEIVE;
                         break;
                     case RECEIVE:
@@ -75,12 +85,13 @@ public class UdpClient {
                         byte[] data = new byte[responsePacket.getLength()];
                         System.arraycopy(responsePacket.getData(), 0, data, 0, responsePacket.getLength());
                         UdpHeader hdr = UdpHeader.fromBytes(data);
-                        msgId = hdr.getMessageId();
-                        msgType = hdr.getMessageType();
-                        logger.trace("Received UDP packet with messageID = {}", msgId);
+                        int receivingMsgId = hdr.getMessageId();
+                        MessageType msgType = hdr.getMessageType();
+                        logger.trace("Received UDP packet with message type {} and messageID = {}", msgType,
+                                receivingMsgId);
 
                         if (msgType != MessageType.ACK) {
-                            ackHandler.sendAck(socket, msgId);
+                            ackHandler.sendAck(socket, receivingMsgId);
                         }
 
                         if (msgType == MessageType.ACK) {
@@ -91,7 +102,7 @@ public class UdpClient {
                             state = State.RECEIVE;
                         } else if (msgType == MessageType.MSP_BLOCKMESSAGE) {
                             if (handleBlock(data, assembler)) {
-                                response = finishResponse(msgType, msgId, assembler);
+                                response = finishResponse(msgType, receivingMsgId, assembler);
                                 state = State.DONE;
                             } else {
                                 state = State.RECEIVE;

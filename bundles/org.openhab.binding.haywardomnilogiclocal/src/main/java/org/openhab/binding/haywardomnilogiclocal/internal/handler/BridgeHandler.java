@@ -35,8 +35,8 @@ import org.openhab.binding.haywardomnilogiclocal.internal.Config;
 import org.openhab.binding.haywardomnilogiclocal.internal.DynamicStateDescriptionProvider;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
-import org.openhab.binding.haywardomnilogiclocal.internal.TypeToRequest;
 import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
+import org.openhab.binding.haywardomnilogiclocal.internal.TypeToRequest;
 import org.openhab.binding.haywardomnilogiclocal.internal.discovery.HaywardDiscoveryService;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpClient;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpMessage;
@@ -223,33 +223,39 @@ public class BridgeHandler extends BaseBridgeHandler {
     }
 
     public synchronized boolean getAlarmList() throws HaywardException {
-        String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>GetAllAlarmList</Name><Parameters/></Request>";
-        String xmlResponse = sendRequest(xmlRequest, MessageType.GET_ALARM_LIST);
 
-        if (xmlResponse.isEmpty()) {
-            logger.debug("Hayward Connection thing: GetAllAlarmList XML response was null");
-            return false;
-        }
+        return true;
 
-        if (!evaluateXPath("/Response/Parameters//Parameter[@name='StatusMessage']/text()", xmlResponse).isEmpty()) {
-            logger.debug("Hayward Connection thing: GetAllAlarmList XML response: {}", xmlResponse);
-            return false;
-        }
-
-        // TODO
-        for (Thing thing : getThing().getThings()) {
-            Map<String, String> properties = thing.getProperties();
-            if ("BACKYARD".equals(properties.get(BindingConstants.PROPERTY_TYPE))) {
-                BackyardHandler handler = (BackyardHandler) thing.getHandler();
-                if (handler != null) {
-                    String systemID = properties.get(BindingConstants.PROPERTY_SYSTEM_ID);
-                    if (systemID != null) {
-                        return handler.getAlarmList(systemID);
-                    }
-                }
-            }
-        }
-        return false;
+        /*
+         * String xmlRequest =
+         * "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>GetAllAlarmList</Name><Parameters/></Request>";
+         * String xmlResponse = sendRequest(xmlRequest, MessageType.GET_ALARM_LIST);
+         * 
+         * if (xmlResponse.isEmpty()) {
+         * logger.debug("Hayward Connection thing: GetAllAlarmList XML response was null");
+         * return false;
+         * }
+         * 
+         * if (!evaluateXPath("/Response/Parameters//Parameter[@name='StatusMessage']/text()", xmlResponse).isEmpty()) {
+         * logger.debug("Hayward Connection thing: GetAllAlarmList XML response: {}", xmlResponse);
+         * return false;
+         * }
+         * 
+         * // TODO
+         * for (Thing thing : getThing().getThings()) {
+         * Map<String, String> properties = thing.getProperties();
+         * if ("BACKYARD".equals(properties.get(BindingConstants.PROPERTY_TYPE))) {
+         * BackyardHandler handler = (BackyardHandler) thing.getHandler();
+         * if (handler != null) {
+         * String systemID = properties.get(BindingConstants.PROPERTY_SYSTEM_ID);
+         * if (systemID != null) {
+         * return handler.getAlarmList(systemID);
+         * }
+         * }
+         * }
+         * }
+         * return false;
+         */
     }
 
     private synchronized void initPolling(int initalDelay) {

@@ -96,8 +96,10 @@
 		<label>Operating Mode</label>
 		<state readOnly="true">
 			<options>
+				<option value="0">Disabled</option>
 				<option value="1">Timed Percent</option>
 				<option value="2">ORP Autosense</option>
+				<option value="3">ORP Timed RW</option>
 			</options>
 		</state>
 	</channel-type>

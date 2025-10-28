@@ -87,6 +87,14 @@ public class UdpMessage {
     /**
      * Convenience method to encode a request with no explicit message id.
      */
+    public static byte[] encodeRequest(MessageType msgType, String xml, byte clientType, Integer messageId)
+            throws UnsupportedEncodingException {
+        return encodeRequest(msgType, xml, messageId, clientType);
+    }
+
+    /**
+     * Convenience method to encode a request with no explicit message id.
+     */
     public static byte[] encodeRequest(MessageType msgType, String xml, Integer messageId)
             throws UnsupportedEncodingException {
         return encodeRequest(msgType, xml, messageId, (byte) 1);

@@ -17,11 +17,19 @@ public class Relay {
     @XStreamAlias("relayState")
     private @Nullable String relayState;
 
+    @XStreamAsAttribute
+    @XStreamAlias("whyOn")
+    private @Nullable String whyOn;
+
     public @Nullable String getSystemId() {
         return systemId;
     }
 
     public @Nullable String getRelayState() {
         return relayState;
+    }
+
+    public @Nullable String getWhyOn() {
+        return whyOn;
     }
 }

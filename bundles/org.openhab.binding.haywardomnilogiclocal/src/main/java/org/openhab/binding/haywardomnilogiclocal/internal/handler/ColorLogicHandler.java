@@ -4,6 +4,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.ColorLogicLight;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
@@ -24,10 +25,29 @@ public class ColorLogicHandler extends HaywardThingHandler {
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        String sysId = getThing().getProperties().get("systemID");
+        String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+        String bowId = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
+
         Bridge bridge = getBridge();
-        if (sysId == null || bridge == null || !(bridge.getHandler() instanceof BridgeHandler bridgehandler)) {
+        if (sysId == null || bowId == null || bridge == null
+                || !(bridge.getHandler() instanceof BridgeHandler bridgehandler)) {
             return;
+        }
+
+        /*
+         * public static final String CHANNEL_COLORLOGIC_ENABLE = "enable";
+         * public static final String CHANNEL_COLORLOGIC_CURRENTSHOW = "currentShow";
+         * public static final String CHANNEL_COLORLOGIC_BRIGHTNESS = "brightness";
+         * public static final String CHANNEL_COLORLOGIC_SPEED = "speed";
+         * public static final String CHANNEL_COLORLOGIC_SPECIALEFFECT = "specialEffect";
+         */
+
+        if (BindingConstants.CHANNEL_COLORLOGIC_CURRENTSHOW.equals(channelUID.getId())) {
+            // sendUdpCommand(CommandBuilder.setStandaloneLightShow(bowId, sysId, command.toString()),
+            // MessageType.SET_STANDALONE_LIGHT_SHOW);
+
+            String xmlStr = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>SetStandAloneLightShow</Name><Parameters><Parameter name=\"PoolID\" dataType=\"int\">30</Parameter><Parameter name=\"LightID\" dataType=\"int\">38</Parameter><Parameter name=\"Show\" dataType=\"int\">2</Parameter><Parameter name=\"IsCountDownTimer\" dataType=\"bool\">false</Parameter><Parameter name=\"StartTimeHours\" dataType=\"int\">0</Parameter><Parameter name=\"StartTimeMinutes\" dataType=\"int\">0</Parameter><Parameter name=\"EndTimeHours\" dataType=\"int\">0</Parameter><Parameter name=\"EndTimeMinutes\" dataType=\"int\">0</Parameter><Parameter name=\"DaysActive\" dataType=\"int\">0</Parameter><Parameter name=\"Recurring\" dataType=\"bool\">false</Parameter></Parameters></Request>";
+            sendUdpCommand(xmlStr, MessageType.XML_ACK);
         }
 
         if ("colorMode".equals(channelUID.getId())) {
@@ -58,7 +78,12 @@ public class ColorLogicHandler extends HaywardThingHandler {
                 @Nullable
                 String lightState = cl.getlightState();
                 if (lightState != null) {
-                    updateData(BindingConstants.CHANNEL_COLORLOGIC_ENABLE, lightState);
+                    if (lightState == "0") {
+                        updateData(BindingConstants.CHANNEL_COLORLOGIC_ENABLE, "0");
+                    } else {
+                        updateData(BindingConstants.CHANNEL_COLORLOGIC_ENABLE, "1");
+                    }
+                    updateData(BindingConstants.CHANNEL_COLORLOGIC_STATE, lightState);
                 } else {
                     logger.debug("Colorlogic light state missing from Telemtry");
                 }

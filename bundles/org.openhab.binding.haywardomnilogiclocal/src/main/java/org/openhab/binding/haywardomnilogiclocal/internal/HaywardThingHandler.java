@@ -100,7 +100,7 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
                 if (bridge != null) {
                     BridgeHandler bridgehandler = (BridgeHandler) bridge.getHandler();
                     if (bridgehandler != null) {
-                        // Get units property from bridge
+                        // Get MSP Units property from bridge
                         Map<String, String> bridgeProperties = bridgehandler.getThing().getProperties();
                         String units = bridgeProperties.get(BindingConstants.PROPERTY_BRIDGE_UNITS);
 
