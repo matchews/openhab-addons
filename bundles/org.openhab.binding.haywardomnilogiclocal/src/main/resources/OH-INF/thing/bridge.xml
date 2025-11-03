@@ -5,7 +5,7 @@
 	xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
 
 	<!-- The bridge to communicate with Hayward's server -->
-	<bridge-type id="bridge">
+	<bridge-type id="bridge" listed="true">
 		<label>Hayward OmniLogix Connection</label>
 		<description>Connection to Hayward controller</description>
 		<semantic-equipment-tag>WebService</semantic-equipment-tag>

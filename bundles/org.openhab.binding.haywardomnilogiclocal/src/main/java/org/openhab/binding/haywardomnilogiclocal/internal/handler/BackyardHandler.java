@@ -1,7 +1,9 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -9,6 +11,7 @@ import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
+import org.openhab.binding.haywardomnilogiclocal.internal.config.BackyardConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Backyard;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
@@ -25,6 +28,29 @@ public class BackyardHandler extends HaywardThingHandler {
 
     public BackyardHandler(Thing thing) {
         super(thing);
+    }
+
+    @Override
+    public void getProperties() {
+        Bridge bridge = getBridge();
+        if (bridge != null) {
+            BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
+            if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
+                String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+                if (sysId != null) {
+                    if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
+                        Object object = bridgeHandler.getMspConfig().getDevice(sysId);
+                        if (object instanceof BackyardConfig) {
+                            BackyardConfig backyard = (BackyardConfig) object;
+                            Map<String, String> props = new HashMap<>();
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BACKYARDSERVICEMODETIMEOUT,
+                                    backyard.getServiceModeTimeout());
+                            updateProperties(props);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override

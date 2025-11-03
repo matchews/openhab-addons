@@ -54,7 +54,11 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
 
     @Override
     public void initialize() {
+        getProperties();
         updateStatus(ThingStatus.ONLINE);
+    }
+
+    public void getProperties() {
     }
 
     @Override
@@ -149,14 +153,23 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
         return channelStates;
     }
 
+    public void putStrStrIfNotNull(Map<String, String> properties, String key, @Nullable String value) {
+        if (value != null) {
+            properties.put(key, value);
+        }
+    }
+
+    public void putStrObjIfNotNull(Map<String, Object> properties, String key, @Nullable String value) {
+        if (value != null) {
+            properties.put(key, value);
+        }
+    }
+
     protected void sendUdpCommand(String xml, MessageType msgType) {
         Bridge bridge = getBridge();
         if (bridge != null && bridge.getHandler() instanceof BridgeHandler bridgehandler) {
             try {
                 String response = bridgehandler.sendRequest(xml, msgType);
-                if (logger.isTraceEnabled()) {
-                    logger.trace("UDP response: {}", response);
-                }
             } catch (HaywardException e) {
                 logger.debug("Error sending UDP command: {}", e.getMessage());
             }

@@ -19,7 +19,7 @@
 			<channel id="specialEffect" typeId="specialEffect"/>
 		</channels>
 
-		<representation-property>systemID</representation-property>
+		<representation-property>System ID</representation-property>
 	</thing-type>
 
     <channel-type id="lightState">

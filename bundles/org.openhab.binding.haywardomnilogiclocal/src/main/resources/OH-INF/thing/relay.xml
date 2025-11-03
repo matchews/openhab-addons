@@ -8,17 +8,13 @@
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge"/>
 		</supported-bridge-type-refs>
-
 		<label>Relay</label>
 		<channels>
 			<channel id="relayState" typeId="system.power"/>
-			<channel id="relayState" typeId="relayWhyOn"/>
+			<channel id="relayWhyOn" typeId="relayWhyOn"/>
 		</channels>
-     
-        <representation-property>systemID</representation-property>
+        <representation-property>System ID</representation-property>
     </thing-type>
-    
-    
         <channel-type id="relayWhyOn">
         <item-type>String</item-type>
         <label>Why On</label>
@@ -33,5 +29,4 @@
             </options>
         </state>
     </channel-type>
-
 </thing:thing-descriptions>

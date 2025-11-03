@@ -12,14 +12,19 @@
  */
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.config.BodyOfWaterConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.BodyOfWater;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
+import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
 import org.slf4j.Logger;
@@ -36,6 +41,39 @@ public class BowHandler extends HaywardThingHandler {
 
     public BowHandler(Thing thing) {
         super(thing);
+    }
+
+    @Override
+    public void getProperties() {
+        Bridge bridge = getBridge();
+        if (bridge != null) {
+            BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
+            if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
+                String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+                if (sysId != null) {
+                    if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
+                        Object object = bridgeHandler.getMspConfig().getDevice(sysId);
+                        if (object instanceof BodyOfWaterConfig) {
+                            BodyOfWaterConfig bow = (BodyOfWaterConfig) object;
+                            Map<String, String> props = new HashMap<>();
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_TYPE, bow.getType());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_SHAREDTYPE, bow.getSharedType());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_SHAREDPRIORITY,
+                                    bow.getSharedPriority());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_SHAREDEQUIPID,
+                                    bow.getSharedEquipmentSystemId());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_SUPPORTSSPILLOVER,
+                                    bow.getSupportsSpillover());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_USESPILLOVERFORFILTEROPERATIONS,
+                                    bow.getUseSpilloverForFilterOperations());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_SIZEINGALLONS,
+                                    bow.getSizeInGallons());
+                            updateProperties(props);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override

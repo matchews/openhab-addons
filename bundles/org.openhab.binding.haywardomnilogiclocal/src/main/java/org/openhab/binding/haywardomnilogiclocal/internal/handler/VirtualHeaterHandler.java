@@ -13,6 +13,8 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -20,15 +22,20 @@ import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
+import org.openhab.binding.haywardomnilogiclocal.internal.config.VirtualHeaterConfig;
+import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.VirtualHeater;
+import org.openhab.core.library.types.OnOffType;
+import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
 import org.openhab.core.types.Command;
+import org.openhab.core.types.RefreshType;
 import org.openhab.core.types.StateDescriptionFragment;
 import org.openhab.core.types.StateDescriptionFragmentBuilder;
 import org.slf4j.Logger;
@@ -50,6 +57,7 @@ public class VirtualHeaterHandler extends HaywardThingHandler {
     @Override
     public void initialize() {
         try {
+            getProperties();
             setStateDescriptions();
             updateStatus(ThingStatus.ONLINE);
         } catch (HaywardException e) {
@@ -61,16 +69,66 @@ public class VirtualHeaterHandler extends HaywardThingHandler {
     public void setStateDescriptions() throws HaywardException {
         Bridge bridge = getBridge();
         if (bridge != null && bridge.getHandler() instanceof BridgeHandler bridgehandler) {
-            // Set heater min and max speeds
+
+            // Set Heater min and max water temps
             Channel ch = thing.getChannel(BindingConstants.CHANNEL_VIRTUALHEATER_CURRENTSETPOINT);
             if (ch != null) {
-                StateDescriptionFragment stateDescriptionFragment = StateDescriptionFragmentBuilder.create()
-                        .withMinimum(new BigDecimal(getThing().getProperties()
-                                .get(BindingConstants.PROPERTY_VIRTUALHEATER_MINSETTABLEWATERTEMP)))
-                        .withMaximum(new BigDecimal(getThing().getProperties()
-                                .get(BindingConstants.PROPERTY_VIRTUALHEATER_MAXSETTABLEWATERTEMP)))
-                        .build();
-                bridgehandler.updateChannelStateDescriptionFragment(ch, stateDescriptionFragment);
+                String minTemp = getThing().getProperties()
+                        .get(BindingConstants.PROPERTY_VIRTUALHEATER_MINSETTABLEWATERTEMP);
+                String maxTemp = getThing().getProperties()
+                        .get(BindingConstants.PROPERTY_VIRTUALHEATER_MAXSETTABLEWATERTEMP);
+                if (minTemp != null && maxTemp != null) {
+                    StateDescriptionFragment stateDescriptionFragment = StateDescriptionFragmentBuilder.create()
+                            .withMinimum(new BigDecimal(getThing().getProperties()
+                                    .get(BindingConstants.PROPERTY_VIRTUALHEATER_MINSETTABLEWATERTEMP)))
+                            .withMaximum(new BigDecimal(getThing().getProperties()
+                                    .get(BindingConstants.PROPERTY_VIRTUALHEATER_MAXSETTABLEWATERTEMP)))
+                            .build();
+                    bridgehandler.updateChannelStateDescriptionFragment(ch, stateDescriptionFragment);
+                    return;
+                }
+            }
+        }
+        logger.warn("Could not update {} state descriptions with min and max settable water temps", thing.getLabel());
+    }
+
+    @Override
+    public void getProperties() {
+        Bridge bridge = getBridge();
+        if (bridge != null) {
+            BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
+            if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
+                String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+                if (sysId != null) {
+                    if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
+                        Object object = bridgeHandler.getMspConfig().getDevice(sysId);
+                        if (object instanceof VirtualHeaterConfig) {
+                            VirtualHeaterConfig virtualHeater = (VirtualHeaterConfig) object;
+                            Map<String, String> props = new HashMap<>();
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_SHAREDTYPE,
+                                    virtualHeater.getSharedType());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_ENABLED,
+                                    virtualHeater.getEnabled());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_CURRENTSETPOINT,
+                                    virtualHeater.getCurrentSetPoint());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_MAXWATERTEMP,
+                                    virtualHeater.getMaxWaterTemp());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_MINSETTABLEWATERTEMP,
+                                    virtualHeater.getMinSettableWaterTemp());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_MAXSETTABLEWATERTEMP,
+                                    virtualHeater.getMaxSettableWaterTemp());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_COOLDOWNENABLED,
+                                    virtualHeater.getCooldownEnabled());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_EXTENDENABLED,
+                                    virtualHeater.getExtendEnabled());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_BOOSTTIMEINTERVAL,
+                                    virtualHeater.getBoostTimeInterval());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_HEATERBECOMEVALIDTIMEOUT,
+                                    virtualHeater.getHeaterBecomeValidTimeout());
+                            updateProperties(props);
+                        }
+                    }
+                }
             }
         }
     }
@@ -118,8 +176,15 @@ public class VirtualHeaterHandler extends HaywardThingHandler {
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
+        if ((command instanceof RefreshType)) {
+            return;
+        }
         String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
         String bowId = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
+        String heaterMinSetTemp = getThing().getProperties()
+                .get(BindingConstants.PROPERTY_VIRTUALHEATER_MINSETTABLEWATERTEMP);
+        String heaterMaxSetTemp = getThing().getProperties()
+                .get(BindingConstants.PROPERTY_VIRTUALHEATER_MAXSETTABLEWATERTEMP);
 
         Bridge bridge = getBridge();
         if (sysId == null || bowId == null || bridge == null
@@ -127,99 +192,59 @@ public class VirtualHeaterHandler extends HaywardThingHandler {
             return;
         }
 
-        /*
-         * public static final String CHANNEL_VIRTUALHEATER_CURRENTSETPOINT = "virtualHeaterCurrentSetpoint";
-         * public static final String CHANNEL_VIRTUALHEATER_ENABLE = "virtualHeaterEnable";
-         * public static final String CHANNEL_VIRTUALHEATER_SOLARSETPOINT = "virtualHeaterSolarSetpoint";
-         */
+        String cmdURL;
+        String cmdString = "0";
+        switch (channelUID.getId()) {
+            case BindingConstants.CHANNEL_VIRTUALHEATER_ENABLE:
 
-        if (BindingConstants.CHANNEL_VIRTUALHEATER_ENABLE.equals(channelUID.getId())) {
-            // sendUdpCommand(CommandBuilder.setStandaloneLightShow(bowId, sysId, command.toString()),
-            // MessageType.SET_STANDALONE_LIGHT_SHOW);
+                if (command == OnOffType.ON) {
+                    cmdString = "1";
+                } else if (command == OnOffType.OFF) {
+                    cmdString = "0";
+                }
+                cmdURL = CommandBuilder.buildSetHeaterEnable(bowId, sysId, cmdString);
+                sendUdpCommand(cmdURL, MessageType.SET_HEATER_ENABLED);
+                break;
 
-            String xmlStr = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>SetHeaterEnable</Name>"
-                    + "<Parameters><Parameter name=\"PoolID\" dataType=\"int\">30</Parameter><Parameter name=\"HeaterID\" dataType=\"int\">32</Parameter><Parameter name=\"Enabled\" dataType=\"bool\">1</Parameter></Parameters></Request>";
+            case BindingConstants.CHANNEL_VIRTUALHEATER_CURRENTSETPOINT:
+                if (command instanceof QuantityType quantityCommand) {
+                    if (heaterMinSetTemp != null && heaterMaxSetTemp != null) {
+                        if (quantityCommand.intValue() < Integer.parseInt(heaterMinSetTemp)) {
+                            cmdString = heaterMinSetTemp;
+                        } else if (quantityCommand.intValue() > Integer.parseInt(heaterMaxSetTemp)) {
+                            cmdString = heaterMaxSetTemp;
+                        } else {
+                            cmdString = this.cmdToString(command);
+                            ;
+                        }
+                        cmdURL = CommandBuilder.buildSetHeaterEnable(bowId, sysId, cmdString);
+                        sendUdpCommand(cmdURL, MessageType.SET_HEATER_ENABLED);
+                    }
+                }
 
-            sendUdpCommand(xmlStr, MessageType.SET_HEATER_ENABLED);
+                break;
+
+            // TODO does the heater min/max apply to solar?
+            case BindingConstants.CHANNEL_VIRTUALHEATER_SOLARSETPOINT:
+                if (command instanceof QuantityType quantityCommand) {
+                    if (heaterMinSetTemp != null && heaterMaxSetTemp != null) {
+                        if (quantityCommand.intValue() < Integer.parseInt(heaterMinSetTemp)) {
+                            cmdString = heaterMinSetTemp;
+                        } else if (quantityCommand.intValue() > Integer.parseInt(heaterMaxSetTemp)) {
+                            cmdString = heaterMaxSetTemp;
+                        } else {
+                            cmdString = this.cmdToString(command);
+                            ;
+                        }
+                        cmdURL = CommandBuilder.buildSetUISolarSetPointCmd(bowId, sysId, cmdString);
+                        sendUdpCommand(cmdURL, MessageType.SET_SOLAR_SET_POINT_COMMAND);
+                    }
+                }
+                break;
+
+            default:
+                logger.warn("haywardCommand Unsupported type {}", channelUID);
+                return;
         }
-
     }
-    /*
-     * @Override
-     * public void handleCommand(ChannelUID channelUID, Command command) {
-     * if ((command instanceof RefreshType)) {
-     * return;
-     * }
-     *
-     * String systemID = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
-     * String poolID = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
-     * String heaterMinSetTemp = getThing().getProperties()
-     * .get(BindingConstants.PROPERTY_VIRTUALHEATER_MINSETTABLEWATERTEMP);
-     * String heaterMaxSetTemp = getThing().getProperties()
-     * .get(BindingConstants.PROPERTY_VIRTUALHEATER_MAXSETTABLEWATERTEMP);
-     *
-     * Bridge bridge = getBridge();
-     * if (bridge != null && bridge.getHandler() instanceof BridgeHandler bridgehandler) {
-     * String cmdString = this.cmdToString(command);
-     * String cmdURL = null;
-     * // String token = bridgehandler.getAccount().getToken();
-     *
-     * //if (poolID == null || systemID == null || token == null) {
-     * // logger.warn("haywardCommand missing configuration (poolID={}, systemID={}, token={})", poolID, systemID,
-     * // token);
-     * return;
-     * }
-     *
-     * // int mspId = Integer.parseInt(bridgehandler.getAccount().getMspSystemID());
-     *
-     * if (command == OnOffType.ON) {
-     * // cmdString = "True";
-     * } else if (command == OnOffType.OFF) {
-     * // cmdString = "False";
-     * }
-     *
-     * try {
-     * switch (channelUID.getId()) {
-     * case BindingConstants.CHANNEL_VIRTUALHEATER_ENABLE:
-     * // cmdURL = CommandBuilder.buildSetHeaterEnable(BindingConstants.COMMAND_PARAMETERS,
-     * // Objects.requireNonNull(token), mspId, Objects.requireNonNull(poolID),
-     * // Objects.requireNonNull(systemID), cmdString);
-     * break;
-     *
-     * case BindingConstants.CHANNEL_VIRTUALHEATER_CURRENTSETPOINT:
-     * if (heaterMinSetTemp != null && heaterMaxSetTemp != null) {
-     * // if (Integer.parseInt(cmdString) < Integer.parseInt(heaterMinSetTemp)) {
-     * // cmdString = heaterMinSetTemp;
-     * // } else if (Integer.parseInt(cmdString) > Integer.parseInt(heaterMaxSetTemp)) {
-     * // cmdString = heaterMaxSetTemp;
-     * }
-     * }
-     *
-     * // cmdURL = CommandBuilder.buildSetUIHeaterCmd(BindingConstants.COMMAND_PARAMETERS,
-     * // Objects.requireNonNull(token), mspId, Objects.requireNonNull(poolID),
-     * // Objects.requireNonNull(systemID), cmdString);
-     * break;
-     * default:
-     * logger.warn("haywardCommand Unsupported type {}", channelUID);
-     * return;
-     * }
-     *
-     * // *****Send Command to Hayward server
-     * String xmlResponse = bridgehandler.sendRequest(cmdURL, MessageType.SET_HEATER_COMMAND);
-     * String status = bridgehandler.evaluateXPath("//Parameter[@name='Status']/text()", xmlResponse).get(0);
-     *
-     * if (!("0".equals(status))) {
-     * logger.debug("haywardCommand XML response: {}", xmlResponse);
-     * return;
-     * }
-     * } catch (Exception e) {
-     * logger.debug("Unable to send command to Hayward's server {}:{}",
-     * bridgehandler.getBridgeConfig().getEndpointUrl(), e.getMessage());
-     * }
-     * this.updateStatus(ThingStatus.ONLINE);
-     * } else {
-     * this.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
-     * }
-     * }
-     */
 }

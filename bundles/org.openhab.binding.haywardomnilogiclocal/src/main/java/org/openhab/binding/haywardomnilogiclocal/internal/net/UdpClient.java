@@ -50,14 +50,14 @@ public class UdpClient {
         DONE
     }
 
-    public UdpMessage send(MessageType requestType, String xml) throws IOException {
+    public synchronized UdpMessage send(MessageType requestType, String xml) throws IOException {
         byte clientType;
-
-        if (requestType == MessageType.GET_TELEMETRY || requestType == MessageType.GET_ALARM_LIST
-                || requestType == MessageType.ACK) {
+        // ToDo
+        if (requestType != MessageType.REQUEST_CONFIGURATION) {
             clientType = (byte) 0;
-        } else if (requestType == MessageType.SET_HEATER_ENABLED) {
-            clientType = (byte) 0;
+        } else if (requestType == MessageType.SET_HEATER_ENABLED
+                || requestType == MessageType.SET_STANDALONE_LIGHT_SHOW) {
+            clientType = (byte) 1;
         } else {
             clientType = (byte) 1;
         }
@@ -89,12 +89,11 @@ public class UdpClient {
                         MessageType msgType = hdr.getMessageType();
                         logger.trace("Received UDP packet with message type {} and messageID = {}", msgType,
                                 receivingMsgId);
-
                         if (msgType != MessageType.ACK) {
                             ackHandler.sendAck(socket, receivingMsgId);
                         }
-
-                        if (msgType == MessageType.ACK) {
+                        if ((requestType == MessageType.GET_TELEMETRY
+                                || requestType == MessageType.REQUEST_CONFIGURATION) && msgType == MessageType.ACK) {
                             state = State.RECEIVE;
                         } else if (msgType == MessageType.MSP_LEADMESSAGE) {
                             boolean compressed = hdr.isCompressed() || requestType == MessageType.GET_TELEMETRY;

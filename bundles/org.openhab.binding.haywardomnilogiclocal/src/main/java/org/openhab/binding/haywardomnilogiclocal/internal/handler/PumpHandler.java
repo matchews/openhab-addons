@@ -1,9 +1,13 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.config.PumpConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Pump;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
@@ -21,6 +25,58 @@ public class PumpHandler extends HaywardThingHandler {
         super(thing);
     }
 
+    public static final String PROPERTY_PUMP_TYPE = "pumpType";
+    public static final String PROPERTY_PUMP_FUNCTION = "pumpFunction";
+    public static final String PROPERTY_PUMP_PRIMINGENABLED = "pumpPrimingEnabled";
+    public static final String PROPERTY_PUMP_MINSPEED = "minPumpPercent";
+    public static final String PROPERTY_PUMP_MAXSPEED = "maxPumpPercent";
+    public static final String PROPERTY_PUMP_MINRPM = "minPumpRPM";
+    public static final String PROPERTY_PUMP_MAXRPM = "maxPumpRPM";
+    public static final String PROPERTY_PUMP_LOWSPEED = "lowPumpSpeed";
+    public static final String PROPERTY_PUMP_MEDSPEED = "mediumPumpSpeed";
+    public static final String PROPERTY_PUMP_HIGHSPEED = "highPumpSpeed";
+    public static final String PROPERTY_PUMP_CUSTOMSPEED = "customPumpSpeed";
+
+    @Override
+    public void getProperties() {
+        Bridge bridge = getBridge();
+        if (bridge != null) {
+            BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
+            if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
+                String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+                if (sysId != null) {
+                    if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
+                        Object object = bridgeHandler.getMspConfig().getDevice(sysId);
+                        if (object instanceof PumpConfig) {
+                            PumpConfig backyardPump = (PumpConfig) object;
+                            Map<String, String> props = new HashMap<>();
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_TYPE, backyardPump.getType());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_FUNCTION,
+                                    backyardPump.getFunction());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_MINSPEED,
+                                    backyardPump.getMinPumpSpeed());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_MAXSPEED,
+                                    backyardPump.getMaxPumpSpeed());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_MINRPM,
+                                    backyardPump.getMinPumpRpm());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_MAXRPM,
+                                    backyardPump.getMaxPumpRpm());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_LOWSPEED,
+                                    backyardPump.getVspLowPumpSpeed());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_MEDSPEED,
+                                    backyardPump.getVspMediumPumpSpeed());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_HIGHSPEED,
+                                    backyardPump.getVspHighPumpSpeed());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_CUSTOMSPEED,
+                                    backyardPump.getVspCustomPumpSpeed());
+                            updateProperties(props);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         String sysId = getThing().getProperties().get("systemID");
@@ -33,14 +89,14 @@ public class PumpHandler extends HaywardThingHandler {
             case "pumpEnable":
                 /// sendUdpCommand(CommandBuilder.setEquipmentEnable(bridgehandler.getAccount().getToken(),
                 // bridgehandler.getAccount().getMspSystemID(), sysId, "ON".equalsIgnoreCase(command.toString())),
-                // MessageType.SET_EQUIPMENT);
+                // MessageType.SET_EQUIPMENT_CMD);
                 break;
             case "pumpSpeed":
                 int speedVal = ((Number) command).intValue();
                 // sendUdpCommand(
                 // CommandBuilder.setPumpSpeed(bridgehandler.getAccount().getToken(),
                 // bridgehandler.getAccount().getMspSystemID(), sysId, speedVal),
-                // MessageType.SET_EQUIPMENT);
+                // MessageType.SET_EQUIPMENT_CMD);
                 break;
             default:
                 break;

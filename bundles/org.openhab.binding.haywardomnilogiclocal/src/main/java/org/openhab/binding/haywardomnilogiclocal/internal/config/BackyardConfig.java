@@ -58,6 +58,15 @@ public class BackyardConfig {
         return bodiesOfWater;
     }
 
+    public @Nullable BodyOfWaterConfig getBodyOfWater(String bowId) {
+        for (BodyOfWaterConfig bow : bodiesOfWater) {
+            if (bowId == bow.getSystemId()) {
+                return bow;
+            }
+        }
+        return null;
+    }
+
     public List<PumpConfig> getPumps() {
         return pumps;
     }

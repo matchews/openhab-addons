@@ -1,12 +1,17 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.config.HeaterEquipConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Heater;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
+import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Thing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +21,50 @@ public class HeaterHandler extends HaywardThingHandler {
 
     public HeaterHandler(Thing thing) {
         super(thing);
+    }
+
+    @Override
+    public void getProperties() {
+        Bridge bridge = getBridge();
+        if (bridge != null) {
+            BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
+            if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
+                String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+                if (sysId != null) {
+                    if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
+                        Object object = bridgeHandler.getMspConfig().getDevice(sysId);
+                        if (object instanceof HeaterEquipConfig) {
+                            HeaterEquipConfig heater = (HeaterEquipConfig) object;
+                            Map<String, String> props = new HashMap<>();
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_HEATER_TYPE, heater.getType());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_HEATER_HEATERTYPE,
+                                    heater.getHeaterType());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_HEATER_ENABLED, heater.getEnabled());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_HEATER_PRIORITY, heater.getPriority());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_HEATER_RUNFORPRIORITY,
+                                    heater.getRunForPriority());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_HEATER_ALLOWLOWSPEEDOPERATION,
+                                    heater.getAllowLowSpeedOperation());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_HEATER_MINSPEEDFOROPERATION,
+                                    heater.getMinSpeedForOperation());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_HEATER_REQUIRESPRIMING,
+                                    heater.getRequiresPriming());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_HEATER_MINPRIMINGINTERVAL,
+                                    heater.getMinPrimingInterval());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_HEATER_TEMPDIFFINITIAL,
+                                    heater.getTempDifferencetInitial());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_HEATER_TEMPDIFFRUNNING,
+                                    heater.getTempDifferenceRunning());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_HEATER_SENSORSYSTEMID,
+                                    heater.getSensorSystemId());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_HEATER_SHAREDEQUIPMENTSYSTEMID,
+                                    heater.getSharedEquipmentSystemID());
+                            updateProperties(props);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override

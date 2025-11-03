@@ -15,7 +15,7 @@
 			<channel id="bowWaterTemp" typeId="waterTemp"/>
 		</channels>
 
-		<representation-property>systemID</representation-property>
+		<representation-property>System ID</representation-property>
 
 	</thing-type>
 

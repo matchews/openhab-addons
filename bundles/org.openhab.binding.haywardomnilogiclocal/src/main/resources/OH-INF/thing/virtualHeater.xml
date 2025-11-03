@@ -20,7 +20,7 @@
             <channel id="virtualHeaterWhyOn" typeId="virtualHeaterWhyOn"/>
         </channels>
 
-        <representation-property>systemID</representation-property>
+        <representation-property>System ID</representation-property>
     </thing-type>
 
     <channel-type id="virtualHeaterCurrentSetpoint">

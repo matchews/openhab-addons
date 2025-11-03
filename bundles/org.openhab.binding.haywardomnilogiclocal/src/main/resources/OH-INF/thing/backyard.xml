@@ -16,7 +16,7 @@
             <channel id="backyardMspVersion" typeId="backyardMspVersion"/>
 		</channels>
 
-		<representation-property>systemID</representation-property>
+		<representation-property>System ID</representation-property>
 	</thing-type>
 
 	<channel-type id="backyardAirTemp">

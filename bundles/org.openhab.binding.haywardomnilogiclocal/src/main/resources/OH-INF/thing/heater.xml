@@ -20,7 +20,7 @@
 			<channel id="heaterMaintainFor" typeId="heaterMaintainFor"/>
 		</channels>
 
-		<representation-property>systemID</representation-property>
+		<representation-property>System ID</representation-property>
 	</thing-type>
 
     <channel-type id="heaterState">

@@ -65,6 +65,14 @@ public class BindingConstants {
     public static final String PROPERTY_BRIDGE_UIFILTERSIMPLEMODE = "UI Filter Simple Mode";
     public static final String PROPERTY_BRIDGE_UILIGHTSSIMPLEMODE = "UL Lights Simple Mode";
 
+    public static final Set<String> BRIDGE_PROPERTIES = Set.of(BindingConstants.PROPERTY_BRIDGE_VSPSPEEDFORMAT,
+            BindingConstants.PROPERTY_BRIDGE_TIMEFORMAT, BindingConstants.PROPERTY_BRIDGE_TIMEZONE,
+            BindingConstants.PROPERTY_BRIDGE_DST, BindingConstants.PROPERTY_BRIDGE_INTERNETTIME,
+            BindingConstants.PROPERTY_BRIDGE_UNITS, BindingConstants.PROPERTY_BRIDGE_CHLORDISPLAY,
+            BindingConstants.PROPERTY_BRIDGE_LANGUAGE, BindingConstants.PROPERTY_BRIDGE_UIDISPLAYMODE,
+            BindingConstants.PROPERTY_BRIDGE_UIMOODCOLORENABLED, BindingConstants.PROPERTY_BRIDGE_UIHEATERSIMPLEMODE,
+            BindingConstants.PROPERTY_BRIDGE_UIFILTERSIMPLEMODE, BindingConstants.PROPERTY_BRIDGE_UILIGHTSSIMPLEMODE);
+
     // Backyard
     public static final String CHANNEL_BACKYARD_AIRTEMP = "backyardAirTemp";
     public static final String CHANNEL_BACKYARD_STATE = "backyardState";
@@ -72,6 +80,8 @@ public class BindingConstants {
     public static final String CHANNEL_BACKYARD_MSPVERSION = "backyardMspVersion";
 
     public static final String PROPERTY_BACKYARDSERVICEMODETIMEOUT = "Service Mode Timeout";
+
+    public static final Set<String> BACKYARD_PROPERTIES = Set.of(BindingConstants.PROPERTY_BACKYARDSERVICEMODETIMEOUT);
 
     // Body of Water
     public static final String CHANNEL_BOW_WATERTEMP = "bowWaterTemp";
@@ -184,7 +194,6 @@ public class BindingConstants {
 
     public static final String PROPERTY_PUMP_TYPE = "pumpType";
     public static final String PROPERTY_PUMP_FUNCTION = "pumpFunction";
-    public static final String PROPERTY_PUMP_PRIMINGENABLED = "pumpPrimingEnabled";
     public static final String PROPERTY_PUMP_MINSPEED = "minPumpPercent";
     public static final String PROPERTY_PUMP_MAXSPEED = "maxPumpPercent";
     public static final String PROPERTY_PUMP_MINRPM = "minPumpRPM";
@@ -233,24 +242,8 @@ public class BindingConstants {
     public static final String PROPERTY_VIRTUALHEATER_HEATERBECOMEVALIDTIMEOUT = "Becomes Valid Timeout";
 
     // The properties associated with all things
-    public static final String PROPERTY_SYSTEM_ID = "systemID";
-    public static final String PROPERTY_TYPE = "thingType";
-    public static final String PROPERTY_BOWNAME = "bowName";
-    public static final String PROPERTY_BOWID = "bowID";
-
-    // Hayward Command html
-    public static final String COMMAND_PREFIX = """
-            <?xml version=\"1.0\" encoding=\"utf-8\"?>
-            """;
-    public static final String COMMAND_SUFFIX = """
-                    <Parameter name="IsCountDownTimer" dataType="bool">false</Parameter>
-                    <Parameter name="StartTimeHours" dataType="int">0</Parameter>
-                    <Parameter name="StartTimeMinutes" dataType="int">0</Parameter>
-                    <Parameter name="EndTimeHours" dataType="int">0</Parameter>
-                    <Parameter name="EndTimeMinutes" dataType="int">0</Parameter>
-                    <Parameter name="DaysActive" dataType="int">0</Parameter>
-                    <Parameter name="Recurring" dataType="bool">false</Parameter>
-                </Parameters>
-            </Request>
-            """;
+    public static final String PROPERTY_SYSTEM_ID = "System ID";
+    public static final String PROPERTY_TYPE = "Thing Type";
+    public static final String PROPERTY_BOWNAME = "Body of Water Name";
+    public static final String PROPERTY_BOWID = "Body of Water ID";
 }

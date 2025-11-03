@@ -17,6 +17,7 @@ import java.io.StringReader;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +38,10 @@ import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.TypeToRequest;
+import org.openhab.binding.haywardomnilogiclocal.internal.config.ConfigParser;
+import org.openhab.binding.haywardomnilogiclocal.internal.config.MspConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.discovery.HaywardDiscoveryService;
+import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpClient;
 import org.openhab.binding.haywardomnilogiclocal.internal.net.UdpMessage;
 import org.openhab.core.library.types.OnOffType;
@@ -49,6 +53,7 @@ import org.openhab.core.thing.ThingStatus;
 import org.openhab.core.thing.ThingStatusDetail;
 import org.openhab.core.thing.binding.BaseBridgeHandler;
 import org.openhab.core.thing.binding.ThingHandlerService;
+import org.openhab.core.thing.binding.builder.BridgeBuilder;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescriptionFragment;
 import org.slf4j.Logger;
@@ -75,18 +80,14 @@ public class BridgeHandler extends BaseBridgeHandler {
     private @Nullable ScheduledFuture<?> pollAlarmsFuture;
     private int commFailureCount;
     private Config config = getConfig().as(Config.class);
+    @Nullable
+    private MspConfig mspConfig;
     public String units = "Standard";
 
-    public Config getBridgeConfig() {
-        return config;
-    }
-
-    public String getUnits() {
-        return units;
-    }
-
-    public void setUnits(String units) {
-        this.units = units;
+    public void updatePropertiez(Map<String, String> bridgeProps) {
+        BridgeBuilder thingBuilder = editThing();
+        thingBuilder.withProperties(bridgeProps);
+        updateThing(thingBuilder.build());
     }
 
     @Override
@@ -104,15 +105,6 @@ public class BridgeHandler extends BaseBridgeHandler {
     }
 
     @Override
-    public void dispose() {
-        clearPolling(initializeFuture);
-        clearPolling(pollTelemetryFuture);
-        clearPolling(pollAlarmsFuture);
-        logger.trace("Hayward polling cancelled");
-        super.dispose();
-    }
-
-    @Override
     public void initialize() {
         initializeFuture = scheduler.schedule(() -> {
             try {
@@ -123,6 +115,15 @@ public class BridgeHandler extends BaseBridgeHandler {
         }, 1, TimeUnit.SECONDS);
     }
 
+    @Override
+    public void dispose() {
+        clearPolling(initializeFuture);
+        clearPolling(pollTelemetryFuture);
+        clearPolling(pollAlarmsFuture);
+        logger.trace("Hayward polling cancelled");
+        super.dispose();
+    }
+
     public void scheduledInitialize() throws UnknownHostException {
         config = getConfigAs(Config.class);
         udpClient = new UdpClient(config.getEndpointUrl(), UDP_PORT);
@@ -131,7 +132,7 @@ public class BridgeHandler extends BaseBridgeHandler {
             clearPolling(pollTelemetryFuture);
             clearPolling(pollAlarmsFuture);
 
-            if (!requestConfiguration() || !requestTelemetryData()) {
+            if (requestConfiguration().isEmpty() || !requestTelemetryData()) {
                 updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
                         "Unable to complete UDP handshake");
                 clearPolling(pollTelemetryFuture);
@@ -163,51 +164,26 @@ public class BridgeHandler extends BaseBridgeHandler {
         }
     }
 
-    public String getMspConfig() throws HaywardException, InterruptedException {
-        String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>RequestConfiguration</Name></Request>";
-        String xmlResponse = sendRequest(xmlRequest, MessageType.REQUEST_CONFIGURATION);
-
-        if (xmlResponse.isEmpty()) {
-            logger.error("Hayward Connection thing: getMspConfig XML response was null");
-            throw new HaywardException("MSP configuration response empty");
-        }
-
-        if (!evaluateXPath("/Response/Parameters//Parameter[@name='StatusMessage']/text()", xmlResponse).isEmpty()) {
-            logger.error("Hayward Connection thing: getMspConfig XML response: {}", xmlResponse);
-            throw new HaywardException("MSP configuration response contains status message");
-        }
-        return xmlResponse;
-    }
-
-    public synchronized boolean requestConfiguration() throws HaywardException {
-        String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>RequestConfiguration</Name></Request>";
+    public synchronized String requestConfiguration() throws HaywardException {
+        String xmlRequest = CommandBuilder.buildRequestConfiguration();
         String xmlResponse = sendRequest(xmlRequest, MessageType.REQUEST_CONFIGURATION);
 
         if (xmlResponse.isEmpty()) {
             logger.debug("Hayward Connection thing: RequestConfiguration XML response was null");
-            return false;
+            throw new HaywardException("MSP configuration response empty");
         }
 
-        if (!evaluateXPath("/Response/Parameters//Parameter[@name='StatusMessage']/text()", xmlResponse).isEmpty()) {
-            logger.debug("Hayward Connection thing: RequestConfiguration XML response: {}", xmlResponse);
-            return false;
-        }
-
+        setMspConfig(ConfigParser.parse(xmlResponse));
         logger.debug("Hayward Connection thing: RequestConfiguration successful");
-        return true;
+        return xmlResponse;
     }
 
     public synchronized boolean requestTelemetryData() throws HaywardException {
-        String xmlRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request xmlns=\"http://nextgen.hayward.com/api\"><Name>RequestTelemetryData</Name></Request>";
+        String xmlRequest = CommandBuilder.buildGetTelemetry();
         String xmlResponse = sendRequest(xmlRequest, MessageType.GET_TELEMETRY);
 
         if (xmlResponse.isEmpty()) {
             logger.debug("Hayward Connection thing: RequestTelemetryData XML response was null");
-            return false;
-        }
-
-        if (!evaluateXPath("/Response/Parameters//Parameter[@name='StatusMessage']/text()", xmlResponse).isEmpty()) {
-            logger.debug("Hayward Connection thing: RequestTelemetryData XML response: {}", xmlResponse);
             return false;
         }
 
@@ -230,17 +206,17 @@ public class BridgeHandler extends BaseBridgeHandler {
          * String xmlRequest =
          * "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>GetAllAlarmList</Name><Parameters/></Request>";
          * String xmlResponse = sendRequest(xmlRequest, MessageType.GET_ALARM_LIST);
-         * 
+         *
          * if (xmlResponse.isEmpty()) {
          * logger.debug("Hayward Connection thing: GetAllAlarmList XML response was null");
          * return false;
          * }
-         * 
+         *
          * if (!evaluateXPath("/Response/Parameters//Parameter[@name='StatusMessage']/text()", xmlResponse).isEmpty()) {
          * logger.debug("Hayward Connection thing: GetAllAlarmList XML response: {}", xmlResponse);
          * return false;
          * }
-         * 
+         *
          * // TODO
          * for (Thing thing : getThing().getThings()) {
          * Map<String, String> properties = thing.getProperties();
@@ -308,6 +284,40 @@ public class BridgeHandler extends BaseBridgeHandler {
         return null;
     }
 
+    public void getProperties() {
+        if (getMspConfig() != null) {
+            List<org.openhab.binding.haywardomnilogiclocal.internal.config.SystemConfig> systems = getMspConfig()
+                    .getSystems();
+            Map<String, String> bridgeProps = new HashMap<>();
+            putStrStrIfNotNull(bridgeProps, BindingConstants.PROPERTY_BRIDGE_VSPSPEEDFORMAT,
+                    systems.get(0).getMspVspSpeedFormat());
+            putStrStrIfNotNull(bridgeProps, BindingConstants.PROPERTY_BRIDGE_TIMEFORMAT,
+                    systems.get(0).getMspTimeFormat());
+            putStrStrIfNotNull(bridgeProps, BindingConstants.PROPERTY_BRIDGE_TIMEZONE, systems.get(0).getTimeZone());
+            putStrStrIfNotNull(bridgeProps, BindingConstants.PROPERTY_BRIDGE_DST, systems.get(0).getDst());
+            putStrStrIfNotNull(bridgeProps, BindingConstants.PROPERTY_BRIDGE_INTERNETTIME,
+                    systems.get(0).getInternetTime());
+            putStrStrIfNotNull(bridgeProps, BindingConstants.PROPERTY_BRIDGE_UNITS, systems.get(0).getUnits());
+            putStrStrIfNotNull(bridgeProps, BindingConstants.PROPERTY_BRIDGE_CHLORDISPLAY,
+                    systems.get(0).getMspChlorDisplay());
+            putStrStrIfNotNull(bridgeProps, BindingConstants.PROPERTY_BRIDGE_LANGUAGE, systems.get(0).getMspLanguage());
+            putStrStrIfNotNull(bridgeProps, BindingConstants.PROPERTY_BRIDGE_UIDISPLAYMODE,
+                    systems.get(0).getUiDisplayMode());
+            putStrStrIfNotNull(bridgeProps, BindingConstants.PROPERTY_BRIDGE_UIMOODCOLORENABLED,
+                    systems.get(0).getUiMoodColorEnabled());
+            putStrStrIfNotNull(bridgeProps, BindingConstants.PROPERTY_BRIDGE_UIHEATERSIMPLEMODE,
+                    systems.get(0).getUiHeaterSimpleMode());
+            putStrStrIfNotNull(bridgeProps, BindingConstants.PROPERTY_BRIDGE_UIFILTERSIMPLEMODE,
+                    systems.get(0).getUiFilterSimpleMode());
+            putStrStrIfNotNull(bridgeProps, BindingConstants.PROPERTY_BRIDGE_UILIGHTSSIMPLEMODE,
+                    systems.get(0).getUiLightsSimpleMode());
+
+            BridgeBuilder bridgeBuilder = editThing();
+            bridgeBuilder.withProperties(bridgeProps);
+            updateThing(bridgeBuilder.build());
+        }
+    }
+
     public List<String> evaluateXPath(String xpathExp, String xmlResponse) {
         List<String> values = new ArrayList<>();
         try {
@@ -326,7 +336,7 @@ public class BridgeHandler extends BaseBridgeHandler {
 
     public synchronized String sendRequest(String xmlRequest, MessageType msgType) throws HaywardException {
         if (logger.isTraceEnabled()) {
-            logger.trace("Hayward Connection thing:  {} Hayward UDP command: {}", getCallingMethod(), xmlRequest);
+            logger.trace("Hayward Connection thing:  {} Hayward UDP command:\r{}", getCallingMethod(), xmlRequest);
         } else if (logger.isDebugEnabled()) {
             logger.debug("Hayward Connection thing:  {}", getCallingMethod());
         }
@@ -356,11 +366,37 @@ public class BridgeHandler extends BaseBridgeHandler {
         stateDescriptionProvider.setStateDescriptionFragment(channelId, descriptionFragment);
     }
 
+    public void putStrStrIfNotNull(Map<String, String> properties, String key, @Nullable String value) {
+        if (value != null) {
+            properties.put(key, value);
+        }
+    }
+
     public int convertCommand(Command command) {
         if (command == OnOffType.ON) {
             return 1;
         } else {
             return 0;
         }
+    }
+
+    public @Nullable MspConfig getMspConfig() {
+        return mspConfig;
+    }
+
+    public void setMspConfig(@Nullable MspConfig mspConfig) {
+        this.mspConfig = mspConfig;
+    }
+
+    public Config getBridgeConfig() {
+        return config;
+    }
+
+    public String getUnits() {
+        return units;
+    }
+
+    public void setUnits(String units) {
+        this.units = units;
     }
 }

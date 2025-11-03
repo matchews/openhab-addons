@@ -1,9 +1,13 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.config.ChlorinatorConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Chlorinator;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
@@ -22,28 +26,41 @@ public class ChlorinatorHandler extends HaywardThingHandler {
     }
 
     @Override
-    public void handleCommand(ChannelUID channelUID, Command command) {
-        String sysId = getThing().getProperties().get("systemID");
+    public void getProperties() {
         Bridge bridge = getBridge();
-        if (sysId == null || bridge == null || !(bridge.getHandler() instanceof BridgeHandler bridgehandler)) {
-            return;
-        }
-
-        switch (channelUID.getId()) {
-            case "chlorEnable":
-                // sendUdpCommand(CommandBuilder.setEquipmentEnable(bridgehandler.getUnits(),
-                // bridgehandler.getU(), sysId, "ON".equalsIgnoreCase(command.toString())),
-                // MessageType.SET_CHLOR_ENABLED);
-                break;
-            case "chlorTimedPercent":
-                // int val = ((Number) command).intValue();
-                // sendUdpCommand(
-                // CommandBuilder.setChlorinatorOutput(bridgehandler.getAccount().getToken(),
-                // bridgehandler.getAccount().getMspSystemID(), sysId, val),
-                // MessageType.SET_CHLOR_PARAMS);
-                break;
-            default:
-                break;
+        if (bridge != null) {
+            BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
+            if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
+                String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+                if (sysId != null) {
+                    if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
+                        Object object = bridgeHandler.getMspConfig().getDevice(sysId);
+                        if (object instanceof ChlorinatorConfig) {
+                            ChlorinatorConfig chlorinator = (ChlorinatorConfig) object;
+                            Map<String, String> props = new HashMap<>();
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_CHLORINATOR_SHAREDTYPE,
+                                    chlorinator.getSharedType());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_CHLORINATOR_ENABLED,
+                                    chlorinator.getEnabled());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_CHLORINATOR_MODE,
+                                    chlorinator.getMode());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_CHLORINATOR_TIMEDPERCENT,
+                                    chlorinator.getTimedPercent());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_CHLORINATOR_SUPERCHLORTIMEOUT,
+                                    chlorinator.getSuperChlorTimeout());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_CHLORINATOR_CELLTYPE,
+                                    chlorinator.getCellType());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_CHLORINATOR_DISPENSERTYPE,
+                                    chlorinator.getDispenserType());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_CHLORINATOR_ORPTIMEOUT,
+                                    chlorinator.getOrpTimeout());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_CHLORINATOR_ORPSENSORID,
+                                    chlorinator.getOrpSensorId());
+                            updateProperties(props);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -134,6 +151,32 @@ public class ChlorinatorHandler extends HaywardThingHandler {
             } else {
                 logger.debug("Chlorinator enable missing from Telemtry");
             }
+        }
+    }
+
+    @Override
+    public void handleCommand(ChannelUID channelUID, Command command) {
+        String sysId = getThing().getProperties().get("systemID");
+        Bridge bridge = getBridge();
+        if (sysId == null || bridge == null || !(bridge.getHandler() instanceof BridgeHandler bridgehandler)) {
+            return;
+        }
+
+        switch (channelUID.getId()) {
+            case "chlorEnable":
+                // sendUdpCommand(CommandBuilder.setEquipmentEnable(bridgehandler.getUnits(),
+                // bridgehandler.getU(), sysId, "ON".equalsIgnoreCase(command.toString())),
+                // MessageType.SET_CHLOR_ENABLED);
+                break;
+            case "chlorTimedPercent":
+                // int val = ((Number) command).intValue();
+                // sendUdpCommand(
+                // CommandBuilder.setChlorinatorOutput(bridgehandler.getAccount().getToken(),
+                // bridgehandler.getAccount().getMspSystemID(), sysId, val),
+                // MessageType.SET_CHLOR_PARAMS);
+                break;
+            default:
+                break;
         }
     }
 }
