@@ -39,7 +39,6 @@ public class BindingConstants {
     public static final ThingTypeUID THING_TYPE_PUMP = new ThingTypeUID(BINDING_ID, "pump");
     public static final ThingTypeUID THING_TYPE_RELAY = new ThingTypeUID(BINDING_ID, "relay");
     public static final ThingTypeUID THING_TYPE_SENSOR = new ThingTypeUID(BINDING_ID, "sensor");
-    public static final ThingTypeUID THING_TYPE_VALVEACTUATOR = new ThingTypeUID(BINDING_ID, "valveActuator");
     public static final ThingTypeUID THING_TYPE_VIRTUALHEATER = new ThingTypeUID(BINDING_ID, "virtualHeater");
     public static final Set<ThingTypeUID> BRIDGE_THING_TYPES_UIDS = Set.of(THING_TYPE_BRIDGE);
 
@@ -48,7 +47,7 @@ public class BindingConstants {
             BindingConstants.THING_TYPE_CHLORINATOR, BindingConstants.THING_TYPE_COLORLOGIC,
             BindingConstants.THING_TYPE_FILTER, BindingConstants.THING_TYPE_HEATER, BindingConstants.THING_TYPE_PUMP,
             BindingConstants.THING_TYPE_RELAY, BindingConstants.THING_TYPE_SENSOR,
-            BindingConstants.THING_TYPE_VALVEACTUATOR, BindingConstants.THING_TYPE_VIRTUALHEATER);
+            BindingConstants.THING_TYPE_VIRTUALHEATER);
 
     // Bridge
     public static final String PROPERTY_BRIDGE_VSPSPEEDFORMAT = "VSP Speed Format";

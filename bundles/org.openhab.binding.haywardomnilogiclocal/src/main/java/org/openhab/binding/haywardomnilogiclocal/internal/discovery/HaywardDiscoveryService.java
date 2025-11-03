@@ -162,48 +162,26 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                         List<RelayConfig> relays = bow.getRelays();
                         if (relays != null) {
                             for (RelayConfig relay : relays) {
-
-                                String relayType = relay.getType();
-                                if ("RLY_VALVE_ACTUATOR".equals(relayType)) {
-
-                                    String relayName = relay.getName();
-                                    if (relayName == null) {
-                                        relayName = "Valve Actuator";
-                                    }
-
-                                    Map<String, Object> valveProps = new HashMap<>();
-                                    valveProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.VALVEACTUATOR);
-                                    putStrObjIfNotNull(valveProps, BindingConstants.PROPERTY_SYSTEM_ID,
-                                            relay.getSystemId());
-                                    addBowContext(valveProps, bow);
-                                    onDeviceDiscovered(BindingConstants.THING_TYPE_VALVEACTUATOR, relayName,
-                                            valveProps);
-                                } else {
-
-                                    String relayName = relay.getName();
-                                    if (relayName == null) {
-                                        relayName = "Relay";
-                                    }
-
-                                    Map<String, Object> relayProps = new HashMap<>();
-                                    relayProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.RELAY);
-                                    putStrObjIfNotNull(relayProps, BindingConstants.PROPERTY_SYSTEM_ID,
-                                            relay.getSystemId());
-                                    addBowContext(relayProps, bow);
-                                    onDeviceDiscovered(BindingConstants.THING_TYPE_RELAY, relayName, relayProps);
+                                String relayName = relay.getName();
+                                if (relayName == null) {
+                                    relayName = "Relay";
                                 }
+                                Map<String, Object> relayProps = new HashMap<>();
+                                relayProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.RELAY);
+                                putStrObjIfNotNull(relayProps, BindingConstants.PROPERTY_SYSTEM_ID,
+                                        relay.getSystemId());
+                                addBowContext(relayProps, bow);
+                                onDeviceDiscovered(BindingConstants.THING_TYPE_RELAY, relayName, relayProps);
                             }
                         }
 
                         List<SensorConfig> sensors = bow.getSensors();
                         if (sensors != null) {
                             for (SensorConfig sensor : sensors) {
-
                                 String sensorName = sensor.getName();
                                 if (sensorName == null) {
                                     sensorName = "Sensor";
                                 }
-
                                 Map<String, Object> sensorProps = new HashMap<>();
                                 sensorProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.SENSOR);
                                 putStrObjIfNotNull(sensorProps, BindingConstants.PROPERTY_SYSTEM_ID,
@@ -264,28 +242,15 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                     if (backyardRelays != null) {
                         for (RelayConfig relay : backyardRelays) {
                             String relayType = relay.getType();
-                            if ("RLY_VALVE_ACTUATOR".equals(relayType)) {
-                                String relayName = relay.getName();
-                                if (relayName == null) {
-                                    relayName = "Valve Actuator";
-                                }
-                                Map<String, Object> valveProps = new HashMap<>();
-                                valveProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.VALVEACTUATOR);
-                                putStrObjIfNotNull(valveProps, BindingConstants.PROPERTY_SYSTEM_ID,
-                                        relay.getSystemId());
-                                onDeviceDiscovered(BindingConstants.THING_TYPE_VALVEACTUATOR, relayName, valveProps);
-                            } else {
-                                String relayName = relay.getName();
-                                if (relayName == null) {
-                                    relayName = "Relay";
-                                }
-                                Map<String, Object> relayProps = new HashMap<>();
-                                relayProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.RELAY);
-                                putStrObjIfNotNull(relayProps, BindingConstants.PROPERTY_SYSTEM_ID,
-                                        relay.getSystemId());
-                                putStrObjIfNotNull(relayProps, BindingConstants.PROPERTY_RELAY_TYPE, relayType);
-                                onDeviceDiscovered(BindingConstants.THING_TYPE_RELAY, relayName, relayProps);
+
+                            String relayName = relay.getName();
+                            if (relayName == null) {
+                                relayName = "Relay";
                             }
+                            Map<String, Object> relayProps = new HashMap<>();
+                            relayProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.RELAY);
+                            putStrObjIfNotNull(relayProps, BindingConstants.PROPERTY_SYSTEM_ID, relay.getSystemId());
+                            onDeviceDiscovered(BindingConstants.THING_TYPE_RELAY, relayName, relayProps);
                         }
                     }
                     List<SensorConfig> backyardSensors = backyard.getSensors();
@@ -306,7 +271,9 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                     }
                 }
             }
+
         }
+
     }
 
     private void putStrObjIfNotNull(Map<String, Object> properties, String key, @Nullable String value) {
