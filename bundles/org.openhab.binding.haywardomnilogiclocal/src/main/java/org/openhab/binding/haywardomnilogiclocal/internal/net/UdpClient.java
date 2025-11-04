@@ -24,16 +24,17 @@ import java.nio.charset.StandardCharsets;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
-import org.openhab.binding.haywardomnilogiclocal.internal.handler.BridgeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Simple UDP client used to communicate with the OmniLogic controller.
+ *
+ * @author Matt Myers - Initial contribution
  */
 @NonNullByDefault
 public class UdpClient {
-    private final Logger logger = LoggerFactory.getLogger(BridgeHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(UdpClient.class);
     private final InetAddress address;
     private final int port;
     private int sendingMsgId = 0;
@@ -41,7 +42,6 @@ public class UdpClient {
     public UdpClient(String host, int port) throws UnknownHostException {
         this.address = InetAddress.getByName(host);
         this.port = port;
-        this.sendingMsgId = sendingMsgId;
     }
 
     private enum State {

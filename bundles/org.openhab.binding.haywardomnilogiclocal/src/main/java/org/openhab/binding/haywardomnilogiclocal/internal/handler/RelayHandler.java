@@ -1,8 +1,21 @@
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
@@ -22,8 +35,14 @@ import org.openhab.core.types.RefreshType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Relay Handler
+ *
+ * @author Matt Myers - Initial contribution
+ */
+@NonNullByDefault
 public class RelayHandler extends HaywardThingHandler {
-    private final Logger logger = LoggerFactory.getLogger(BackyardHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(RelayHandler.class);
 
     public RelayHandler(Thing thing) {
         super(thing);
@@ -35,7 +54,7 @@ public class RelayHandler extends HaywardThingHandler {
         if (bridge != null) {
             BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
             if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
-                String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+                String sysId = getThing().getUID().getId();
                 if (sysId != null) {
                     if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
                         Object object = bridgeHandler.getMspConfig().getDevice(sysId);
@@ -55,13 +74,12 @@ public class RelayHandler extends HaywardThingHandler {
     @Override
     public void getTelemetry(String xmlResponse) throws HaywardException {
         Status status = TelemetryParser.parse(xmlResponse);
-        String sysId = getThing().getProperties().get("systemID");
+        String sysId = getThing().getUID().getId();
         if (sysId == null) {
             return;
         }
         for (Relay relay : status.getRelays()) {
             if (sysId.equals(relay.getSystemId())) {
-
                 @Nullable
                 String relayState = relay.getRelayState();
                 if (relayState != null) {

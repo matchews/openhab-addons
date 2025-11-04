@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.openhab.binding.haywardomnilogiclocal.internal.telemetry;
 
 import java.util.ArrayList;
@@ -9,7 +21,9 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
- * Representation of the STATUS telemetry response from the controller.
+ * Representation of a Status element.
+ *
+ * @author Matt Myers - Initial contribution
  */
 @NonNullByDefault
 @XStreamAlias("STATUS")
@@ -35,11 +49,9 @@ public class Status {
     @XStreamImplicit(itemFieldName = "Chlorinator")
     private final List<Chlorinator> chlorinators = new ArrayList<>();
 
+    @XStreamAlias("ValveActuator")
     @XStreamImplicit(itemFieldName = "Relay")
     private final List<Relay> relays = new ArrayList<>();
-
-    @XStreamImplicit(itemFieldName = "ValveActuator")
-    private final List<ValveActuator> valveActuators = new ArrayList<>();
 
     @XStreamImplicit(itemFieldName = "Pump")
     private final List<Pump> pumps = new ArrayList<>();
@@ -74,10 +86,6 @@ public class Status {
 
     public List<Relay> getRelays() {
         return relays;
-    }
-
-    public List<ValveActuator> getValveActuators() {
-        return valveActuators;
     }
 
     public List<Pump> getPumps() {

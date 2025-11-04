@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.openhab.binding.haywardomnilogiclocal.internal.net;
 
 import java.io.ByteArrayInputStream;
@@ -6,9 +18,14 @@ import java.io.IOException;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
- * Utility for compressing and decompressing message payloads.
+ * Utility for compressing and decompressing message payloads
+ *
+ * @author Matt Myers - Initial contribution.
  */
+@NonNullByDefault
 public final class PayloadCodec {
 
     private PayloadCodec() {

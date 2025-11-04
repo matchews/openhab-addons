@@ -27,6 +27,8 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 /**
  * Assembles multi-packet responses from the OmniLogic controller. It collects
  * lead messages and subsequent blocks and performs decompression when required.
+ *
+ * @author Matt Myers - Initial contribution
  */
 @NonNullByDefault
 public class MessageAssembler {

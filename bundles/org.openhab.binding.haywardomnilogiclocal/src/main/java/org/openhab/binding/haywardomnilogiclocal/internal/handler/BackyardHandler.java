@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.util.ArrayList;
@@ -22,6 +34,11 @@ import org.openhab.core.thing.ThingStatusDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Backyard Handler
+ *
+ * @author Matt Myers - Initial contribution
+ */
 @NonNullByDefault
 public class BackyardHandler extends HaywardThingHandler {
     private final Logger logger = LoggerFactory.getLogger(BackyardHandler.class);
@@ -36,7 +53,7 @@ public class BackyardHandler extends HaywardThingHandler {
         if (bridge != null) {
             BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
             if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
-                String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+                String sysId = getThing().getUID().getId();
                 if (sysId != null) {
                     if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
                         Object object = bridgeHandler.getMspConfig().getDevice(sysId);
@@ -56,7 +73,7 @@ public class BackyardHandler extends HaywardThingHandler {
     @Override
     public void getTelemetry(String xmlResponse) throws HaywardException {
         Status status = TelemetryParser.parse(xmlResponse);
-        String sysId = getThing().getProperties().get("systemID");
+        String sysId = getThing().getUID().getId();
         if (sysId == null) {
             return;
         }

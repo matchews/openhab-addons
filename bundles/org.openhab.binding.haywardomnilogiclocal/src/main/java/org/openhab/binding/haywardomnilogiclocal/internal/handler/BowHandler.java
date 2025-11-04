@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 @NonNullByDefault
 public class BowHandler extends HaywardThingHandler {
-    private final Logger logger = LoggerFactory.getLogger(BackyardHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(BowHandler.class);
 
     public BowHandler(Thing thing) {
         super(thing);
@@ -49,7 +49,7 @@ public class BowHandler extends HaywardThingHandler {
         if (bridge != null) {
             BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
             if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
-                String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+                String sysId = getThing().getUID().getId();
                 if (sysId != null) {
                     if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
                         Object object = bridgeHandler.getMspConfig().getDevice(sysId);
@@ -82,7 +82,6 @@ public class BowHandler extends HaywardThingHandler {
         String sysId = getThing().getUID().getId();
         for (BodyOfWater bow : status.getBodiesOfWater()) {
             if (sysId.equals(bow.getSystemId())) {
-
                 @Nullable
                 String flow = bow.getFlow();
                 if (flow != null) {
@@ -98,7 +97,6 @@ public class BowHandler extends HaywardThingHandler {
                 } else {
                     logger.debug("Body of Water temp missing from Telemtry");
                 }
-
             }
         }
         updateStatus(ThingStatus.ONLINE);

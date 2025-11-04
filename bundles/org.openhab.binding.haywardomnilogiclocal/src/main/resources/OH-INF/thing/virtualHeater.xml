@@ -1,72 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <thing:thing-descriptions bindingId="haywardomnilogiclocal"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
-    xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
 
-    <thing-type id="virtualHeater" listed="false">
-        <supported-bridge-type-refs>
-            <bridge-type-ref id="bridge"/>
-        </supported-bridge-type-refs>
+	<thing-type id="virtualHeater" listed="false">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="bridge"/>
+		</supported-bridge-type-refs>
 
-        <label>Heater</label>
-        <semantic-equipment-tag>WaterHeater</semantic-equipment-tag>
-        <channels>
-            <channel id="virtualHeaterCurrentSetpoint" typeId="virtualHeaterCurrentSetpoint"/>
-            <channel id="virtualHeaterEnable" typeId="system.power"/>
-            <channel id="virtualHeaterSolarSetpoint" typeId="virtualHeaterSolarSetpoint"/>
-            <channel id="virtualHeaterMode" typeId="virtualHeaterMode"/>
-            <channel id="virtualHeaterSilentMode" typeId="virtualHeaterSilentMode"/>
-            <channel id="virtualHeaterWhyOn" typeId="virtualHeaterWhyOn"/>
-        </channels>
+		<label>Heater</label>
+		<semantic-equipment-tag>WaterHeater</semantic-equipment-tag>
+		<channels>
+			<channel id="virtualHeaterCurrentSetpoint" typeId="virtualHeaterCurrentSetpoint"/>
+			<channel id="virtualHeaterEnable" typeId="system.power"/>
+			<channel id="virtualHeaterSolarSetpoint" typeId="virtualHeaterSolarSetpoint"/>
+			<channel id="virtualHeaterMode" typeId="virtualHeaterMode"/>
+			<channel id="virtualHeaterSilentMode" typeId="virtualHeaterSilentMode"/>
+			<channel id="virtualHeaterWhyOn" typeId="virtualHeaterWhyOn"/>
+		</channels>
 
-        <representation-property>System ID</representation-property>
-    </thing-type>
+		<representation-property>System ID</representation-property>
+	</thing-type>
 
-    <channel-type id="virtualHeaterCurrentSetpoint">
-        <item-type>Number:Temperature</item-type>
-        <label>Current Setpoint</label>
-        <category>Temperature</category>
-        <tags>
-            <tag>Setpoint</tag>
-            <tag>Temperature</tag>
-        </tags>
-        <state min="65" max="90" step="1.0" pattern="%d %unit%" readOnly="false"/>
-    </channel-type>
+	<channel-type id="virtualHeaterCurrentSetpoint">
+		<item-type>Number:Temperature</item-type>
+		<label>Current Setpoint</label>
+		<category>Temperature</category>
+		<tags>
+			<tag>Setpoint</tag>
+			<tag>Temperature</tag>
+		</tags>
+		<state min="65" max="90" step="1.0" pattern="%d %unit%" readOnly="false"/>
+	</channel-type>
 
-    <channel-type id="virtualHeaterSolarSetpoint">
-        <item-type>Number:Temperature</item-type>
-        <label>Solar Setpoint</label>
-        <category>Temperature</category>
-        <tags>
-            <tag>Setpoint</tag>
-            <tag>Temperature</tag>
-        </tags>
-        <state min="65" max="90" step="1.0" pattern="%d %unit%" readOnly="false"/>
-    </channel-type>
+	<channel-type id="virtualHeaterSolarSetpoint">
+		<item-type>Number:Temperature</item-type>
+		<label>Solar Setpoint</label>
+		<category>Temperature</category>
+		<tags>
+			<tag>Setpoint</tag>
+			<tag>Temperature</tag>
+		</tags>
+		<state min="65" max="90" step="1.0" pattern="%d %unit%" readOnly="false"/>
+	</channel-type>
 
-    <channel-type id="virtualHeaterMode">
-        <item-type>String</item-type>
-        <label>Mode</label>
-        <state readOnly="true">
-            <options>
-                <option value="0">Heat</option>
-                <option value="1">Cool</option>
-                <option value="2">Auto</option> 
-            </options>
-        </state>
-    </channel-type>
+	<channel-type id="virtualHeaterMode">
+		<item-type>String</item-type>
+		<label>Mode</label>
+		<state readOnly="true">
+			<options>
+				<option value="0">Heat</option>
+				<option value="1">Cool</option>
+				<option value="2">Auto</option>
+			</options>
+		</state>
+	</channel-type>
 
-    <channel-type id="virtualHeaterSilentMode">
-        <item-type>String</item-type>
-        <label>Silent Mode</label>
-        <state readOnly="true"/>
-    </channel-type>
+	<channel-type id="virtualHeaterSilentMode">
+		<item-type>String</item-type>
+		<label>Silent Mode</label>
+		<state readOnly="true"/>
+	</channel-type>
 
-    <channel-type id="virtualHeaterWhyOn">
-        <item-type>String</item-type>
-        <label>Why On</label>
-        <state readOnly="true"/>
-    </channel-type>
+	<channel-type id="virtualHeaterWhyOn">
+		<item-type>String</item-type>
+		<label>Why On</label>
+		<state readOnly="true"/>
+	</channel-type>
 
 </thing:thing-descriptions>

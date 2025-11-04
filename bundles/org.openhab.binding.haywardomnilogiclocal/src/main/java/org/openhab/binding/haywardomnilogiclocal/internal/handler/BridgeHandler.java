@@ -141,7 +141,7 @@ public class BridgeHandler extends BaseBridgeHandler {
                 initPolling(60);
                 return;
             }
-
+            getProperties();
             if (this.thing.getStatus() != ThingStatus.ONLINE) {
                 updateStatus(ThingStatus.ONLINE);
             }
@@ -199,7 +199,6 @@ public class BridgeHandler extends BaseBridgeHandler {
     }
 
     public synchronized boolean getAlarmList() throws HaywardException {
-
         return true;
 
         /*

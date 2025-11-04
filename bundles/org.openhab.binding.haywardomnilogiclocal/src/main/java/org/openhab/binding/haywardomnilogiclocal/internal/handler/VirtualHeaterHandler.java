@@ -69,7 +69,6 @@ public class VirtualHeaterHandler extends HaywardThingHandler {
     public void setStateDescriptions() throws HaywardException {
         Bridge bridge = getBridge();
         if (bridge != null && bridge.getHandler() instanceof BridgeHandler bridgehandler) {
-
             // Set Heater min and max water temps
             Channel ch = thing.getChannel(BindingConstants.CHANNEL_VIRTUALHEATER_CURRENTSETPOINT);
             if (ch != null) {
@@ -98,7 +97,7 @@ public class VirtualHeaterHandler extends HaywardThingHandler {
         if (bridge != null) {
             BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
             if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
-                String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+                String sysId = getThing().getUID().getId();
                 if (sysId != null) {
                     if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
                         Object object = bridgeHandler.getMspConfig().getDevice(sysId);
@@ -196,7 +195,6 @@ public class VirtualHeaterHandler extends HaywardThingHandler {
         String cmdString = "0";
         switch (channelUID.getId()) {
             case BindingConstants.CHANNEL_VIRTUALHEATER_ENABLE:
-
                 if (command == OnOffType.ON) {
                     cmdString = "1";
                 } else if (command == OnOffType.OFF) {

@@ -72,7 +72,6 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
     }
 
     public State toState(String type, String channelID, String value) throws NumberFormatException {
-
         switch (type) {
             case "Number":
                 return new DecimalType(value);
@@ -169,7 +168,7 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
         Bridge bridge = getBridge();
         if (bridge != null && bridge.getHandler() instanceof BridgeHandler bridgehandler) {
             try {
-                String response = bridgehandler.sendRequest(xml, msgType);
+                bridgehandler.sendRequest(xml, msgType);
             } catch (HaywardException e) {
                 logger.debug("Error sending UDP command: {}", e.getMessage());
             }

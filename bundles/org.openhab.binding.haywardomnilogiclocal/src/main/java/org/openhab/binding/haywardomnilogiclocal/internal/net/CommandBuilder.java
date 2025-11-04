@@ -1,9 +1,23 @@
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.openhab.binding.haywardomnilogiclocal.internal.net;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * Helper for building XML command strings sent to the Hayward controller.
+ *
+ * @author Matt Myers - Initial contribution
  */
 @NonNullByDefault
 public class CommandBuilder {
@@ -183,16 +197,5 @@ public class CommandBuilder {
         return XML_DECLARATION
                 + String.format(SET_STANDALONE_LIGHTSHOW_OMNIDIRECT, bowID, equipmentID, show, speed, brightness)
                 + COMMAND_SCHEDULE + PARAMETERS_SUFFIX + REQUEST_SUFFIX;
-    }
-
-    // todo
-    private static String closingTag(String prefix) {
-        if (prefix.contains("<Request>")) {
-            return "</Request>";
-        } else if (prefix.contains("<GetTelemetry>")) {
-            return "</GetTelemetry>";
-        } else {
-            return "";
-        }
     }
 }

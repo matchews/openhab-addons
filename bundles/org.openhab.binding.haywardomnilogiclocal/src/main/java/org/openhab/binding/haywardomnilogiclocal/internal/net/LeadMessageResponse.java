@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.openhab.binding.haywardomnilogiclocal.internal.net;
 
 import java.util.List;
@@ -13,6 +25,8 @@ import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 
 /**
  * Model for the lead message response sent by the controller.
+ *
+ * @author Matt Myers - Initial contribution
  */
 @NonNullByDefault
 @XStreamAlias("Response")
@@ -54,7 +68,9 @@ public class LeadMessageResponse {
                 for (Parameter p : parameters) {
                     if (name.equals(p.name) && p.value != null) {
                         try {
-                            return Integer.parseInt(p.value);
+                            // return Integer.parseInt(p.value);
+                            // todo
+                            return Integer.parseInt(java.util.Objects.requireNonNull(p.value));
                         } catch (NumberFormatException e) {
                             return 0;
                         }

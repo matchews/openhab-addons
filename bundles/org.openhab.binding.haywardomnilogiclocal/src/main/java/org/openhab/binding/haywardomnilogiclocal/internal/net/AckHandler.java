@@ -22,6 +22,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * Handles sending ACK responses back to the OmniLogic controller.
+ *
+ * @author Matt Myers - Initial contribution
  */
 @NonNullByDefault
 public class AckHandler {

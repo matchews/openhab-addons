@@ -34,7 +34,7 @@
 	</channel-type>
 
 	<channel-type id="chlorSaltInstantLevel">
-        <item-type unitHint="ppm">Number:Dimensionless</item-type>
+		<item-type unitHint="ppm">Number:Dimensionless</item-type>
 		<label>Salt Level: Instant</label>
 		<description>Salt level Insant</description>
 		<state readOnly="true"/>
@@ -86,7 +86,7 @@
 	</channel-type>
 
 	<channel-type id="chlorTimedPercent">
-        <item-type unitHint="%">Number:Dimensionless</item-type>
+		<item-type unitHint="%">Number:Dimensionless</item-type>
 		<label>Timed Percent</label>
 		<state min="0" max="100" step="1.0" pattern="%d %%" readOnly="false"/>
 	</channel-type>

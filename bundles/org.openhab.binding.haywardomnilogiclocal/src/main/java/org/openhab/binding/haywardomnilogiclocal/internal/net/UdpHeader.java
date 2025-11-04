@@ -21,6 +21,8 @@ import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
 
 /**
  * Represents the 24 byte UDP header used by the OmniLogic protocol.
+ *
+ * @author Matt Myers - Initial contribution
  */
 @NonNullByDefault
 public class UdpHeader {

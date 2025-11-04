@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <thing:thing-descriptions bindingId="haywardomnilogiclocal"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
-    xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
-    
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+
 	<thing-type id="colorlogic" listed="false">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="bridge"/>
@@ -22,27 +22,27 @@
 		<representation-property>System ID</representation-property>
 	</thing-type>
 
-    <channel-type id="lightState">
-        <item-type>String</item-type>
-        <label>State</label>
-        <state readOnly="false">
-            <options>
-                <option value="0">Off</option>
-                <option value="1">Powering Off</option>
-                <option value="3">Changing Show</option>
-                <option value="4">15 Seconds White</option>
-                <option value="6">Active</option>
-                <option value="7">Cooldown</option>
-            </options>
-        </state>
-    </channel-type>
-    
-    <channel-type id="currentShow">
+	<channel-type id="lightState">
+		<item-type>String</item-type>
+		<label>State</label>
+		<state readOnly="false">
+			<options>
+				<option value="0">Off</option>
+				<option value="1">Powering Off</option>
+				<option value="3">Changing Show</option>
+				<option value="4">15 Seconds White</option>
+				<option value="6">Active</option>
+				<option value="7">Cooldown</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="currentShow">
 		<item-type>String</item-type>
 		<label>Show</label>
 		<state readOnly="false">
 			<options>
-			    <option value="0">Off</option>
+				<option value="0">Off</option>
 				<option value="1">Deep Blue Sea</option>
 				<option value="2">Afternoon Skies</option>
 				<option value="3">Emerald</option>

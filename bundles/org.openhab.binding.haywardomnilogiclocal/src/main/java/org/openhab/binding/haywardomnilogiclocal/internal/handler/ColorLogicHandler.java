@@ -1,8 +1,21 @@
+/*
+ * Copyright (c) 2010-2025 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
@@ -23,8 +36,14 @@ import org.openhab.core.types.RefreshType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Colorlogic Light Handler
+ *
+ * @author Matt Myers - Initial contribution
+ */
+@NonNullByDefault
 public class ColorLogicHandler extends HaywardThingHandler {
-    private final Logger logger = LoggerFactory.getLogger(BackyardHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(ColorLogicHandler.class);
 
     public ColorLogicHandler(Thing thing) {
         super(thing);
@@ -36,7 +55,7 @@ public class ColorLogicHandler extends HaywardThingHandler {
         if (bridge != null) {
             BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
             if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
-                String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+                String sysId = getThing().getUID().getId();
                 if (sysId != null) {
                     if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
                         Object object = bridgeHandler.getMspConfig().getDevice(sysId);
@@ -60,18 +79,17 @@ public class ColorLogicHandler extends HaywardThingHandler {
     @Override
     public void getTelemetry(String xmlResponse) throws HaywardException {
         Status status = TelemetryParser.parse(xmlResponse);
-        String sysId = getThing().getProperties().get("systemID");
+        String sysId = getThing().getUID().getId();
         if (sysId == null) {
             return;
         }
 
         for (ColorLogicLight cl : status.getColorLogicLights()) {
             if (sysId.equals(cl.getSystemId())) {
-
                 @Nullable
                 String lightState = cl.getlightState();
                 if (lightState != null) {
-                    if (lightState.equals("0")) {
+                    if ("0".equals(lightState)) {
                         updateData(BindingConstants.CHANNEL_COLORLOGIC_ENABLE, "0");
                     } else {
                         updateData(BindingConstants.CHANNEL_COLORLOGIC_ENABLE, "1");

@@ -241,8 +241,6 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                     List<RelayConfig> backyardRelays = backyard.getRelays();
                     if (backyardRelays != null) {
                         for (RelayConfig relay : backyardRelays) {
-                            String relayType = relay.getType();
-
                             String relayName = relay.getName();
                             if (relayName == null) {
                                 relayName = "Relay";
@@ -271,9 +269,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                     }
                 }
             }
-
         }
-
     }
 
     private void putStrObjIfNotNull(Map<String, Object> properties, String key, @Nullable String value) {

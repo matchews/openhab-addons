@@ -13,20 +13,20 @@
 			<channel id="relayState" typeId="system.power"/>
 			<channel id="relayWhyOn" typeId="relayWhyOn"/>
 		</channels>
-        <representation-property>System ID</representation-property>
-    </thing-type>
-        <channel-type id="relayWhyOn">
-        <item-type>String</item-type>
-        <label>Why On</label>
-        <state readOnly="true">
-            <options>
-                <option value="0">Off</option>
-                <option value="1">On</option>
-                <option value="2">Freeze Protect</option> 
-                <option value="3">Waiting for Interlock</option>
-                <option value="4">Paused</option>
-                <option value="5">Waiting for Filter</option> 
-            </options>
-        </state>
-    </channel-type>
+		<representation-property>System ID</representation-property>
+	</thing-type>
+	<channel-type id="relayWhyOn">
+		<item-type>String</item-type>
+		<label>Why On</label>
+		<state readOnly="true">
+			<options>
+				<option value="0">Off</option>
+				<option value="1">On</option>
+				<option value="2">Freeze Protect</option>
+				<option value="3">Waiting for Interlock</option>
+				<option value="4">Paused</option>
+				<option value="5">Waiting for Filter</option>
+			</options>
+		</state>
+	</channel-type>
 </thing:thing-descriptions>

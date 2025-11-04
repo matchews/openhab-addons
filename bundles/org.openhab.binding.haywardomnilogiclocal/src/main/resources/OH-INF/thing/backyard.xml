@@ -13,7 +13,7 @@
 			<channel id="backyardAirTemp" typeId="backyardAirTemp"/>
 			<channel id="backyardState" typeId="backyardState"/>
 			<channel id="backyardConfigChksum" typeId="backyardConfigChksum"/>
-            <channel id="backyardMspVersion" typeId="backyardMspVersion"/>
+			<channel id="backyardMspVersion" typeId="backyardMspVersion"/>
 		</channels>
 
 		<representation-property>System ID</representation-property>
@@ -38,17 +38,17 @@
 			</options>
 		</state>
 	</channel-type>
-	
+
 	<channel-type id="backyardConfigChksum">
-        <item-type>String</item-type>
-        <label>Checksum</label>
-        <state readOnly="true"/>
-    </channel-type>
-   
-    <channel-type id="backyardMspVersion">
-        <item-type>String</item-type>
-        <label>MSP Version</label>
-        <state readOnly="true"/>
-    </channel-type>
-     
+		<item-type>String</item-type>
+		<label>Checksum</label>
+		<state readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="backyardMspVersion">
+		<item-type>String</item-type>
+		<label>MSP Version</label>
+		<state readOnly="true"/>
+	</channel-type>
+
 </thing:thing-descriptions>

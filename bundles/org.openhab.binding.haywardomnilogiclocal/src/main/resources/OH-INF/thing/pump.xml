@@ -21,7 +21,7 @@
 	</thing-type>
 
 	<channel-type id="speed">
-        <item-type unitHint="%">Number:Dimensionless</item-type>
+		<item-type unitHint="%">Number:Dimensionless</item-type>
 		<label>Pump Speed</label>
 		<description>Dynamic units (% or rpm from config)</description>
 		<state readOnly="false"/>
