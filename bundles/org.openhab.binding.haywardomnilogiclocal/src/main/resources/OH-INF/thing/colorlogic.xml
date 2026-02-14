@@ -23,7 +23,8 @@
 		<item-type>String</item-type>
 		<label>State</label>
 		<tags>
-			<tag>Control</tag>
+			<tag>Status</tag>
+			<tag>Light</tag>
 		</tags>
 		<state readOnly="false">
 			<options>
@@ -43,6 +44,7 @@
 		<item-type>String</item-type>
 		<label>Show</label>
 		<tags>
+			<tag>Control</tag>
 			<tag>Color</tag>
 		</tags>
 		<state readOnly="false"/>

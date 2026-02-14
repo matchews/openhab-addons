@@ -191,6 +191,7 @@ public class FilterHandler extends HaywardThingHandler {
     public void getTelemetry(String xmlResponse) throws HaywardException {
         Status status = TelemetryParser.parse(xmlResponse);
         String sysId = getThing().getUID().getId();
+        String bowID = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
 
         for (Filter f : status.getFilters()) {
             if (sysId.equals(f.getSystemId())) {
@@ -218,8 +219,9 @@ public class FilterHandler extends HaywardThingHandler {
 
                 @Nullable
                 String valvePosition = f.getValvePosition();
-                if (valvePosition != null) {
+                if (valvePosition != null && bowID != null) {
                     updateData(BindingConstants.CHANNEL_FILTER_VALVEPOSITION, valvePosition);
+                    onFilterValvePositionUpdated(bowID, valvePosition);
                 } else {
                     logger.debug("Filter valve position missing from Telemtry");
                 }
@@ -265,7 +267,6 @@ public class FilterHandler extends HaywardThingHandler {
                 }
 
                 // TODO Test/implement Filter Diagnostics
-                String bowID = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
                 if (bowID != null) {
                     String cmdURL = CommandBuilder.buildGetUIFilterDiagnosticInfo(bowID, sysId);
                     // sendUdpCommand(cmdURL, MessageType.DEFAULT);
@@ -326,5 +327,14 @@ public class FilterHandler extends HaywardThingHandler {
             default:
                 break;
         }
+    }
+
+    private void onFilterValvePositionUpdated(String bowID, String valvePosition) {
+        if (bowID == null) {
+            return; // or log debug
+        }
+        Bridge bridge = getBridge();
+        BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
+        bridgeHandler.updateFilterValvePositionForBow(bowID, valvePosition);
     }
 }

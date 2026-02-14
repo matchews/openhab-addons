@@ -164,6 +164,7 @@
 			<tag>Measurement</tag>
 			<tag>Power</tag>
 		</tags>
+		<state readOnly="true"/>
 	</channel-type>
 
 </thing:thing-descriptions>

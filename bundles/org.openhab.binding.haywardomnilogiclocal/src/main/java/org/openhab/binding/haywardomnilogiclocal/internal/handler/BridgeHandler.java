@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -72,7 +73,6 @@ import org.xml.sax.InputSource;
 public class BridgeHandler extends BaseBridgeHandler {
     private final Logger logger = LoggerFactory.getLogger(BridgeHandler.class);
     private static final int UDP_PORT = 10444;
-
     private final HaywardDynamicStateDescriptionProvider stateDescriptionProvider;
     private @Nullable UdpClient udpClient;
     private @Nullable ScheduledFuture<?> initializeFuture;
@@ -83,7 +83,17 @@ public class BridgeHandler extends BaseBridgeHandler {
     @Nullable
     private MspConfig mspConfig;
     public String units = "Standard";
+    private final ConcurrentHashMap<String, String> filterValvePositionByBow = new ConcurrentHashMap<>();
 
+    public @Nullable String getFilterValvePositionForBow(String bowID) {
+        return filterValvePositionByBow.get(bowID);
+    }
+
+    public void updateFilterValvePositionForBow(String bowId, String valvePosition) {
+        filterValvePositionByBow.put(bowId, valvePosition);
+    }
+
+    // ToDO delete?
     public void updatePropertiez(Map<String, String> bridgeProps) {
         BridgeBuilder thingBuilder = editThing();
         thingBuilder.withProperties(bridgeProps);

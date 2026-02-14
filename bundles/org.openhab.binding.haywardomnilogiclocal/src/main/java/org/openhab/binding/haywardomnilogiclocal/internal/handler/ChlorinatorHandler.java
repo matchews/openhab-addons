@@ -53,10 +53,13 @@ public class ChlorinatorHandler extends HaywardThingHandler {
     }
 
     // Defaults used when we don't yet have telemetry
+    private static final String DEFAULT_CHLOR_ENABLE = "1";
     private static final String DEFAULT_SC_ENABLE = "0";
     private static final String DEFAULT_OPERATINGMODE = "1"; // 1 = Timed (matches your existing comment)
 
     private static final class ChlorAggregate {
+        @org.eclipse.jdt.annotation.Nullable
+        String chlorEnable;
         @org.eclipse.jdt.annotation.Nullable
         String scEnable;
         @org.eclipse.jdt.annotation.Nullable
@@ -64,6 +67,7 @@ public class ChlorinatorHandler extends HaywardThingHandler {
 
         ChlorAggregate copy() {
             ChlorAggregate c = new ChlorAggregate();
+            c.chlorEnable = this.chlorEnable;
             c.scEnable = this.scEnable;
             c.operatingMode = this.operatingMode;
             return c;
@@ -195,6 +199,9 @@ public class ChlorinatorHandler extends HaywardThingHandler {
             @Nullable
             String enable = c.getEnable();
             if (enable != null) {
+                synchronized (aggLock) {
+                    agg.chlorEnable = enable;
+                }
                 updateData(BindingConstants.CHANNEL_CHLORINATOR_ENABLE, enable);
             } else {
                 logger.debug("Chlorinator enable missing from Telemtry");
@@ -251,12 +258,12 @@ public class ChlorinatorHandler extends HaywardThingHandler {
             snap = agg.copy();
         }
 
-        String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
-        String bowId = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
+        String sysID = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+        String bowID = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
         String cellType = getThing().getProperties().get(BindingConstants.PROPERTY_CHLORINATOR_CELLTYPE);
 
         Bridge bridge = getBridge();
-        if (sysId == null || bowId == null || cellType == null || bridge == null
+        if (sysID == null || bowID == null || cellType == null || bridge == null
                 || !(bridge.getHandler() instanceof BridgeHandler bridgehandler)) {
             return;
         }
@@ -271,21 +278,41 @@ public class ChlorinatorHandler extends HaywardThingHandler {
                 } else if (command == OnOffType.OFF) {
                     cmdString = "0";
                 }
-                cmdURL = CommandBuilder.buildSetChlorEnableCmd(bowId, cmdString);
+                cmdURL = CommandBuilder.buildSetChlorEnableCmd(bowID, cmdString);
                 sendUdpCommand(cmdURL, MessageType.SET_CHLOR_ENABLED);
                 break;
 
             // TODO somewhat working - need to run pump to change timed percent OR have t-cell plugged in. it won't
             // change on the app either
             case BindingConstants.CHANNEL_CHLORINATOR_TIMEDPERCENT:
+                String cholorEnabled = orDefault(snap.chlorEnable, DEFAULT_CHLOR_ENABLE);
                 String scEnabled = orDefault(snap.scEnable, DEFAULT_SC_ENABLE);
+                // Ensure SC is not running
                 if ("0".equals(scEnabled)) {
-                    String cfgState = "3"; // Disable Chlorinator = 2, Enable Chlorinator =3
+                    BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
+                    String valvePos = bridgeHandler.getFilterValvePositionForBow(bowID);
+                    String bowType;
+                    // If filterValve is set to SPA (2)
+                    if ("2".equals(valvePos)) {
+                        // Spa
+                        bowType = "1";
+                    } else {
+                        // Pool
+                        bowType = "0";
+                    }
+
+                    String cfgState;
+                    if ("1".equals(cholorEnabled)) {
+                        // Enable Chlorinator
+                        cfgState = "3";
+                    } else {
+                        // Disable Chlorinator
+                        cfgState = "2";
+                    }
                     String opMode = orDefault(snap.operatingMode, DEFAULT_OPERATINGMODE);
-                    String bowType = "0"; // 0 = Pool, 1 = SPA TODO Need to get this from the filters valveposition
                     String scTimeout = "0";
                     String orpTimeout = "0";
-                    cmdURL = CommandBuilder.buildSetChlorParamsCmd(bowId, sysId, cfgState, opMode, bowType, cellType,
+                    cmdURL = CommandBuilder.buildSetChlorParamsCmd(bowID, sysID, cfgState, opMode, bowType, cellType,
                             this.cmdToString(command), scTimeout, orpTimeout);
                     sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);
                 }
@@ -299,7 +326,7 @@ public class ChlorinatorHandler extends HaywardThingHandler {
                 } else if (command == OnOffType.OFF) {
                     cmdString = "0";
                 }
-                cmdURL = CommandBuilder.buildSetUISuperChlorCmd(bowId, sysId, cmdString);
+                cmdURL = CommandBuilder.buildSetUISuperChlorCmd(bowID, sysID, cmdString);
                 sendUdpCommand(cmdURL, MessageType.SET_UI_SUPERCHLORINATE);
 
                 // optimistic cache update (so subsequent commands can read it immediately)
@@ -307,7 +334,7 @@ public class ChlorinatorHandler extends HaywardThingHandler {
                     agg.scEnable = cmdString;
                 }
 
-                cmdURL = CommandBuilder.buildSetUISuperChlorTimeoutCmd(bowId, sysId, "5");
+                cmdURL = CommandBuilder.buildSetUISuperChlorTimeoutCmd(bowID, sysID, "5");
                 sendUdpCommand(cmdURL, MessageType.SET_UI_SUPERCHLORINATE);
                 break;
 
