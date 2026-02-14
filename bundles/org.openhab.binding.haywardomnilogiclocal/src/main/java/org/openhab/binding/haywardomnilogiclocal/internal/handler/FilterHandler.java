@@ -12,7 +12,10 @@
  */
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -27,11 +30,18 @@ import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Filter;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
 import org.openhab.core.library.types.OnOffType;
+import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.thing.Bridge;
+import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
+import org.openhab.core.thing.ThingStatus;
+import org.openhab.core.thing.ThingStatusDetail;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.RefreshType;
+import org.openhab.core.types.StateDescriptionFragment;
+import org.openhab.core.types.StateDescriptionFragmentBuilder;
+import org.openhab.core.types.StateOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +56,66 @@ public class FilterHandler extends HaywardThingHandler {
 
     public FilterHandler(Thing thing) {
         super(thing);
+    }
+
+    @Override
+    public void initialize() {
+        try {
+            getProperties();
+            setStateDescriptions();
+
+            updateStatus(ThingStatus.ONLINE);
+        } catch (HaywardException e) {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
+                    "Unable to set FilterHandler StateDescriptions");
+        }
+    }
+
+    @Override
+    public void setStateDescriptions() throws HaywardException {
+        List<StateOption> options = new ArrayList<>();
+        String option;
+
+        Bridge bridge = getBridge();
+        if (bridge != null && bridge.getHandler() instanceof BridgeHandler bridgehandler) {
+            // Set minimum and maximum speeds
+            Channel ch = thing.getChannel(BindingConstants.CHANNEL_FILTER_SPEED);
+            if (ch != null) {
+                StateDescriptionFragment stateDescriptionFragment = StateDescriptionFragmentBuilder.create()
+                        .withMinimum(new BigDecimal(
+                                getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MINSPEED)))
+                        .withMaximum(new BigDecimal(
+                                getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MAXSPEED)))
+                        .withPattern("%d %%").withStep(new BigDecimal(5)).withReadOnly(false).build();
+                bridgehandler.updateChannelStateDescriptionFragment(ch, stateDescriptionFragment);
+            }
+
+            // Set Speed States
+            ch = thing.getChannel(BindingConstants.CHANNEL_FILTER_SPEEDPRESET);
+            if (ch != null) {
+                options.add(new StateOption("0", "Off"));
+                option = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_LOWSPEED);
+                if (option != null) {
+                    options.add(new StateOption(option, "Low"));
+                }
+                option = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MEDSPEED);
+                if (option != null) {
+                    options.add(new StateOption(option, "Medium"));
+                }
+                option = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_HIGHSPEED);
+                if (option != null) {
+                    options.add(new StateOption(option, "High"));
+                }
+                option = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_CUSTOMSPEED);
+                if (option != null) {
+                    options.add(new StateOption(option, "Custom"));
+                }
+
+                StateDescriptionFragment stateDescriptionFragment = StateDescriptionFragmentBuilder.create()
+                        .withOptions(options).build();
+                bridgehandler.updateChannelStateDescriptionFragment(ch, stateDescriptionFragment);
+            }
+        }
     }
 
     @Override
@@ -121,9 +191,7 @@ public class FilterHandler extends HaywardThingHandler {
     public void getTelemetry(String xmlResponse) throws HaywardException {
         Status status = TelemetryParser.parse(xmlResponse);
         String sysId = getThing().getUID().getId();
-        if (sysId == null) {
-            return;
-        }
+
         for (Filter f : status.getFilters()) {
             if (sysId.equals(f.getSystemId())) {
                 @Nullable
@@ -143,6 +211,7 @@ public class FilterHandler extends HaywardThingHandler {
                 String speed = f.getSpeed();
                 if (speed != null) {
                     updateData(BindingConstants.CHANNEL_FILTER_SPEED, speed);
+                    updateData(BindingConstants.CHANNEL_FILTER_SPEEDPRESET, speed);
                 } else {
                     logger.debug("Filter speed missing from Telemtry");
                 }
@@ -194,6 +263,13 @@ public class FilterHandler extends HaywardThingHandler {
                 } else {
                     logger.debug("Filter last speed missing from Telemtry");
                 }
+
+                // TODO Test/implement Filter Diagnostics
+                String bowID = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
+                if (bowID != null) {
+                    String cmdURL = CommandBuilder.buildGetUIFilterDiagnosticInfo(bowID, sysId);
+                    // sendUdpCommand(cmdURL, MessageType.DEFAULT);
+                }
             }
         }
     }
@@ -205,10 +281,8 @@ public class FilterHandler extends HaywardThingHandler {
         }
         String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
         String bowId = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
-        String heaterMinSetTemp = getThing().getProperties()
-                .get(BindingConstants.PROPERTY_VIRTUALHEATER_MINSETTABLEWATERTEMP);
-        String heaterMaxSetTemp = getThing().getProperties()
-                .get(BindingConstants.PROPERTY_VIRTUALHEATER_MAXSETTABLEWATERTEMP);
+        String minSpeed = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MINSPEED);
+        String maxSpeed = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MAXSPEED);
 
         Bridge bridge = getBridge();
         if (sysId == null || bowId == null || bridge == null
@@ -225,27 +299,30 @@ public class FilterHandler extends HaywardThingHandler {
                 } else if (command == OnOffType.OFF) {
                     cmdString = "0";
                 }
-                cmdURL = CommandBuilder.buildSetEquipmentCommand(bowId, sysId, cmdString);
+                cmdURL = CommandBuilder.buildSetEquipmentCmd(bowId, sysId, cmdString);
                 sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);
                 break;
 
             case BindingConstants.CHANNEL_FILTER_SPEED:
-                int speedVal = ((Number) command).intValue();
-                // sendUdpCommand(
-                // CommandBuilder.setFilterSpeed(bridgehandler.getAccount().getToken(),
-                // bridgehandler.getAccount().getMspSystemID(), sysId, speedVal),
-                // MessageType.SET_FILTER_SPEED);
-
-                if (command == OnOffType.ON) {
-                    cmdString = "1";
-                } else if (command == OnOffType.OFF) {
-                    cmdString = "0";
+                if (command instanceof QuantityType quantityCommand) {
+                    if (minSpeed != null && maxSpeed != null) {
+                        if (quantityCommand.intValue() < Integer.parseInt(minSpeed)) {
+                            cmdString = minSpeed;
+                        } else if (quantityCommand.intValue() > Integer.parseInt(maxSpeed)) {
+                            cmdString = maxSpeed;
+                        } else {
+                            cmdString = this.cmdToString(command);
+                            ;
+                        }
+                    }
+                    cmdURL = CommandBuilder.buildSetEquipmentCmd(bowId, sysId, cmdString);
+                    sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);
                 }
-                cmdURL = CommandBuilder.buildSetEquipmentCommand(bowId, sysId, cmdString);
-                sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);
-
                 break;
-
+            case BindingConstants.CHANNEL_FILTER_SPEEDPRESET:
+                cmdURL = CommandBuilder.buildSetEquipmentCmd(bowId, sysId, command.toString());
+                sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);
+                break;
             default:
                 break;
         }

@@ -15,18 +15,18 @@ package org.openhab.binding.haywardomnilogiclocal.internal;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * The {@link Config} class contains fields mapping thing configuration parameters.
+ * The {@link HaywardConfig} class contains fields mapping thing configuration parameters.
  *
  * @author Matt Myers - Initial contribution
  */
 
 @NonNullByDefault
-public class Config {
+public class HaywardConfig {
     private String host = "";
     private int alarmPollTime = 60;
     private int telemetryPollTime = 10;
 
-    public Config() {
+    public HaywardConfig() {
     }
 
     public String getEndpointUrl() {

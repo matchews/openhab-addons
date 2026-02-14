@@ -26,6 +26,9 @@
 	<channel-type id="heaterState">
 		<item-type>String</item-type>
 		<label>State</label>
+		<tags>
+			<tag>Status</tag>
+		</tags>
 		<state readOnly="true">
 			<options>
 				<option value="0">Off</option>
@@ -49,12 +52,18 @@
 	<channel-type id="heaterPriority">
 		<item-type>String</item-type>
 		<label>Priority</label>
+		<tags>
+			<tag>Status</tag>
+		</tags>
 		<state readOnly="true"/>
 	</channel-type>
 
 	<channel-type id="heaterMaintainFor">
 		<item-type>String</item-type>
 		<label>Maintain For</label>
+		<tags>
+			<tag>Status</tag>
+		</tags>
 		<state readOnly="true"/>
 	</channel-type>
 

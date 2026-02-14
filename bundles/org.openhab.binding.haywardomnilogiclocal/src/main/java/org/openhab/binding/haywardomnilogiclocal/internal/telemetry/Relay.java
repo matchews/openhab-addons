@@ -31,7 +31,6 @@ public class Relay {
     private @Nullable String systemId;
 
     @XStreamAsAttribute
-    @XStreamAlias("relayState")
     private @Nullable String relayState;
 
     @XStreamAsAttribute

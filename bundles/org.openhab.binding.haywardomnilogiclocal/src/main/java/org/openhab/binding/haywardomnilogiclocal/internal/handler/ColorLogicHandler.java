@@ -12,7 +12,9 @@
  */
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -28,11 +30,19 @@ import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.Bridge;
+import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
+import org.openhab.core.thing.ThingStatusDetail;
+import org.openhab.core.thing.binding.builder.ChannelBuilder;
+import org.openhab.core.thing.binding.builder.ThingBuilder;
+import org.openhab.core.thing.type.ChannelTypeUID;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.RefreshType;
+import org.openhab.core.types.StateDescriptionFragment;
+import org.openhab.core.types.StateDescriptionFragmentBuilder;
+import org.openhab.core.types.StateOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,9 +54,192 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public class ColorLogicHandler extends HaywardThingHandler {
     private final Logger logger = LoggerFactory.getLogger(ColorLogicHandler.class);
+    private final Object aggLock = new Object();
+    private final LightAggregate agg = new LightAggregate();
+
+    private static String orDefault(@Nullable String v, String def) {
+        return v != null ? v : def;
+    }
+
+    private static final String DEFAULT_SHOW = "0";
+    private static final String DEFAULT_SPEED = "4";
+    private static final String DEFAULT_BRIGHTNESS = "4";
 
     public ColorLogicHandler(Thing thing) {
         super(thing);
+    }
+
+    private static final class LightAggregate {
+        @org.eclipse.jdt.annotation.Nullable
+        String show;
+        @org.eclipse.jdt.annotation.Nullable
+        String speed;
+        @org.eclipse.jdt.annotation.Nullable
+        String brightness;
+        @org.eclipse.jdt.annotation.Nullable
+        String enabled;
+        @org.eclipse.jdt.annotation.Nullable
+        String specialEffect;
+
+        LightAggregate copy() {
+            LightAggregate c = new LightAggregate();
+            c.show = this.show;
+            c.speed = this.speed;
+            c.brightness = this.brightness;
+            c.enabled = this.enabled;
+            c.specialEffect = this.specialEffect;
+            return c;
+        }
+    }
+
+    @Override
+    public void initialize() {
+        try {
+            getProperties();
+            setStateDescriptions();
+            // Add brightness, speed and special effect channels for advanced lights
+            String lightType = getThing().getProperties().get(BindingConstants.PROPERTY_COLORLOGIC_TYPE);
+            if (lightType != null) {
+                if ("COLOR_LOGIC_UCL".equals(lightType) || "COLOR_LOGIC_UCL_V2".equals(lightType)) {
+                    addV2Channels();
+                }
+            }
+            updateStatus(ThingStatus.ONLINE);
+        } catch (HaywardException e) {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
+                    "Unable to set ColorLogixHandler StateDescriptions");
+        }
+    }
+
+    protected void addV2Channels() {
+        if (thing.getChannel(BindingConstants.CHANNEL_COLORLOGIC_BRIGHTNESS) == null) {
+            ThingBuilder thingBuilder = editThing();
+            ChannelUID uid = new ChannelUID(thing.getUID(), BindingConstants.CHANNEL_COLORLOGIC_BRIGHTNESS);
+            ChannelBuilder chnBuilder = ChannelBuilder.create(uid, "String");
+            chnBuilder.withType(
+                    new ChannelTypeUID(BindingConstants.BINDING_ID, BindingConstants.TYPE_COLORLOGIC_LIGHTBRIGHTNESS));
+            chnBuilder.withLabel("Brightness");
+            chnBuilder.withDescription("Brightness");
+            Channel channel = chnBuilder.build();
+            thingBuilder.withChannel(channel);
+            updateThing(thingBuilder.build());
+        }
+
+        if (thing.getChannel(BindingConstants.CHANNEL_COLORLOGIC_SPEED) == null) {
+            ThingBuilder thingBuilder = editThing();
+            ChannelUID uid = new ChannelUID(thing.getUID(), BindingConstants.CHANNEL_COLORLOGIC_SPEED);
+            ChannelBuilder chnBuilder = ChannelBuilder.create(uid, "String");
+            chnBuilder.withType(
+                    new ChannelTypeUID(BindingConstants.BINDING_ID, BindingConstants.TYPE_COLORLOGIC_LIGHTSPEED));
+            chnBuilder.withLabel("Speed");
+            chnBuilder.withDescription("Speed");
+            Channel channel = chnBuilder.build();
+            thingBuilder.withChannel(channel);
+            updateThing(thingBuilder.build());
+        }
+
+        if (thing.getChannel(BindingConstants.CHANNEL_COLORLOGIC_SPECIALEFFECT) == null) {
+            ThingBuilder thingBuilder = editThing();
+            ChannelUID uid = new ChannelUID(thing.getUID(), BindingConstants.CHANNEL_COLORLOGIC_SPECIALEFFECT);
+            ChannelBuilder chnBuilder = ChannelBuilder.create(uid, "String");
+            chnBuilder.withType(
+                    new ChannelTypeUID(BindingConstants.BINDING_ID, BindingConstants.TYPE_COLORLOGIC_SPECIALEFFECT));
+            chnBuilder.withLabel("Special Effect");
+            chnBuilder.withDescription("Special Effect");
+            Channel channel = chnBuilder.build();
+            thingBuilder.withChannel(channel);
+            updateThing(thingBuilder.build());
+        }
+    }
+
+    @Override
+    public void setStateDescriptions() throws HaywardException {
+        List<StateOption> options = new ArrayList<>();
+        Bridge bridge = getBridge();
+        if (bridge != null && bridge.getHandler() instanceof BridgeHandler bridgehandler) {
+            // Set Light Shows based on light type
+            Channel ch = thing.getChannel(BindingConstants.CHANNEL_COLORLOGIC_CURRENTSHOW);
+            if (ch != null) {
+                String lightType = getThing().getProperties().get(BindingConstants.PROPERTY_COLORLOGIC_TYPE);
+                if (lightType != null) {
+                    if ("COLOR_LOGIC_2_5".equals(lightType) || "COLOR_LOGIC_4_0".equals(lightType)) {
+                        options.add(new StateOption("0", "Voodoo Lounge"));
+                        options.add(new StateOption("1", "Deep Blue Sea"));
+                        options.add(new StateOption("2", "Afternoon Sky"));
+                        options.add(new StateOption("3", "Emerald"));
+                        options.add(new StateOption("4", "Sangria"));
+                        options.add(new StateOption("5", "Cloud White"));
+                        options.add(new StateOption("6", "Twilight"));
+                        options.add(new StateOption("7", "Tranquility"));
+                        options.add(new StateOption("8", "Gemstone"));
+                        options.add(new StateOption("9", "USA"));
+                        options.add(new StateOption("10", "Mardi Gras"));
+                        options.add(new StateOption("11", "Cool Cabaret"));
+                    } else if (lightType.contains("COLOR_LOGIC_UCL")) {
+                        options.add(new StateOption("0", "Voodoo Lounge"));
+                        options.add(new StateOption("1", "Deep Blue Sea"));
+                        options.add(new StateOption("2", "Royal Blue"));
+                        options.add(new StateOption("3", "Afternoon Sky"));
+                        options.add(new StateOption("4", "Aqua Green"));
+                        options.add(new StateOption("5", "Emerald"));
+                        options.add(new StateOption("6", "Cloud White"));
+                        options.add(new StateOption("7", "Warm Red"));
+                        options.add(new StateOption("8", "Flamingo"));
+                        options.add(new StateOption("9", "Vivid Violet"));
+                        options.add(new StateOption("10", "Sangria"));
+                        options.add(new StateOption("11", "Twilight"));
+                        options.add(new StateOption("12", "Tranquility"));
+                        options.add(new StateOption("13", "Gemstone"));
+                        options.add(new StateOption("14", "USA"));
+                        options.add(new StateOption("15", "Mardi Gras"));
+                        options.add(new StateOption("16", "Cool Cabaret"));
+                        if ("COLOR_LOGIC_UCL_V2".equals(lightType)) {
+                            options.add(new StateOption("17", "Yellow"));
+                            options.add(new StateOption("18", "Orange"));
+                            options.add(new StateOption("19", "Gold"));
+                            options.add(new StateOption("20", "Mint"));
+                            options.add(new StateOption("21", "Teal"));
+                            options.add(new StateOption("22", "Burnt Orange"));
+                            options.add(new StateOption("23", "Pure White"));
+                            options.add(new StateOption("24", "Crisp White"));
+                            options.add(new StateOption("25", "Warm White"));
+                            options.add(new StateOption("26", "Bright Yellow"));
+                        }
+                    } else if ("CL_P_COLOR".equals(lightType)) {
+                        options.add(new StateOption("0", "Sam Show"));
+                        options.add(new StateOption("1", "Party Show"));
+                        options.add(new StateOption("2", "Romance Show"));
+                        options.add(new StateOption("3", "Caribbean Show"));
+                        options.add(new StateOption("4", "American Show"));
+                        options.add(new StateOption("5", "Sunset Show"));
+                        options.add(new StateOption("6", "Royal Show"));
+                        options.add(new StateOption("7", "Blue"));
+                        options.add(new StateOption("8", "Green"));
+                        options.add(new StateOption("9", "Red"));
+                        options.add(new StateOption("10", "White"));
+                        options.add(new StateOption("11", "Magenta"));
+                    } else if ("CL_Z_COLOR".equals(lightType)) {
+                        options.add(new StateOption("0", "Alpine White"));
+                        options.add(new StateOption("1", "Sky Blue"));
+                        options.add(new StateOption("2", "Cobalt Blue"));
+                        options.add(new StateOption("3", "Caribbean Blue"));
+                        options.add(new StateOption("4", "Spring Green"));
+                        options.add(new StateOption("5", "Emerald Green"));
+                        options.add(new StateOption("6", "Emerald Rose"));
+                        options.add(new StateOption("7", "Magenta"));
+                        options.add(new StateOption("8", "Violet"));
+                        options.add(new StateOption("9", "Slow Color Splash"));
+                        options.add(new StateOption("10", "Fast Color Splash"));
+                        options.add(new StateOption("11", "America The Beautiful"));
+                        options.add(new StateOption("12", "Fat Tuesday"));
+                        options.add(new StateOption("13", "Disco Tech"));
+                    }
+                    StateDescriptionFragment stateDescriptionFragment = StateDescriptionFragmentBuilder.create()
+                            .withOptions(options).build();
+                    bridgehandler.updateChannelStateDescriptionFragment(ch, stateDescriptionFragment);
+                }
+            }
+        }
     }
 
     @Override
@@ -56,20 +249,17 @@ public class ColorLogicHandler extends HaywardThingHandler {
             BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
             if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
                 String sysId = getThing().getUID().getId();
-                if (sysId != null) {
-                    if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
-                        Object object = bridgeHandler.getMspConfig().getDevice(sysId);
-                        if (object instanceof ColorLogicLightConfig) {
-                            ColorLogicLightConfig colorLogicLight = (ColorLogicLightConfig) object;
-                            Map<String, String> props = new HashMap<>();
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_COLORLOGIC_TYPE,
-                                    colorLogicLight.getType());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_COLORLOGIC_NODEID,
-                                    colorLogicLight.getNodeId());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_COLORLOGIC_NETWORKED,
-                                    colorLogicLight.getNetworked());
-                            updateProperties(props);
-                        }
+                if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
+                    Object object = bridgeHandler.getMspConfig().getDevice(sysId);
+                    if (object instanceof ColorLogicLightConfig) {
+                        ColorLogicLightConfig colorLogicLight = (ColorLogicLightConfig) object;
+                        Map<String, String> props = new HashMap<>();
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_COLORLOGIC_TYPE, colorLogicLight.getType());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_COLORLOGIC_NODEID,
+                                colorLogicLight.getNodeId());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_COLORLOGIC_NETWORKED,
+                                colorLogicLight.getNetworked());
+                        updateProperties(props);
                     }
                 }
             }
@@ -80,52 +270,51 @@ public class ColorLogicHandler extends HaywardThingHandler {
     public void getTelemetry(String xmlResponse) throws HaywardException {
         Status status = TelemetryParser.parse(xmlResponse);
         String sysId = getThing().getUID().getId();
-        if (sysId == null) {
-            return;
-        }
 
         for (ColorLogicLight cl : status.getColorLogicLights()) {
             if (sysId.equals(cl.getSystemId())) {
                 @Nullable
                 String lightState = cl.getlightState();
+                @Nullable
+                String currentShow = cl.getCurrentShow();
+                @Nullable
+                String speed = cl.getSpeed();
+                @Nullable
+                String brightness = cl.getBrightness();
+                @Nullable
+                String specialEffect = cl.getSpecialEffect();
+
+                synchronized (aggLock) {
+                    agg.enabled = lightState == null ? agg.enabled : ("0".equals(lightState) ? "0" : "1");
+                    agg.show = currentShow != null ? currentShow : agg.show;
+                    agg.speed = speed != null ? speed : agg.speed;
+                    agg.brightness = brightness != null ? brightness : agg.brightness;
+                    agg.specialEffect = specialEffect != null ? specialEffect : agg.specialEffect;
+                }
+
+                // Push channel states to Items (UI)
                 if (lightState != null) {
-                    if ("0".equals(lightState)) {
-                        updateData(BindingConstants.CHANNEL_COLORLOGIC_ENABLE, "0");
-                    } else {
-                        updateData(BindingConstants.CHANNEL_COLORLOGIC_ENABLE, "1");
-                    }
+                    updateData(BindingConstants.CHANNEL_COLORLOGIC_ENABLE, "0".equals(lightState) ? "0" : "1");
                     updateData(BindingConstants.CHANNEL_COLORLOGIC_STATE, lightState);
                 } else {
                     logger.debug("Colorlogic light state missing from Telemtry");
                 }
-
-                @Nullable
-                String currentShow = cl.getCurrentShow();
                 if (currentShow != null) {
                     updateData(BindingConstants.CHANNEL_COLORLOGIC_CURRENTSHOW, currentShow);
                 } else {
                     logger.debug("Colorlogic light current show missing from Telemtry");
                 }
-
-                @Nullable
-                String speed = cl.getSpeed();
                 if (speed != null) {
                     updateData(BindingConstants.CHANNEL_COLORLOGIC_SPEED, speed);
                 } else {
                     logger.debug("Colorlogic light speed missing from Telemtry");
                 }
-
-                @Nullable
-                String brightness = cl.getBrightness();
                 if (brightness != null) {
                     updateData(BindingConstants.CHANNEL_COLORLOGIC_BRIGHTNESS, brightness);
                 } else {
                     logger.debug("Colorlogic light brightness missing from Telemtry");
                 }
-
-                @Nullable
-                String specialEffect = cl.getSpecialEffect();
-                if (speed != null) {
+                if (specialEffect != null) {
                     updateData(BindingConstants.CHANNEL_COLORLOGIC_SPECIALEFFECT, specialEffect);
                 } else {
                     logger.debug("Colorlogic light special effect missing from Telemtry");
@@ -135,98 +324,100 @@ public class ColorLogicHandler extends HaywardThingHandler {
         updateStatus(ThingStatus.ONLINE);
     }
 
-    /*
-     *
-     * @Override
-     * public void handleCommand(ChannelUID channelUID, Command command) {
-     * String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
-     * String bowId = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
-     *
-     * Bridge bridge = getBridge();
-     * if (sysId == null || bowId == null || bridge == null
-     * || !(bridge.getHandler() instanceof BridgeHandler bridgehandler)) {
-     * return;
-     * }
-     *
-     *
-     * public static final String CHANNEL_COLORLOGIC_ENABLE = "enable";
-     * public static final String CHANNEL_COLORLOGIC_CURRENTSHOW = "currentShow";
-     * public static final String CHANNEL_COLORLOGIC_BRIGHTNESS = "brightness";
-     * public static final String CHANNEL_COLORLOGIC_SPEED = "speed";
-     * public static final String CHANNEL_COLORLOGIC_SPECIALEFFECT = "specialEffect";
-     *
-     *
-     * if (BindingConstants.CHANNEL_COLORLOGIC_CURRENTSHOW.equals(channelUID.getId())) {
-     * // sendUdpCommand(CommandBuilder.setStandaloneLightShow(bowId, sysId, command.toString()),
-     * // MessageType.SET_STANDALONE_LIGHT_SHOW);
-     *
-     * String xmlStr =
-     * "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>SetStandAloneLightShow</Name><Parameters><Parameter name=\"PoolID\" dataType=\"int\">30</Parameter><Parameter name=\"LightID\" dataType=\"int\">38</Parameter><Parameter name=\"Show\" dataType=\"int\">2</Parameter><Parameter name=\"IsCountDownTimer\" dataType=\"bool\">false</Parameter><Parameter name=\"StartTimeHours\" dataType=\"int\">0</Parameter><Parameter name=\"StartTimeMinutes\" dataType=\"int\">0</Parameter><Parameter name=\"EndTimeHours\" dataType=\"int\">0</Parameter><Parameter name=\"EndTimeMinutes\" dataType=\"int\">0</Parameter><Parameter name=\"DaysActive\" dataType=\"int\">0</Parameter><Parameter name=\"Recurring\" dataType=\"bool\">false</Parameter></Parameters></Request>"
-     * ;
-     * sendUdpCommand(xmlStr, MessageType.SET_STANDALONE_LIGHT_SHOW);
-     * }
-     *
-     * if ("colorMode".equals(channelUID.getId())) {
-     * // sendUdpCommand(
-     * // CommandBuilder.setColorMode(bridgehandler.getAccount().getToken(),
-     * // bridgehandler.getAccount().getMspSystemID(), sysId, command.toString()),
-     * // MessageType.SET_CHLOR_ENABLED);
-     * } else if ("brightness".equals(channelUID.getId())) {
-     * int val = ((Number) command).intValue();
-     * // sendUdpCommand(
-     * // CommandBuilder.setBrightness(bridgehandler.getAccount().getToken(),
-     * // bridgehandler.getAccount().getMspSystemID(), sysId, val),
-     * // MessageType.SET_CHLOR_ENABLED);
-     * }
-     * }
-     */
-
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        if ((command instanceof RefreshType)) {
+        if (command instanceof RefreshType) {
             return;
         }
-        String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
-        String bowId = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
 
+        String sysID = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+        String bowID = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
         Bridge bridge = getBridge();
-        if (sysId == null || bowId == null || bridge == null) {
+        if (sysID == null || bowID == null || bridge == null) {
             return;
+        }
+
+        // Take a snapshot of current aggregate
+        final LightAggregate snap;
+        synchronized (aggLock) {
+            snap = agg.copy();
         }
 
         String cmdURL;
-        String cmdString = "0";
         switch (channelUID.getId()) {
-            case BindingConstants.CHANNEL_COLORLOGIC_ENABLE:
-                if (command == OnOffType.ON) {
-                    cmdString = "1";
-                } else if (command == OnOffType.OFF) {
-                    cmdString = "0";
-                }
-                cmdURL = CommandBuilder.buildSetEquipmentCommand(bowId, sysId, cmdString);
+            case BindingConstants.CHANNEL_COLORLOGIC_ENABLE: {
+                String on = (command == OnOffType.ON) ? "1" : "0";
+                cmdURL = CommandBuilder.buildSetEquipmentCmd(bowID, sysID, on);
                 sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);
+                // optimistic cache update
+                synchronized (aggLock) {
+                    agg.enabled = on;
+                }
                 break;
+            }
+            case BindingConstants.CHANNEL_COLORLOGIC_CURRENTSHOW: {
+                String newShow = cmdToString(command);
+                String speed = orDefault(snap.speed, DEFAULT_SPEED);
+                String brightness = orDefault(snap.brightness, DEFAULT_BRIGHTNESS);
 
-            case BindingConstants.CHANNEL_COLORLOGIC_CURRENTSHOW:
-                cmdURL = CommandBuilder.buildSetStandaloneLightShow(bowId, sysId, this.cmdToString(command));
-                sendUdpCommand(cmdURL, MessageType.SET_STANDALONE_LIGHT_SHOW);
+                String lightType = getThing().getProperties().get(BindingConstants.PROPERTY_COLORLOGIC_TYPE);
+                if (lightType != null && lightType.contains("UCL")) {
+                    cmdURL = CommandBuilder.buildSetStandaloneLightShowOmniDirect(bowID, sysID, newShow, speed,
+                            brightness);
+                } else {
+                    cmdURL = CommandBuilder.buildSetStandaloneLightShow(bowID, sysID, newShow);
+                }
+                sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);
+
+                synchronized (aggLock) {
+                    agg.show = newShow;
+                }
                 break;
+            }
+            case BindingConstants.CHANNEL_COLORLOGIC_SPEED: {
+                String newSpeed = cmdToString(command);
+                String show = orDefault(snap.show, DEFAULT_SHOW);
+                String brightness = orDefault(snap.brightness, DEFAULT_BRIGHTNESS);
 
+                String lightType = getThing().getProperties().get(BindingConstants.PROPERTY_COLORLOGIC_TYPE);
+                if (lightType != null && lightType.contains("UCL")) {
+                    cmdURL = CommandBuilder.buildSetStandaloneLightShowOmniDirect(bowID, sysID, show, newSpeed,
+                            brightness);
+                } else {
+                    cmdURL = CommandBuilder.buildSetStandaloneLightShow(bowID, sysID, show);
+                }
+                sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);
+
+                synchronized (aggLock) {
+                    agg.speed = newSpeed;
+                }
+                break;
+            }
+            case BindingConstants.CHANNEL_COLORLOGIC_BRIGHTNESS: {
+                String newBrightness = cmdToString(command);
+                String show = orDefault(snap.show, DEFAULT_SHOW);
+                String speed = orDefault(snap.speed, DEFAULT_SPEED);
+
+                String lightType = getThing().getProperties().get(BindingConstants.PROPERTY_COLORLOGIC_TYPE);
+                if (lightType != null && lightType.contains("UCL")) {
+                    cmdURL = CommandBuilder.buildSetStandaloneLightShowOmniDirect(bowID, sysID, show, speed,
+                            newBrightness);
+                } else {
+                    cmdURL = CommandBuilder.buildSetStandaloneLightShow(bowID, sysID, show);
+                }
+                sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);
+
+                synchronized (aggLock) {
+                    agg.brightness = newBrightness;
+                }
+                break;
+            }
             // TODO
-            case BindingConstants.CHANNEL_COLORLOGIC_BRIGHTNESS:
-                break;
-
-            // TODO
-            case BindingConstants.CHANNEL_COLORLOGIC_SPEED:
-                break;
-
-            // TODO
-            case BindingConstants.CHANNEL_COLORLOGIC_SPECIALEFFECT:
-                break;
-
+            // Special Effect
+            // Flicker effect for solid color water bowl lights only.
+            // Waiting on Linnette for command
             default:
-                logger.warn("haywardCommand Unsupported type {}", channelUID);
-                return;
+                logger.warn("Unsupported channel {}", channelUID);
         }
     }
 }

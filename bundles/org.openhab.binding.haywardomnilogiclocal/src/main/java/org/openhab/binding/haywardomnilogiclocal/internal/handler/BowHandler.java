@@ -50,26 +50,23 @@ public class BowHandler extends HaywardThingHandler {
             BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
             if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
                 String sysId = getThing().getUID().getId();
-                if (sysId != null) {
-                    if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
-                        Object object = bridgeHandler.getMspConfig().getDevice(sysId);
-                        if (object instanceof BodyOfWaterConfig) {
-                            BodyOfWaterConfig bow = (BodyOfWaterConfig) object;
-                            Map<String, String> props = new HashMap<>();
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_TYPE, bow.getType());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_SHAREDTYPE, bow.getSharedType());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_SHAREDPRIORITY,
-                                    bow.getSharedPriority());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_SHAREDEQUIPID,
-                                    bow.getSharedEquipmentSystemId());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_SUPPORTSSPILLOVER,
-                                    bow.getSupportsSpillover());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_USESPILLOVERFORFILTEROPERATIONS,
-                                    bow.getUseSpilloverForFilterOperations());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_SIZEINGALLONS,
-                                    bow.getSizeInGallons());
-                            updateProperties(props);
-                        }
+                if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
+                    Object object = bridgeHandler.getMspConfig().getDevice(sysId);
+                    if (object instanceof BodyOfWaterConfig) {
+                        BodyOfWaterConfig bow = (BodyOfWaterConfig) object;
+                        Map<String, String> props = new HashMap<>();
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_TYPE, bow.getType());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_SHAREDTYPE, bow.getSharedType());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_SHAREDPRIORITY,
+                                bow.getSharedPriority());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_SHAREDEQUIPID,
+                                bow.getSharedEquipmentSystemId());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_SUPPORTSSPILLOVER,
+                                bow.getSupportsSpillover());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_USESPILLOVERFORFILTEROPERATIONS,
+                                bow.getUseSpilloverForFilterOperations());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_BOW_SIZEINGALLONS, bow.getSizeInGallons());
+                        updateProperties(props);
                     }
                 }
             }

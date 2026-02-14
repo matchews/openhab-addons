@@ -49,12 +49,14 @@ public class Status {
     @XStreamImplicit(itemFieldName = "Chlorinator")
     private final List<Chlorinator> chlorinators = new ArrayList<>();
 
-    @XStreamAlias("ValveActuator")
     @XStreamImplicit(itemFieldName = "Relay")
     private final List<Relay> relays = new ArrayList<>();
 
     @XStreamImplicit(itemFieldName = "Pump")
     private final List<Pump> pumps = new ArrayList<>();
+
+    @XStreamImplicit(itemFieldName = "ValveActuator")
+    private final List<ValveActuator> valveActuators = new ArrayList<>();
 
     public List<Backyard> getBackyards() {
         return backyards;
@@ -90,5 +92,9 @@ public class Status {
 
     public List<Pump> getPumps() {
         return pumps;
+    }
+
+    public List<ValveActuator> getValveActuators() {
+        return valveActuators;
     }
 }

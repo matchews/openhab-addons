@@ -31,8 +31,48 @@ public class CommandBuilder {
                 <Name>RequestConfiguration</Name>
             """;
 
+    private static final String GET_ALARMLIST = """
+               <Name>GetAllAlarmList</Name>
+            """;
+
     private static final String GET_TELEMETRY = """
                 <Name>RequestTelemetryData</Name>
+            """;
+
+    private static final String GET_UI_FILTER_DIAGNOSTIC_INFO = """
+            <Name>GetUIFilterDiagnosticInfo</Name>
+            <Parameters>
+                <Parameter name="PoolID" dataType="int">%s</Parameter>
+                <Parameter name="EquipmentID" dataType="int">%s</Parameter>
+            """;
+
+    private static final String SET_CHLOR_ENABLE = """
+            <Name>SetCHLOREnable</Name>
+            <Parameters>
+                <Parameter name="PoolID" dataType="int">%s</Parameter>
+                <Parameter name="Enabled" dataType="bool">%s</Parameter>
+            """;
+
+    private static final String SET_CHLOR_PARAMS = """
+            <Name>SetCHLORParams</Name>
+            <Parameters>
+                <Parameter name="PoolID" dataType="int">%s</Parameter>
+                <Parameter name="ChlorID" dataType="int">%s</Parameter>
+                <Parameter name="CfgState" dataType="byte">%s</Parameter>
+                <Parameter name="OpMode" dataType="byte">%s</Parameter>
+                <Parameter name="BOWType" dataType="byte">%s</Parameter>
+                <Parameter name="CellType" dataType="byte">%s</Parameter>
+                <Parameter name="TimedPercent" dataType="byte">%s</Parameter>
+                <Parameter name="SCTimeout" dataType="byte">%s</Parameter>
+                <Parameter name="ORPTimout" dataType="byte">%s</Parameter>
+            """;
+
+    private static final String SET_EQUIPMENT_CMD = """
+            <Name>SetUIEquipmentCmd</Name>
+            <Parameters>
+                <Parameter name="PoolID" dataType="int">%s</Parameter>
+                <Parameter name="EquipmentID" dataType="int">%s</Parameter>
+                <Parameter name="IsOn" dataType="bool">%s</Parameter>
             """;
 
     private static final String SET_HEATER_ENABLE = """
@@ -43,6 +83,25 @@ public class CommandBuilder {
                 <Parameter name="Enabled" dataType="bool">%s</Parameter>
             """;
 
+    private static final String SET_STANDALONE_LIGHTSHOW = """
+            <Name>SetStandAloneLightShow</Name>
+            <Parameters>
+                <Parameter name="PoolID" dataType="int">%s</Parameter>
+                <Parameter name="LightID" dataType="int">%s</Parameter>
+                <Parameter name="Show" dataType="byte">%s</Parameter>
+            """;
+
+    private static final String SET_STANDALONE_LIGHTSHOW_OMNIDIRECT = """
+              <Name>SetStandAloneLightShow</Name>
+              <Parameters>
+                <Parameter name="PoolID" dataType="int">%s</Parameter>
+                <Parameter name="LightID" dataType="int">%s</Parameter>
+                <Parameter name="Show" dataType="byte">%s</Parameter>
+                <Parameter name="Speed" dataType="byte">%s</Parameter>
+                <Parameter name="Brightness" dataType="byte">%s</Parameter>
+                <Parameter name="Reserved" dataType="byte">0</Parameter>
+            """;
+
     private static final String SET_UI_HEATER_CMD = """
             <Name>SetUIHeaterCmd</Name>
             <Parameters>
@@ -51,7 +110,7 @@ public class CommandBuilder {
                 <Parameter name="Temp" dataType="bool">%s</Parameter>
             """;
 
-    // todo
+    // TODO
     private static final String SET_UI_HEATER_MODE_CMD = """
             <Name>SetUIHeaterModeCmd</Name>
             <Parameters>
@@ -67,15 +126,7 @@ public class CommandBuilder {
                 <Parameter name="HeaterID" dataType="int">%s</Parameter>
                 <Parameter name="Temp" dataType="bool">%s</Parameter>
             """;
-
-    private static final String SET_EQUIPMENT_CMD = """
-            <Name>SetUIEquipmentCmd</Name>
-            <Parameters>
-                <Parameter name="PoolID" dataType="int">%s</Parameter>
-                <Parameter name="EquipmentID" dataType="int">%s</Parameter>
-                <Parameter name="IsOn" dataType="bool">%s</Parameter>
-            """;
-
+    // TODO
     private static final String SET_UI_SPILLOVER_CMD = """
             <Name>SetUISpilloverCmd</Name>
             <Parameters>
@@ -99,33 +150,14 @@ public class CommandBuilder {
                 <Parameter name="Timeout" dataType=\"bool\">%s</Parameter>
             """;
 
-    private static final String SET_STANDALONE_LIGHTSHOW = """
-            <Name>SetStandAloneLightShow</Name>
-            <Parameters>
-                <Parameter name="PoolID" dataType="int">%s</Parameter>
-                <Parameter name="LightID" dataType="int">%s</Parameter>
-                <Parameter name="Show" dataType="int">%s</Parameter>
-            """;
-
-    private static final String SET_STANDALONE_LIGHTSHOW_OMNIDIRECT = """
-            <Name>SetStandAloneLightShow</Name>
-            <Parameters>
-                <Parameter name="PoolID" dataType="int">%s</Parameter>
-                <Parameter name="LightID" dataType="int">%s</Parameter>
-                <Parameter name="Show" dataType="int">%s</Parameter>
-                <Parameter name="Speed" dataType="byte">%s</Parameter>
-                <Parameter name="Brightness" dataType="byte">%s</Parameter>
-                <Parameter name="Reserved" dataType="byte">0</Parameter>
-            """;
-
     public static final String COMMAND_SCHEDULE = """
-                <Parameter name="IsCountDownTimer" dataType="bool">false</Parameter>
+                <Parameter name="IsCountDownTimer" dataType="bool">0</Parameter>
                 <Parameter name="StartTimeHours" dataType="int">0</Parameter>
                 <Parameter name="StartTimeMinutes" dataType="int">0</Parameter>
                 <Parameter name="EndTimeHours" dataType="int">0</Parameter>
                 <Parameter name="EndTimeMinutes" dataType="int">0</Parameter>
                 <Parameter name="DaysActive" dataType="int">0</Parameter>
-                <Parameter name="Recurring" dataType="bool">false</Parameter>
+                <Parameter name="Recurring" dataType="bool">0</Parameter>
             """;
 
     public static final String PARAMETERS_SUFFIX = """
@@ -140,16 +172,45 @@ public class CommandBuilder {
         // ToDo
     }
 
-    // todo
+    // working
     public static String buildRequestConfiguration() {
         return XML_DECLARATION + REQUEST_CONFIGURATION + REQUEST_SUFFIX;
     }
 
+    // working
+    public static String buildGetAlarmList() {
+        return XML_DECLARATION + GET_ALARMLIST + REQUEST_SUFFIX;
+    }
+
+    // working
     public static String buildGetTelemetry() {
         return XML_DECLARATION + GET_TELEMETRY + REQUEST_SUFFIX;
     }
 
-    public static String buildSetHeaterEnable(String bowID, String equipmentID, String enable) {
+    // working
+    public static String buildGetUIFilterDiagnosticInfo(String bowID, String equipmentID) {
+        return XML_DECLARATION + String.format(GET_UI_FILTER_DIAGNOSTIC_INFO, bowID, equipmentID) + PARAMETERS_SUFFIX
+                + REQUEST_SUFFIX;
+    }
+
+    // Working
+    public static String buildSetChlorEnableCmd(String bowID, String enable) {
+        return XML_DECLARATION + String.format(SET_CHLOR_ENABLE, bowID, enable) + PARAMETERS_SUFFIX + REQUEST_SUFFIX;
+    }
+
+    public static String buildSetChlorParamsCmd(String bowId, String chlorID, String cfgState, String opMode,
+            String bowType, String cellType, String timedPercent, String scTimeout, String orpTimeout) {
+        return XML_DECLARATION + String.format(SET_CHLOR_PARAMS, bowId, chlorID, cfgState, opMode, bowType, cellType,
+                timedPercent, scTimeout, orpTimeout) + PARAMETERS_SUFFIX + REQUEST_SUFFIX;
+    }
+
+    // works to turn on filter
+    public static String buildSetEquipmentCmd(String bowID, String equipmentID, String isOn) {
+        return XML_DECLARATION + String.format(SET_EQUIPMENT_CMD, bowID, equipmentID, isOn) + COMMAND_SCHEDULE
+                + PARAMETERS_SUFFIX + REQUEST_SUFFIX;
+    }
+
+    public static String buildSetHeaterEnableCmd(String bowID, String equipmentID, String enable) {
         return XML_DECLARATION + String.format(SET_HEATER_ENABLE, bowID, equipmentID, enable) + PARAMETERS_SUFFIX
                 + REQUEST_SUFFIX;
     }
@@ -159,6 +220,7 @@ public class CommandBuilder {
                 + REQUEST_SUFFIX;
     }
 
+    // TODO UNTESTED
     public static String buildSetUISolarSetPointCmd(String bowID, String equipmentID, String temp) {
         return XML_DECLARATION + String.format(SET_UI_SOLAR_SETPOINT_CMD, bowID, equipmentID, temp) + PARAMETERS_SUFFIX
                 + REQUEST_SUFFIX;
@@ -182,16 +244,13 @@ public class CommandBuilder {
                 + COMMAND_SCHEDULE + PARAMETERS_SUFFIX + REQUEST_SUFFIX;
     }
 
-    public static String buildSetEquipmentCommand(String bowID, String equipmentID, String isOn) {
-        return XML_DECLARATION + String.format(SET_EQUIPMENT_CMD, bowID, equipmentID, isOn) + COMMAND_SCHEDULE
-                + PARAMETERS_SUFFIX + REQUEST_SUFFIX;
-    }
-
+    // NOT WORKING
     public static String buildSetStandaloneLightShow(String bowID, String equipmentID, String show) {
         return XML_DECLARATION + String.format(SET_STANDALONE_LIGHTSHOW, bowID, equipmentID, show) + COMMAND_SCHEDULE
                 + PARAMETERS_SUFFIX + REQUEST_SUFFIX;
     }
 
+    // Working
     public static String buildSetStandaloneLightShowOmniDirect(String bowID, String equipmentID, String show,
             String speed, String brightness) {
         return XML_DECLARATION

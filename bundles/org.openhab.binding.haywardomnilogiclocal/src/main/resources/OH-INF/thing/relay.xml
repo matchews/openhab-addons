@@ -18,14 +18,23 @@
 	<channel-type id="relayWhyOn">
 		<item-type>String</item-type>
 		<label>Why On</label>
+		<tags>
+			<tag>Status</tag>
+		</tags>
 		<state readOnly="true">
 			<options>
-				<option value="0">Off</option>
-				<option value="1">On</option>
-				<option value="2">Freeze Protect</option>
-				<option value="3">Waiting for Interlock</option>
-				<option value="4">Paused</option>
-				<option value="5">Waiting for Filter</option>
+				<option value="0"></option>
+				<option value="1">Manual Off</option>
+				<option value="2">Countdown Done</option>
+				<option value="3">End Schedule</option>
+				<option value="4">Group Off</option>
+				<option value="5">Manual On</option>
+				<option value="6">Countdown Timer</option>
+				<option value="7">Schedule On</option>
+				<option value="8">Group On</option>
+				<option value="9">Freeze Protect</option>
+				<option value="10">Interlock</option>
+				<option value="11">Max Action</option>
 			</options>
 		</state>
 	</channel-type>

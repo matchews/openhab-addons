@@ -26,6 +26,7 @@ import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Relay;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
+import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.ValveActuator;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
@@ -55,16 +56,14 @@ public class RelayHandler extends HaywardThingHandler {
             BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
             if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
                 String sysId = getThing().getUID().getId();
-                if (sysId != null) {
-                    if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
-                        Object object = bridgeHandler.getMspConfig().getDevice(sysId);
-                        if (object instanceof RelayConfig) {
-                            RelayConfig relay = (RelayConfig) object;
-                            Map<String, String> props = new HashMap<>();
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_RELAY_FUNCTION, relay.getFunction());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_RELAY_TYPE, relay.getType());
-                            updateProperties(props);
-                        }
+                if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
+                    Object object = bridgeHandler.getMspConfig().getDevice(sysId);
+                    if (object instanceof RelayConfig) {
+                        RelayConfig relay = (RelayConfig) object;
+                        Map<String, String> props = new HashMap<>();
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_RELAY_FUNCTION, relay.getFunction());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_RELAY_TYPE, relay.getType());
+                        updateProperties(props);
                     }
                 }
             }
@@ -75,25 +74,48 @@ public class RelayHandler extends HaywardThingHandler {
     public void getTelemetry(String xmlResponse) throws HaywardException {
         Status status = TelemetryParser.parse(xmlResponse);
         String sysId = getThing().getUID().getId();
-        if (sysId == null) {
-            return;
-        }
-        for (Relay relay : status.getRelays()) {
-            if (sysId.equals(relay.getSystemId())) {
-                @Nullable
-                String relayState = relay.getRelayState();
-                if (relayState != null) {
-                    updateData(BindingConstants.CHANNEL_RELAY_STATE, relayState);
-                } else {
-                    logger.debug("Relay state missing from Telemtry");
-                }
 
-                @Nullable
-                String whyOn = relay.getWhyOn();
-                if (whyOn != null) {
-                    updateData(BindingConstants.CHANNEL_RELAY_WHYON, whyOn);
-                } else {
-                    logger.debug("Relay why on missing from Telemtry");
+        // todo
+        if (status.getRelays() != null) {
+            for (Relay relay : status.getRelays()) {
+                if (sysId.equals(relay.getSystemId())) {
+                    @Nullable
+                    String relayState = relay.getRelayState();
+                    if (relayState != null) {
+                        updateData(BindingConstants.CHANNEL_RELAY_STATE, relayState);
+                    } else {
+                        logger.debug("Relay state missing from Telemtry");
+                    }
+
+                    @Nullable
+                    String whyOn = relay.getWhyOn();
+                    if (whyOn != null) {
+                        updateData(BindingConstants.CHANNEL_RELAY_WHYON, whyOn);
+                    } else {
+                        logger.debug("Relay why on missing from Telemtry");
+                    }
+                }
+            }
+        }
+
+        if (status.getValveActuators() != null) {
+            for (ValveActuator valveActuator : status.getValveActuators()) {
+                if (sysId.equals(valveActuator.getSystemId())) {
+                    @Nullable
+                    String valveActuatorState = valveActuator.getValveActuatorState();
+                    if (valveActuatorState != null) {
+                        updateData(BindingConstants.CHANNEL_RELAY_STATE, valveActuatorState);
+                    } else {
+                        logger.debug("Relay state missing from Telemtry");
+                    }
+
+                    @Nullable
+                    String whyOn = valveActuator.getWhyOn();
+                    if (whyOn != null) {
+                        updateData(BindingConstants.CHANNEL_RELAY_WHYON, whyOn);
+                    } else {
+                        logger.debug("Relay why on missing from Telemtry");
+                    }
                 }
             }
         }
@@ -121,7 +143,7 @@ public class RelayHandler extends HaywardThingHandler {
                 } else if (command == OnOffType.OFF) {
                     cmdString = "0";
                 }
-                cmdURL = CommandBuilder.buildSetEquipmentCommand(bowId, sysId, cmdString);
+                cmdURL = CommandBuilder.buildSetEquipmentCmd(bowId, sysId, cmdString);
                 sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);
                 break;
 

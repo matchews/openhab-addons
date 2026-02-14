@@ -135,6 +135,8 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                                 lightProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.COLORLOGIC);
                                 putStrObjIfNotNull(lightProps, BindingConstants.PROPERTY_SYSTEM_ID,
                                         light.getSystemId());
+                                putStrObjIfNotNull(lightProps, BindingConstants.PROPERTY_COLORLOGIC_TYPE,
+                                        light.getType());
                                 addBowContext(lightProps, bow);
                                 onDeviceDiscovered(BindingConstants.THING_TYPE_COLORLOGIC, lightName, lightProps);
                             }

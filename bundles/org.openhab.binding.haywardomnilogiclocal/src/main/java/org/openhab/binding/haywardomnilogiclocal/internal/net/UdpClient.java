@@ -52,12 +52,8 @@ public class UdpClient {
 
     public synchronized UdpMessage send(MessageType requestType, String xml) throws IOException {
         byte clientType;
-        // ToDo
         if (requestType != MessageType.REQUEST_CONFIGURATION) {
             clientType = (byte) 0;
-        } else if (requestType == MessageType.SET_HEATER_ENABLED
-                || requestType == MessageType.SET_STANDALONE_LIGHT_SHOW) {
-            clientType = (byte) 1;
         } else {
             clientType = (byte) 1;
         }
@@ -87,7 +83,7 @@ public class UdpClient {
                         UdpHeader hdr = UdpHeader.fromBytes(data);
                         int receivingMsgId = hdr.getMessageId();
                         MessageType msgType = hdr.getMessageType();
-                        logger.trace("Received UDP packet with message type {} and messageID = {}", msgType,
+                        logger.debug("Received UDP packet with message type {} and messageID = {}", msgType,
                                 receivingMsgId);
                         if (msgType != MessageType.ACK) {
                             ackHandler.sendAck(socket, receivingMsgId);

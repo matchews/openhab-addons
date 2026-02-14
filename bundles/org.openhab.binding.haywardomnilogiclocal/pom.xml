@@ -12,6 +12,6 @@
 
   <artifactId>org.openhab.binding.haywardomnilogiclocal</artifactId>
 
-  <name>openHAB Add-ons :: Bundles :: Hayward OmniLogic Binding</name>
+  <name>openHAB Add-ons :: Bundles :: Hayward OmniLogic Local Binding</name>
 
 </project>

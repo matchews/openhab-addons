@@ -100,11 +100,14 @@ public class BindingConstants {
     public static final String CHANNEL_CHLORINATOR_AVGSALTLEVEL = "chlorSaltAvgLevel";
     public static final String CHANNEL_CHLORINATOR_ALERT = "chlorAlert";
     public static final String CHANNEL_CHLORINATOR_ERROR = "chlorError";
-    public static final String CHANNEL_CHLORINATOR_SCMODE = "chlorScMode";
+    public static final String CHANNEL_CHLORINATOR_SC_MODE = "chlorScMode";
     public static final String CHANNEL_CHLORINATOR_OPERATINGSTATE = "chlorOperatingState";
     public static final String CHANNEL_CHLORINATOR_TIMEDPERCENT = "chlorTimedPercent";
     public static final String CHANNEL_CHLORINATOR_OPERATINGMODE = "chlorOperatingMode";
     public static final String CHANNEL_CHLORINATOR_ENABLE = "chlorEnable";
+    public static final String CHANNEL_CHLORINATOR_SC_ENABLE = "chlorScEnable";
+    public static final String CHANNEL_CHLORINATOR_SC_DURATION = "chlorScDuration";
+    public static final String CHANNEL_CHLORINATOR_SC_REMAINING = "chlorScRemaining";
 
     public static final String PROPERTY_CHLORINATOR_SHAREDTYPE = "Shared Type";
     public static final String PROPERTY_CHLORINATOR_ENABLED = "Enabled";
@@ -128,11 +131,16 @@ public class BindingConstants {
     public static final String PROPERTY_COLORLOGIC_NODEID = "Node ID";
     public static final String PROPERTY_COLORLOGIC_NETWORKED = "Networked";
 
+    public static final String TYPE_COLORLOGIC_LIGHTBRIGHTNESS = "brightness";
+    public static final String TYPE_COLORLOGIC_LIGHTSPEED = "speed";
+    public static final String TYPE_COLORLOGIC_SPECIALEFFECT = "specialEffect";
+
     // Filter
     public static final String CHANNEL_FILTER_ENABLE = "filterEnable";
     public static final String CHANNEL_FILTER_STATE = "filterState";
     public static final String CHANNEL_FILTER_VALVEPOSITION = "filterValvePosition";
     public static final String CHANNEL_FILTER_SPEED = "filterSpeed";
+    public static final String CHANNEL_FILTER_SPEEDPRESET = "filterSpeedPreset";
     public static final String CHANNEL_FILTER_LASTSPEED = "filterLastSpeed";
     public static final String CHANNEL_FILTER_WHYFILTERISON = "filterWhyFilterIsOn";
     public static final String CHANNEL_FILTER_FPOVERRIDE = "filterFpOverride";
@@ -189,6 +197,7 @@ public class BindingConstants {
     // Pump
     public static final String CHANNEL_PUMP_ENABLE = "pumpEnable";
     public static final String CHANNEL_PUMP_SPEED = "pumpSpeed";
+    public static final String CHANNEL_PUMP_SPEEDPRESET = "pumpSpeedPreset";
     public static final String CHANNEL_PUMP_STATE = "pumpState";
 
     public static final String PROPERTY_PUMP_TYPE = "pumpType";

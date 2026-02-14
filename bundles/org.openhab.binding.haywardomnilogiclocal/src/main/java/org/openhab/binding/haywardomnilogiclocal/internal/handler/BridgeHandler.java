@@ -32,8 +32,8 @@ import javax.xml.xpath.XPathFactory;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
-import org.openhab.binding.haywardomnilogiclocal.internal.Config;
-import org.openhab.binding.haywardomnilogiclocal.internal.DynamicStateDescriptionProvider;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardConfig;
+import org.openhab.binding.haywardomnilogiclocal.internal.HaywardDynamicStateDescriptionProvider;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
@@ -73,13 +73,13 @@ public class BridgeHandler extends BaseBridgeHandler {
     private final Logger logger = LoggerFactory.getLogger(BridgeHandler.class);
     private static final int UDP_PORT = 10444;
 
-    private final DynamicStateDescriptionProvider stateDescriptionProvider;
+    private final HaywardDynamicStateDescriptionProvider stateDescriptionProvider;
     private @Nullable UdpClient udpClient;
     private @Nullable ScheduledFuture<?> initializeFuture;
     private @Nullable ScheduledFuture<?> pollTelemetryFuture;
     private @Nullable ScheduledFuture<?> pollAlarmsFuture;
     private int commFailureCount;
-    private Config config = getConfig().as(Config.class);
+    private HaywardConfig haywardConfig = getConfig().as(HaywardConfig.class);
     @Nullable
     private MspConfig mspConfig;
     public String units = "Standard";
@@ -95,7 +95,7 @@ public class BridgeHandler extends BaseBridgeHandler {
         return Set.of(HaywardDiscoveryService.class);
     }
 
-    public BridgeHandler(DynamicStateDescriptionProvider stateDescriptionProvider, Bridge bridge) {
+    public BridgeHandler(HaywardDynamicStateDescriptionProvider stateDescriptionProvider, Bridge bridge) {
         super(bridge);
         this.stateDescriptionProvider = stateDescriptionProvider;
     }
@@ -125,10 +125,10 @@ public class BridgeHandler extends BaseBridgeHandler {
     }
 
     public void scheduledInitialize() throws UnknownHostException {
-        config = getConfigAs(Config.class);
-        udpClient = new UdpClient(config.getEndpointUrl(), UDP_PORT);
+        haywardConfig = getConfigAs(HaywardConfig.class);
 
         try {
+            udpClient = new UdpClient(haywardConfig.getEndpointUrl(), UDP_PORT);
             clearPolling(pollTelemetryFuture);
             clearPolling(pollAlarmsFuture);
 
@@ -146,12 +146,12 @@ public class BridgeHandler extends BaseBridgeHandler {
                 updateStatus(ThingStatus.ONLINE);
             }
 
-            logger.debug("Successfully opened connection to Hayward controller: {}", config.getEndpointUrl());
+            logger.debug("Successfully opened connection to Hayward controller: {}", haywardConfig.getEndpointUrl());
 
             initPolling(0);
             logger.trace("Hayward Telemetry polling scheduled");
 
-            if (config.getAlarmPollTime() > 0) {
+            if (haywardConfig.getAlarmPollTime() > 0) {
                 initAlarmPolling(1);
             }
         } catch (HaywardException e) {
@@ -161,6 +161,43 @@ public class BridgeHandler extends BaseBridgeHandler {
             clearPolling(pollAlarmsFuture);
             commFailureCount = 50;
             initPolling(60);
+        }
+    }
+
+    private synchronized void initPolling(int initalDelay) {
+        pollTelemetryFuture = scheduler.scheduleWithFixedDelay(() -> {
+            try {
+                if (commFailureCount >= 5) {
+                    commFailureCount = 0;
+                    clearPolling(pollTelemetryFuture);
+                    clearPolling(pollAlarmsFuture);
+                    initialize();
+                    return;
+                }
+                if (!(requestTelemetryData())) {
+                    commFailureCount++;
+                    return;
+                }
+                updateStatus(ThingStatus.ONLINE);
+            } catch (HaywardException e) {
+                logger.debug("Hayward Connection thing: Exception during poll: {}", e.getMessage());
+            }
+        }, initalDelay, haywardConfig.getTelemetryPollTime(), TimeUnit.SECONDS);
+    }
+
+    private synchronized void initAlarmPolling(int initalDelay) {
+        pollAlarmsFuture = scheduler.scheduleWithFixedDelay(() -> {
+            try {
+                getAlarmList();
+            } catch (HaywardException e) {
+                logger.debug("Hayward Connection thing: Exception during getAlarmList: {}", e.getMessage());
+            }
+        }, initalDelay, haywardConfig.getAlarmPollTime(), TimeUnit.SECONDS);
+    }
+
+    private void clearPolling(@Nullable ScheduledFuture<?> pollJob) {
+        if (pollJob != null) {
+            pollJob.cancel(false);
         }
     }
 
@@ -198,23 +235,21 @@ public class BridgeHandler extends BaseBridgeHandler {
         return true;
     }
 
+    // This is not working in mspVersion="R0501001"
+    // TODO Linnette has a ticket in on this
     public synchronized boolean getAlarmList() throws HaywardException {
+        String xmlRequest = CommandBuilder.buildGetAlarmList();
+        String xmlResponse = sendRequest(xmlRequest, MessageType.GET_ALARM_LIST);
+
+        if (xmlResponse.isEmpty()) {
+            logger.debug("Hayward Connection thing: getAlarmList XML response was null");
+            throw new HaywardException("getAlarmList response empty");
+        }
+
+        logger.debug("Hayward Connection thing: getAlarmList successful");
         return true;
 
         /*
-         * String xmlRequest =
-         * "<?xml version=\"1.0\" encoding=\"utf-8\"?><Request><Name>GetAllAlarmList</Name><Parameters/></Request>";
-         * String xmlResponse = sendRequest(xmlRequest, MessageType.GET_ALARM_LIST);
-         *
-         * if (xmlResponse.isEmpty()) {
-         * logger.debug("Hayward Connection thing: GetAllAlarmList XML response was null");
-         * return false;
-         * }
-         *
-         * if (!evaluateXPath("/Response/Parameters//Parameter[@name='StatusMessage']/text()", xmlResponse).isEmpty()) {
-         * logger.debug("Hayward Connection thing: GetAllAlarmList XML response: {}", xmlResponse);
-         * return false;
-         * }
          *
          * // TODO
          * for (Thing thing : getThing().getThings()) {
@@ -231,43 +266,6 @@ public class BridgeHandler extends BaseBridgeHandler {
          * }
          * return false;
          */
-    }
-
-    private synchronized void initPolling(int initalDelay) {
-        pollTelemetryFuture = scheduler.scheduleWithFixedDelay(() -> {
-            try {
-                if (commFailureCount >= 5) {
-                    commFailureCount = 0;
-                    clearPolling(pollTelemetryFuture);
-                    clearPolling(pollAlarmsFuture);
-                    initialize();
-                    return;
-                }
-                if (!(requestTelemetryData())) {
-                    commFailureCount++;
-                    return;
-                }
-                updateStatus(ThingStatus.ONLINE);
-            } catch (HaywardException e) {
-                logger.debug("Hayward Connection thing: Exception during poll: {}", e.getMessage());
-            }
-        }, initalDelay, config.getTelemetryPollTime(), TimeUnit.SECONDS);
-    }
-
-    private synchronized void initAlarmPolling(int initalDelay) {
-        pollAlarmsFuture = scheduler.scheduleWithFixedDelay(() -> {
-            try {
-                getAlarmList();
-            } catch (HaywardException e) {
-                logger.debug("Hayward Connection thing: Exception during poll: {}", e.getMessage());
-            }
-        }, initalDelay, config.getAlarmPollTime(), TimeUnit.SECONDS);
-    }
-
-    private void clearPolling(@Nullable ScheduledFuture<?> pollJob) {
-        if (pollJob != null) {
-            pollJob.cancel(false);
-        }
     }
 
     @Nullable
@@ -346,6 +344,14 @@ public class BridgeHandler extends BaseBridgeHandler {
 
         try {
             UdpMessage response = udpClient.send(msgType, xmlRequest);
+            if (logger.isTraceEnabled()) {
+                if (!response.getXml().isEmpty()) {
+                    logger.trace("Hayward Connection thing:  {} Hayward UDP command Response:\r{}", getCallingMethod(),
+                            response.getXml());
+                }
+            } else if (logger.isDebugEnabled()) {
+                logger.debug("Hayward Connection thing:  {}", getCallingMethod());
+            }
             return response.getXml();
         } catch (IOException e) {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
@@ -387,8 +393,8 @@ public class BridgeHandler extends BaseBridgeHandler {
         this.mspConfig = mspConfig;
     }
 
-    public Config getBridgeConfig() {
-        return config;
+    public HaywardConfig getBridgeHaywardConfig() {
+        return haywardConfig;
     }
 
     public String getUnits() {

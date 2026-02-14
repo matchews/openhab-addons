@@ -22,12 +22,18 @@
 	<channel-type id="backyardAirTemp">
 		<item-type>Number:Temperature</item-type>
 		<label>Air Temp</label>
+		<tags>
+			<tag>Temperature</tag>
+		</tags>
 		<state readOnly="true"/>
 	</channel-type>
 
 	<channel-type id="backyardState">
 		<item-type>String</item-type>
 		<label>MSP State</label>
+		<tags>
+			<tag>Status</tag>
+		</tags>
 		<state readOnly="true">
 			<options>
 				<option value="0">Off</option>

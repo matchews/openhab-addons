@@ -14,17 +14,55 @@
 		<channels>
 			<channel id="pumpEnable" typeId="system.power"/>
 			<channel id="pumpSpeed" typeId="speed"/>
-			<channel id="pumpState" typeId="state"/>
+			<channel id="pumpSpeedPreset" typeId="speedPreset"/>
+			<channel id="pumpState" typeId="pumpState"/>
 		</channels>
 
 		<representation-property>System ID</representation-property>
 	</thing-type>
 
+	<channel-type id="pumpState">
+		<item-type>String</item-type>
+		<label>Pump State</label>
+		<tags>
+			<tag>Status</tag>
+		</tags>
+		<state readOnly="true">
+			<options>
+				<option value="0">Off</option>
+				<option value="1">On</option>
+				<option value="2">Freeze Protect</option>
+			</options>
+		</state>
+	</channel-type>
+
 	<channel-type id="speed">
 		<item-type unitHint="%">Number:Dimensionless</item-type>
 		<label>Pump Speed</label>
 		<description>Dynamic units (% or rpm from config)</description>
+		<tags>
+			<tag>Control</tag>
+			<tag>Speed</tag>
+		</tags>
 		<state readOnly="false"/>
+	</channel-type>
+
+	<channel-type id="pumpSpeedPreset">
+		<item-type>String</item-type>
+		<label>Pump Speed Preset</label>
+		<tags>
+			<tag>Control</tag>
+			<tag>Speed</tag>
+		</tags>
+		<state readOnly="false">
+			<options>
+				<option value="0">Off</option>
+				<option value="33">Low</option>
+				<option value="66">Medium</option>
+				<option value="100">High</option>
+				<option value="100">Custom</option>
+			</options>
+		</state>
 	</channel-type>
 
 </thing:thing-descriptions>

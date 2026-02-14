@@ -15,6 +15,7 @@
 			<channel id="filterEnable" typeId="system.power"/>
 			<channel id="filterState" typeId="filterState"/>
 			<channel id="filterSpeed" typeId="filterSpeed"/>
+			<channel id="filterSpeedPreset" typeId="filterSpeedPreset"/>
 			<channel id="filterValvePosition" typeId="filterValvePosition"/>
 			<channel id="filterWhyFilterIsOn" typeId="filterWhyFilterIsOn"/>
 			<channel id="filterFpOverride" typeId="filterFpOverride"/>
@@ -29,7 +30,9 @@
 	<channel-type id="filterState">
 		<item-type>String</item-type>
 		<label>Filter State</label>
-		<description>Filter State</description>
+		<tags>
+			<tag>Status</tag>
+		</tags>
 		<state readOnly="true">
 			<options>
 				<option value="0">Off</option>
@@ -53,16 +56,36 @@
 		<label>Filter Speed</label>
 		<description>Filter speed</description>
 		<tags>
-			<tag>Measurement</tag>
+			<tag>Control</tag>
 			<tag>Speed</tag>
 		</tags>
 		<state min="0" max="100" step="5" pattern="%d %%" readOnly="false"/>
 	</channel-type>
 
+	<channel-type id="filterSpeedPreset">
+		<item-type>String</item-type>
+		<label>Filter Speed Preset</label>
+		<tags>
+			<tag>Control</tag>
+			<tag>Speed</tag>
+		</tags>
+		<state readOnly="false">
+			<options>
+				<option value="0">Off</option>
+				<option value="33">Low</option>
+				<option value="66">Medium</option>
+				<option value="100">High</option>
+				<option value="75">Custom</option>
+			</options>
+		</state>
+	</channel-type>
+
 	<channel-type id="filterValvePosition">
 		<item-type>String</item-type>
 		<label>Valve Position</label>
-		<description>Valve Position</description>
+		<tags>
+			<tag>Status</tag>
+		</tags>
 		<state readOnly="true">
 			<options>
 				<option value="1">Pool Only</option>
@@ -77,7 +100,9 @@
 	<channel-type id="filterWhyFilterIsOn">
 		<item-type>String</item-type>
 		<label>Why Filter Is On</label>
-		<description>Why Filter is On</description>
+		<tags>
+			<tag>Status</tag>
+		</tags>
 		<state readOnly="true">
 			<options>
 				<option value="0">Off</option>
@@ -103,6 +128,9 @@
 	<channel-type id="filterFpOverride">
 		<item-type>String</item-type>
 		<label>fpOverride</label>
+		<tags>
+			<tag>Status</tag>
+		</tags>
 		<state readOnly="true"/>
 	</channel-type>
 
@@ -110,6 +138,10 @@
 	<channel-type id="filterLastSpeed">
 		<item-type unitHint="%">Number:Dimensionless</item-type>
 		<label>Last Speed</label>
+		<tags>
+			<tag>Measurement</tag>
+			<tag>Speed</tag>
+		</tags>
 		<state readOnly="true"/>
 	</channel-type>
 

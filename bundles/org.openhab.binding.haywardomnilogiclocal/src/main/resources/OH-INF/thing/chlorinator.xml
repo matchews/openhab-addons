@@ -22,6 +22,9 @@
 			<channel id="chlorTimedPercent" typeId="chlorTimedPercent"/>
 			<channel id="chlorOperatingMode" typeId="chlorOperatingMode"/>
 			<channel id="chlorEnable" typeId="system.power"/>
+			<channel id="chlorScEnable" typeId="chlorScEnable"/>
+			<channel id="chlorScDuration" typeId="chlorScDuration"/>
+			<channel id="chlorScRemaining" typeId="chlorScRemaining"/>
 		</channels>
 
 		<representation-property>System ID</representation-property>
@@ -30,26 +33,36 @@
 	<channel-type id="chlorStatus">
 		<item-type>String</item-type>
 		<label>Status</label>
+		<tags>
+			<tag>Status</tag>
+		</tags>
 		<state readOnly="true"/>
 	</channel-type>
 
 	<channel-type id="chlorSaltInstantLevel">
 		<item-type unitHint="ppm">Number:Dimensionless</item-type>
 		<label>Salt Level: Instant</label>
-		<description>Salt level Insant</description>
+		<tags>
+			<tag>Measurement</tag>
+		</tags>
 		<state readOnly="true"/>
 	</channel-type>
 
 	<channel-type id="chlorSaltAvgLevel">
 		<item-type unitHint="ppm">Number:Dimensionless</item-type>
 		<label>Salt Level: Average</label>
-		<description>Salt level Average</description>
+		<tags>
+			<tag>Measurement</tag>
+		</tags>
 		<state readOnly="true"/>
 	</channel-type>
 
 	<channel-type id="chlorAlert">
 		<item-type>String</item-type>
 		<label>Chlorinator Alert</label>
+		<tags>
+			<tag>Status</tag>
+		</tags>
 		<state pattern="%s" readOnly="true">
 		</state>
 	</channel-type>
@@ -58,15 +71,19 @@
 		<item-type>String</item-type>
 		<label>Chlorinator Error</label>
 		<tags>
+			<tag>Status</tag>
 			<tag>Alarm</tag>
 		</tags>
 		<state pattern="%s" readOnly="true"/>
 	</channel-type>
 
-	<channel-type id="scMode">
+	<channel-type id="chlorScMode">
 		<item-type>String</item-type>
-		<label>scMode</label>
-		<state readOnly="true">
+		<label>SC Mode</label>
+		<tags>
+			<tag>Status</tag>
+		</tags>
+		<state readOnly="false">
 			<options>
 				<option value="0">Off</option>
 				<option value="1">Super Chlorinating</option>
@@ -77,6 +94,9 @@
 	<channel-type id="chlorOperatingState">
 		<item-type>String</item-type>
 		<label>Operating State</label>
+		<tags>
+			<tag>Status</tag>
+		</tags>
 		<state readOnly="true">
 			<options>
 				<option value="1">??</option>
@@ -88,12 +108,18 @@
 	<channel-type id="chlorTimedPercent">
 		<item-type unitHint="%">Number:Dimensionless</item-type>
 		<label>Timed Percent</label>
+		<tags>
+			<tag>Control</tag>
+		</tags>
 		<state min="0" max="100" step="1.0" pattern="%d %%" readOnly="false"/>
 	</channel-type>
 
 	<channel-type id="chlorOperatingMode">
 		<item-type>String</item-type>
 		<label>Operating Mode</label>
+		<tags>
+			<tag>Status</tag>
+		</tags>
 		<state readOnly="true">
 			<options>
 				<option value="0">Disabled</option>
@@ -102,6 +128,39 @@
 				<option value="3">ORP Timed RW</option>
 			</options>
 		</state>
+	</channel-type>
+
+	<channel-type id="chlorScEnable">
+		<item-type>Switch</item-type>
+		<label>SC Enable</label>
+		<tags>
+			<tag>Control</tag>
+		</tags>
+		<state readOnly="false">
+			<options>
+				<option value="0">Off</option>
+				<option value="1">Super Chlorinating</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="chlorScDuration">
+		<item-type unitHint="h">Number:Time</item-type>
+		<label>SC Duration</label>
+		<tags>
+			<tag>Setpoint</tag>
+		</tags>
+		<state min="0" max="96" step="1.0" pattern="%d %%" readOnly="false"/>
+	</channel-type>
+
+	<channel-type id="chlorScRemaining">
+		<item-type unitHint="h">Number:Time</item-type>
+		<label>SC Time Remaining</label>
+		<tags>
+			<tag>Status</tag>
+		</tags>
+		<state pattern="%s" readOnly="true"/>
+
 	</channel-type>
 
 </thing:thing-descriptions>

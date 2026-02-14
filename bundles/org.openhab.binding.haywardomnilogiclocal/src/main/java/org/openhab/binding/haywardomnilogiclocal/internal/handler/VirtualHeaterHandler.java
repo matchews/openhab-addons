@@ -98,34 +98,32 @@ public class VirtualHeaterHandler extends HaywardThingHandler {
             BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
             if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
                 String sysId = getThing().getUID().getId();
-                if (sysId != null) {
-                    if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
-                        Object object = bridgeHandler.getMspConfig().getDevice(sysId);
-                        if (object instanceof VirtualHeaterConfig) {
-                            VirtualHeaterConfig virtualHeater = (VirtualHeaterConfig) object;
-                            Map<String, String> props = new HashMap<>();
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_SHAREDTYPE,
-                                    virtualHeater.getSharedType());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_ENABLED,
-                                    virtualHeater.getEnabled());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_CURRENTSETPOINT,
-                                    virtualHeater.getCurrentSetPoint());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_MAXWATERTEMP,
-                                    virtualHeater.getMaxWaterTemp());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_MINSETTABLEWATERTEMP,
-                                    virtualHeater.getMinSettableWaterTemp());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_MAXSETTABLEWATERTEMP,
-                                    virtualHeater.getMaxSettableWaterTemp());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_COOLDOWNENABLED,
-                                    virtualHeater.getCooldownEnabled());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_EXTENDENABLED,
-                                    virtualHeater.getExtendEnabled());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_BOOSTTIMEINTERVAL,
-                                    virtualHeater.getBoostTimeInterval());
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_HEATERBECOMEVALIDTIMEOUT,
-                                    virtualHeater.getHeaterBecomeValidTimeout());
-                            updateProperties(props);
-                        }
+                if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
+                    Object object = bridgeHandler.getMspConfig().getDevice(sysId);
+                    if (object instanceof VirtualHeaterConfig) {
+                        VirtualHeaterConfig virtualHeater = (VirtualHeaterConfig) object;
+                        Map<String, String> props = new HashMap<>();
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_SHAREDTYPE,
+                                virtualHeater.getSharedType());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_ENABLED,
+                                virtualHeater.getEnabled());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_CURRENTSETPOINT,
+                                virtualHeater.getCurrentSetPoint());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_MAXWATERTEMP,
+                                virtualHeater.getMaxWaterTemp());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_MINSETTABLEWATERTEMP,
+                                virtualHeater.getMinSettableWaterTemp());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_MAXSETTABLEWATERTEMP,
+                                virtualHeater.getMaxSettableWaterTemp());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_COOLDOWNENABLED,
+                                virtualHeater.getCooldownEnabled());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_EXTENDENABLED,
+                                virtualHeater.getExtendEnabled());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_BOOSTTIMEINTERVAL,
+                                virtualHeater.getBoostTimeInterval());
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_VIRTUALHEATER_HEATERBECOMEVALIDTIMEOUT,
+                                virtualHeater.getHeaterBecomeValidTimeout());
+                        updateProperties(props);
                     }
                 }
             }
@@ -200,7 +198,7 @@ public class VirtualHeaterHandler extends HaywardThingHandler {
                 } else if (command == OnOffType.OFF) {
                     cmdString = "0";
                 }
-                cmdURL = CommandBuilder.buildSetHeaterEnable(bowId, sysId, cmdString);
+                cmdURL = CommandBuilder.buildSetHeaterEnableCmd(bowId, sysId, cmdString);
                 sendUdpCommand(cmdURL, MessageType.SET_HEATER_ENABLED);
                 break;
 
@@ -215,14 +213,13 @@ public class VirtualHeaterHandler extends HaywardThingHandler {
                             cmdString = this.cmdToString(command);
                             ;
                         }
-                        cmdURL = CommandBuilder.buildSetHeaterEnable(bowId, sysId, cmdString);
-                        sendUdpCommand(cmdURL, MessageType.SET_HEATER_ENABLED);
+                        cmdURL = CommandBuilder.buildSetUIHeaterCmd(bowId, sysId, cmdString);
+                        sendUdpCommand(cmdURL, MessageType.SET_UI_HEATER_COMMAND);
                     }
                 }
 
                 break;
 
-            // TODO does the heater min/max apply to solar?
             case BindingConstants.CHANNEL_VIRTUALHEATER_SOLARSETPOINT:
                 if (command instanceof QuantityType quantityCommand) {
                     if (heaterMinSetTemp != null && heaterMaxSetTemp != null) {

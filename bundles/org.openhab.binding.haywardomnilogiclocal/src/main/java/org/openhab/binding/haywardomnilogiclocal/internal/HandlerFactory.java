@@ -54,7 +54,7 @@ public class HandlerFactory extends BaseThingHandlerFactory {
 
     private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.unmodifiableSet(
             Stream.concat(BRIDGE_THING_TYPES_UIDS.stream(), THING_TYPES_UIDS.stream()).collect(Collectors.toSet()));
-    private final DynamicStateDescriptionProvider stateDescriptionProvider;
+    private final HaywardDynamicStateDescriptionProvider stateDescriptionProvider;
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -62,7 +62,7 @@ public class HandlerFactory extends BaseThingHandlerFactory {
     }
 
     @Activate
-    public HandlerFactory(final @Reference DynamicStateDescriptionProvider stateDescriptionProvider) {
+    public HandlerFactory(final @Reference HaywardDynamicStateDescriptionProvider stateDescriptionProvider) {
         this.stateDescriptionProvider = stateDescriptionProvider;
     }
 

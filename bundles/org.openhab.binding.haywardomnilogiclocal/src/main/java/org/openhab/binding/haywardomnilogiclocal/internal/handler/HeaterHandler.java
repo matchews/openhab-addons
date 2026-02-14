@@ -20,12 +20,18 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.haywardomnilogiclocal.internal.BindingConstants;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardException;
 import org.openhab.binding.haywardomnilogiclocal.internal.HaywardThingHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.MessageType;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.HeaterEquipConfig;
+import org.openhab.binding.haywardomnilogiclocal.internal.net.CommandBuilder;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Heater;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.Status;
 import org.openhab.binding.haywardomnilogiclocal.internal.telemetry.TelemetryParser;
+import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.Bridge;
+import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.RefreshType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,9 +96,7 @@ public class HeaterHandler extends HaywardThingHandler {
     public void getTelemetry(String xmlResponse) throws HaywardException {
         Status status = TelemetryParser.parse(xmlResponse);
         String sysId = getThing().getUID().getId();
-        if (sysId == null) {
-            return;
-        }
+
         for (Heater h : status.getHeaters()) {
             if (sysId.equals(h.getSystemId())) {
                 @Nullable
@@ -116,7 +120,7 @@ public class HeaterHandler extends HaywardThingHandler {
                 if (heaterEnable != null) {
                     updateData(BindingConstants.CHANNEL_HEATER_ENABLE, heaterEnable);
                 } else {
-                    logger.debug("Heater temp missing from Telemtry");
+                    logger.debug("Heater enable missing from Telemtry");
                 }
 
                 @Nullable
@@ -135,6 +139,38 @@ public class HeaterHandler extends HaywardThingHandler {
                     logger.debug("Heater maintain for missing from Telemtry");
                 }
             }
+        }
+    }
+
+    @Override
+    public void handleCommand(ChannelUID channelUID, Command command) {
+        if ((command instanceof RefreshType)) {
+            return;
+        }
+        String sysId = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
+        String bowId = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
+
+        Bridge bridge = getBridge();
+        if (sysId == null || bowId == null || bridge == null
+                || !(bridge.getHandler() instanceof BridgeHandler bridgehandler)) {
+            return;
+        }
+
+        String cmdURL;
+        String cmdString = "0";
+        switch (channelUID.getId()) {
+            case BindingConstants.CHANNEL_HEATER_ENABLE:
+                if (command == OnOffType.ON) {
+                    cmdString = "1";
+                } else if (command == OnOffType.OFF) {
+                    cmdString = "0";
+                }
+                cmdURL = CommandBuilder.buildSetHeaterEnableCmd(bowId, sysId, cmdString);
+                sendUdpCommand(cmdURL, MessageType.SET_HEATER_ENABLED);
+                break;
+            default:
+                logger.warn("haywardCommand Unsupported type {}", channelUID);
+                return;
         }
     }
 }

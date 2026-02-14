@@ -54,16 +54,14 @@ public class BackyardHandler extends HaywardThingHandler {
             BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
             if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
                 String sysId = getThing().getUID().getId();
-                if (sysId != null) {
-                    if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
-                        Object object = bridgeHandler.getMspConfig().getDevice(sysId);
-                        if (object instanceof BackyardConfig) {
-                            BackyardConfig backyard = (BackyardConfig) object;
-                            Map<String, String> props = new HashMap<>();
-                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_BACKYARDSERVICEMODETIMEOUT,
-                                    backyard.getServiceModeTimeout());
-                            updateProperties(props);
-                        }
+                if (bridgeHandler.getMspConfig().getDevice(sysId) != null) {
+                    Object object = bridgeHandler.getMspConfig().getDevice(sysId);
+                    if (object instanceof BackyardConfig) {
+                        BackyardConfig backyard = (BackyardConfig) object;
+                        Map<String, String> props = new HashMap<>();
+                        putStrStrIfNotNull(props, BindingConstants.PROPERTY_BACKYARDSERVICEMODETIMEOUT,
+                                backyard.getServiceModeTimeout());
+                        updateProperties(props);
                     }
                 }
             }
@@ -74,9 +72,10 @@ public class BackyardHandler extends HaywardThingHandler {
     public void getTelemetry(String xmlResponse) throws HaywardException {
         Status status = TelemetryParser.parse(xmlResponse);
         String sysId = getThing().getUID().getId();
-        if (sysId == null) {
-            return;
-        }
+        // TODO
+        // if (sysId == null) {
+        // return;
+        // }
 
         for (Backyard by : status.getBackyards()) {
             if (sysId.equals(by.getSystemId())) {

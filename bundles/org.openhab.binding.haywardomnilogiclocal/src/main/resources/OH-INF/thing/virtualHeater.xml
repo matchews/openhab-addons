@@ -48,11 +48,16 @@
 	<channel-type id="virtualHeaterMode">
 		<item-type>String</item-type>
 		<label>Mode</label>
+		<tags>
+			<tag>Control</tag>
+			<tag>Heating</tag>
+		</tags>
 		<state readOnly="true">
 			<options>
 				<option value="0">Heat</option>
 				<option value="1">Cool</option>
 				<option value="2">Auto</option>
+				<option value="3">Off</option>
 			</options>
 		</state>
 	</channel-type>
@@ -60,12 +65,18 @@
 	<channel-type id="virtualHeaterSilentMode">
 		<item-type>String</item-type>
 		<label>Silent Mode</label>
+		<tags>
+			<tag>Status</tag>
+		</tags>
 		<state readOnly="true"/>
 	</channel-type>
 
 	<channel-type id="virtualHeaterWhyOn">
 		<item-type>String</item-type>
 		<label>Why On</label>
+		<tags>
+			<tag>Status</tag>
+		</tags>
 		<state readOnly="true"/>
 	</channel-type>
 
