@@ -261,7 +261,6 @@ public class BridgeHandler extends BaseBridgeHandler {
 
         /*
          *
-         * // TODO
          * for (Thing thing : getThing().getThings()) {
          * Map<String, String> properties = thing.getProperties();
          * if ("BACKYARD".equals(properties.get(BindingConstants.PROPERTY_TYPE))) {

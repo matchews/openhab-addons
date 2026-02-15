@@ -229,7 +229,7 @@ public class ChlorinatorHandler extends HaywardThingHandler {
                 if (bridge != null) {
                     BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
                     if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
-                        bridgeHandler.requestConfiguration();
+                        // bridgeHandler.requestConfiguration();
                         Object object = bridgeHandler.getMspConfig().getDevice(sysId);
                         if (object instanceof ChlorinatorConfig) {
                             ChlorinatorConfig chlorinator = (ChlorinatorConfig) object;
@@ -271,7 +271,6 @@ public class ChlorinatorHandler extends HaywardThingHandler {
         String cmdString = "0";
 
         switch (channelUID.getId()) {
-            // TODO working!
             case BindingConstants.CHANNEL_CHLORINATOR_ENABLE:
                 if (command == OnOffType.ON) {
                     cmdString = "1";
@@ -291,24 +290,13 @@ public class ChlorinatorHandler extends HaywardThingHandler {
                 if ("0".equals(scEnabled)) {
                     BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
                     String valvePos = bridgeHandler.getFilterValvePositionForBow(bowID);
-                    String bowType;
-                    // If filterValve is set to SPA (2)
-                    if ("2".equals(valvePos)) {
-                        // Spa
-                        bowType = "1";
-                    } else {
-                        // Pool
-                        bowType = "0";
-                    }
 
-                    String cfgState;
-                    if ("1".equals(cholorEnabled)) {
-                        // Enable Chlorinator
-                        cfgState = "3";
-                    } else {
-                        // Disable Chlorinator
-                        cfgState = "2";
-                    }
+                    // Set bowType based on filter valvePosition
+                    String bowType = "2".equals(valvePos) ? "1" : "0";
+
+                    // cfgState 3 enables/2 disables the chlorinator. Used stored value.
+                    String cfgState = "1".equals(cholorEnabled) ? "3" : "2";
+
                     String opMode = orDefault(snap.operatingMode, DEFAULT_OPERATINGMODE);
                     String scTimeout = "0";
                     String orpTimeout = "0";

@@ -172,28 +172,23 @@ public class CommandBuilder {
         // ToDo
     }
 
-    // working
     public static String buildRequestConfiguration() {
         return XML_DECLARATION + REQUEST_CONFIGURATION + REQUEST_SUFFIX;
     }
 
-    // working
     public static String buildGetAlarmList() {
         return XML_DECLARATION + GET_ALARMLIST + REQUEST_SUFFIX;
     }
 
-    // working
     public static String buildGetTelemetry() {
         return XML_DECLARATION + GET_TELEMETRY + REQUEST_SUFFIX;
     }
 
-    // working
     public static String buildGetUIFilterDiagnosticInfo(String bowID, String equipmentID) {
         return XML_DECLARATION + String.format(GET_UI_FILTER_DIAGNOSTIC_INFO, bowID, equipmentID) + PARAMETERS_SUFFIX
                 + REQUEST_SUFFIX;
     }
 
-    // Working
     public static String buildSetChlorEnableCmd(String bowID, String enable) {
         return XML_DECLARATION + String.format(SET_CHLOR_ENABLE, bowID, enable) + PARAMETERS_SUFFIX + REQUEST_SUFFIX;
     }
@@ -204,7 +199,6 @@ public class CommandBuilder {
                 timedPercent, scTimeout, orpTimeout) + PARAMETERS_SUFFIX + REQUEST_SUFFIX;
     }
 
-    // works to turn on filter
     public static String buildSetEquipmentCmd(String bowID, String equipmentID, String isOn) {
         return XML_DECLARATION + String.format(SET_EQUIPMENT_CMD, bowID, equipmentID, isOn) + COMMAND_SCHEDULE
                 + PARAMETERS_SUFFIX + REQUEST_SUFFIX;
@@ -220,7 +214,6 @@ public class CommandBuilder {
                 + REQUEST_SUFFIX;
     }
 
-    // TODO UNTESTED
     public static String buildSetUISolarSetPointCmd(String bowID, String equipmentID, String temp) {
         return XML_DECLARATION + String.format(SET_UI_SOLAR_SETPOINT_CMD, bowID, equipmentID, temp) + PARAMETERS_SUFFIX
                 + REQUEST_SUFFIX;
@@ -232,7 +225,6 @@ public class CommandBuilder {
                 + PARAMETERS_SUFFIX + REQUEST_SUFFIX;
     }
 
-    // todo
     public static String buildSetUISuperChlorCmd(String bowID, String equipmentID, String isOn) {
         return XML_DECLARATION + String.format(SET_UI_SUPER_CHLOR_CMD, bowID, equipmentID, isOn) + COMMAND_SCHEDULE
                 + PARAMETERS_SUFFIX + REQUEST_SUFFIX;
@@ -244,13 +236,11 @@ public class CommandBuilder {
                 + COMMAND_SCHEDULE + PARAMETERS_SUFFIX + REQUEST_SUFFIX;
     }
 
-    // NOT WORKING
     public static String buildSetStandaloneLightShow(String bowID, String equipmentID, String show) {
         return XML_DECLARATION + String.format(SET_STANDALONE_LIGHTSHOW, bowID, equipmentID, show) + COMMAND_SCHEDULE
                 + PARAMETERS_SUFFIX + REQUEST_SUFFIX;
     }
 
-    // Working
     public static String buildSetStandaloneLightShowOmniDirect(String bowID, String equipmentID, String show,
             String speed, String brightness) {
         return XML_DECLARATION

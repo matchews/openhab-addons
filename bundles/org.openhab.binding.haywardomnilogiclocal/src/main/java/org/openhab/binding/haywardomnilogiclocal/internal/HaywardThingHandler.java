@@ -72,50 +72,81 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
     }
 
     public State toState(String type, String channelID, String value) throws NumberFormatException {
+        // ---- Read bridge properties once (safe defaults) ----
+        String unitsPref = "Standard"; // Standard => °F
+        String vspFormat = "Percent"; // Percent => %
+
+        Bridge bridge = getBridge();
+        if (bridge != null && bridge.getHandler() instanceof BridgeHandler bridgeHandler) {
+            Map<String, String> bridgeProps = bridgeHandler.getThing().getProperties();
+            String u = bridgeProps.get(BindingConstants.PROPERTY_BRIDGE_UNITS);
+            if (u != null) {
+                unitsPref = u;
+            }
+            String vs = bridgeProps.get(BindingConstants.PROPERTY_BRIDGE_VSPSPEEDFORMAT);
+            if (vs != null) {
+                vspFormat = vs;
+            }
+        }
+
+        // ---- Convert by item-type ----
         switch (type) {
             case "Number":
                 return new DecimalType(value);
+
             case "Switch":
                 return OnOffType.from(Integer.parseInt(value) > 0);
-            case "Number:Dimensionless":
-                switch (channelID) {
-                    case BindingConstants.CHANNEL_CHLORINATOR_AVGSALTLEVEL:
-                        return new QuantityType<>(Integer.parseInt(value), Units.PARTS_PER_MILLION);
-                    case BindingConstants.CHANNEL_CHLORINATOR_INSTANTSALTLEVEL:
-                        return new QuantityType<>(Integer.parseInt(value), Units.PARTS_PER_MILLION);
-                    case BindingConstants.CHANNEL_CHLORINATOR_TIMEDPERCENT:
-                        return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
-                    case BindingConstants.CHANNEL_FILTER_SPEED:
-                        return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
-                    case BindingConstants.CHANNEL_FILTER_LASTSPEED:
-                        return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
-                    case BindingConstants.CHANNEL_PUMP_SPEED:
-                        return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
-                }
-                return StringType.valueOf(value);
-            case "Number:Power":
-                switch (channelID) {
-                    case BindingConstants.CHANNEL_FILTER_POWER:
-                        return new QuantityType<>(Integer.parseInt(value), Units.WATT);
-                }
-            case "Number:Temperature":
-                Bridge bridge = getBridge();
-                if (bridge != null) {
-                    BridgeHandler bridgehandler = (BridgeHandler) bridge.getHandler();
-                    if (bridgehandler != null) {
-                        // Get MSP Units property from bridge
-                        Map<String, String> bridgeProperties = bridgehandler.getThing().getProperties();
-                        String units = bridgeProperties.get(BindingConstants.PROPERTY_BRIDGE_UNITS);
 
-                        if ("Standard".equals(units)) {
-                            return new QuantityType<>(Integer.parseInt(value), ImperialUnits.FAHRENHEIT);
-                        } else {
-                            return new QuantityType<>(Integer.parseInt(value), SIUnits.CELSIUS);
-                        }
+            case "Number:Power":
+                if (BindingConstants.CHANNEL_FILTER_POWER.equals(channelID)) {
+                    return new QuantityType<>(Integer.parseInt(value), Units.WATT);
+                }
+                return new DecimalType(value);
+
+            case "Number:Temperature": {
+                int v = Integer.parseInt(value);
+                if ("Metric".equalsIgnoreCase(unitsPref)) {
+                    return new QuantityType<>(v, SIUnits.CELSIUS);
+                } else {
+                    // Default Standard
+                    return new QuantityType<>(v, ImperialUnits.FAHRENHEIT);
+                }
+            }
+            case "Number:Dimensionless": {
+                // --- Chlorinator salt levels: ppm vs g/L ---
+                if (BindingConstants.CHANNEL_CHLORINATOR_AVGSALTLEVEL.equals(channelID)
+                        || BindingConstants.CHANNEL_CHLORINATOR_INSTANTSALTLEVEL.equals(channelID)) {
+                    // If the controller is displaying PPM, use ppm in OH.
+                    // Otherwise treat as g/L (or anything else) and return dimensionless numeric.
+                    if ("Metric".equalsIgnoreCase(unitsPref)) {
+                        // g/L not available in openHAB units -> dimensionless number
+                        return new DecimalType(value);
+                    } else {
+                        return new QuantityType<>(Integer.parseInt(value), Units.PARTS_PER_MILLION);
                     }
                 }
-                // default to imperial if no bridge
-                return new QuantityType<>(Integer.parseInt(value), ImperialUnits.FAHRENHEIT);
+
+                // --- Timed percent is always percent ---
+                if (BindingConstants.CHANNEL_CHLORINATOR_TIMEDPERCENT.equals(channelID)) {
+                    return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
+                }
+
+                // --- Speed channels: Percent vs RPM depending on PROPERTY_BRIDGE_VSPSPEEDFORMAT ---
+                if (BindingConstants.CHANNEL_FILTER_SPEED.equals(channelID)
+                        || BindingConstants.CHANNEL_FILTER_LASTSPEED.equals(channelID)
+                        || BindingConstants.CHANNEL_PUMP_SPEED.equals(channelID)) {
+                    int v = Integer.parseInt(value);
+
+                    if ("RPM".equalsIgnoreCase(vspFormat)) {
+                        return new QuantityType<>(v, Units.RPM);
+                    } else {
+                        return new QuantityType<>(v, Units.PERCENT);
+                    }
+                }
+
+                // Default for other Number:Dimensionless channels: keep numeric
+                return new DecimalType(value);
+            }
             default:
                 return StringType.valueOf(value);
         }

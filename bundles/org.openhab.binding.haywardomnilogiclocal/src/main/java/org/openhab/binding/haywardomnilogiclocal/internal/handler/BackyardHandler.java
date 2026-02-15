@@ -72,10 +72,6 @@ public class BackyardHandler extends HaywardThingHandler {
     public void getTelemetry(String xmlResponse) throws HaywardException {
         Status status = TelemetryParser.parse(xmlResponse);
         String sysId = getThing().getUID().getId();
-        // TODO
-        // if (sysId == null) {
-        // return;
-        // }
 
         for (Backyard by : status.getBackyards()) {
             if (sysId.equals(by.getSystemId())) {

@@ -15,9 +15,9 @@
 				<label>Network Address</label>
 				<description>The local address or hostname of the Omnilogic controller</description>
 			</parameter>
-			<parameter name="telemetryPollTime" type="integer" min="2" max="60" unit="s" required="true">
+			<parameter name="telemetryPollTime" type="integer" min="5" max="60" unit="s" required="true">
 				<label>Telemetry Poll Delay</label>
-				<default>3</default>
+				<default>10</default>
 				<description>How often to request telemetry data from Hayward Controller</description>
 			</parameter>
 			<parameter name="alarmPollTime" type="integer" min="0" max="120" unit="s" required="true">

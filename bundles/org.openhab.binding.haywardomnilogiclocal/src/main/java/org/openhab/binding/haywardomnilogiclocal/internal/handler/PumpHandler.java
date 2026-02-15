@@ -159,6 +159,41 @@ public class PumpHandler extends HaywardThingHandler {
     }
 
     @Override
+    public void getTelemetry(String xmlResponse) throws HaywardException {
+        Status status = TelemetryParser.parse(xmlResponse);
+        String sysId = getThing().getProperties().get("systemID");
+        if (sysId == null) {
+            return;
+        }
+        for (Pump p : status.getPumps()) {
+            if (sysId.equals(p.getSystemId())) {
+                @Nullable
+                String pumpSpeed = p.getPumpSpeed();
+                if (pumpSpeed != null) {
+                    updateData(BindingConstants.CHANNEL_PUMP_SPEED, pumpSpeed);
+
+                    if (Integer.parseInt(pumpSpeed) > 0) {
+                        updateData(BindingConstants.CHANNEL_PUMP_ENABLE, "1");
+                    } else {
+                        updateData(BindingConstants.CHANNEL_PUMP_ENABLE, "0");
+                    }
+
+                } else {
+                    logger.debug("Pump speed missing from Telemtry");
+                }
+
+                @Nullable
+                String pumpState = p.getPumpState();
+                if (pumpState != null) {
+                    updateData(BindingConstants.CHANNEL_PUMP_STATE, pumpState);
+                } else {
+                    logger.debug("Pump state missing from Telemtry");
+                }
+            }
+        }
+    }
+
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         if ((command instanceof RefreshType)) {
             return;
@@ -210,41 +245,6 @@ public class PumpHandler extends HaywardThingHandler {
                 break;
             default:
                 break;
-        }
-    }
-
-    @Override
-    public void getTelemetry(String xmlResponse) throws HaywardException {
-        Status status = TelemetryParser.parse(xmlResponse);
-        String sysId = getThing().getProperties().get("systemID");
-        if (sysId == null) {
-            return;
-        }
-        for (Pump p : status.getPumps()) {
-            if (sysId.equals(p.getSystemId())) {
-                @Nullable
-                String pumpSpeed = p.getPumpSpeed();
-                if (pumpSpeed != null) {
-                    updateData(BindingConstants.CHANNEL_PUMP_SPEED, pumpSpeed);
-
-                    if (Integer.parseInt(pumpSpeed) > 0) {
-                        updateData(BindingConstants.CHANNEL_PUMP_ENABLE, "1");
-                    } else {
-                        updateData(BindingConstants.CHANNEL_PUMP_ENABLE, "0");
-                    }
-
-                } else {
-                    logger.debug("Pump speed missing from Telemtry");
-                }
-
-                @Nullable
-                String pumpState = p.getPumpState();
-                if (pumpState != null) {
-                    updateData(BindingConstants.CHANNEL_PUMP_STATE, pumpState);
-                } else {
-                    logger.debug("Pump state missing from Telemtry");
-                }
-            }
         }
     }
 }
