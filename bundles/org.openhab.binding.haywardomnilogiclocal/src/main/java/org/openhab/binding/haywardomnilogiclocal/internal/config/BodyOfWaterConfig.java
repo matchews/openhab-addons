@@ -60,7 +60,7 @@ public class BodyOfWaterConfig {
     private final List<FilterConfig> filters = new ArrayList<>();
 
     @XStreamImplicit(itemFieldName = "Pump")
-    private final List<FilterConfig> pump = new ArrayList<>();
+    private final List<PumpConfig> pumps = new ArrayList<>();
 
     @XStreamImplicit(itemFieldName = "Heater")
     private final List<VirtualHeaterConfig> virtualHeaters = new ArrayList<>();
@@ -115,6 +115,10 @@ public class BodyOfWaterConfig {
 
     public List<FilterConfig> getFilters() {
         return filters;
+    }
+
+    public List<PumpConfig> getPumps() {
+        return pumps;
     }
 
     public List<VirtualHeaterConfig> getVirtualHeaters() {

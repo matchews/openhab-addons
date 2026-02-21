@@ -46,6 +46,13 @@ public class CommandBuilder {
                 <Parameter name="EquipmentID" dataType="int">%s</Parameter>
             """;
 
+    private static final String RUN_GROUP_CMD = """
+            <Name>RunGroupCmd</Name>
+            <Parameters>
+                <Parameter name="GroupID" dataType="int">%s</Parameter>
+                <Parameter name="Data" dataType="int">%s</Parameter>
+            """;
+
     private static final String SET_CHLOR_ENABLE = """
             <Name>SetCHLOREnable</Name>
             <Parameters>
@@ -186,6 +193,11 @@ public class CommandBuilder {
 
     public static String buildGetUIFilterDiagnosticInfo(String bowID, String equipmentID) {
         return XML_DECLARATION + String.format(GET_UI_FILTER_DIAGNOSTIC_INFO, bowID, equipmentID) + PARAMETERS_SUFFIX
+                + REQUEST_SUFFIX;
+    }
+
+    public static String buildRunGroupCmd(String groupID, String enable) {
+        return XML_DECLARATION + String.format(RUN_GROUP_CMD, groupID, enable) + COMMAND_SCHEDULE + PARAMETERS_SUFFIX
                 + REQUEST_SUFFIX;
     }
 

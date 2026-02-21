@@ -15,19 +15,19 @@ The local UDP connection requires no authentication, and the controller listens 
 
 The table below lists the Hayward OmniLogic binding thing types:
 
-| Things                   | Description                                                   | Thing Type     |
-|--------------------------|---------------------------------------------------------------|----------------|
-| Hayward OmniLogix Bridge | Connection to the local OmniLogic controller over UDP        | bridge         |
-| Backyard                 | Backyard                                                      | backyard       |
-| Body of Water            | Body of Water                                                 | bow            |
-| Chlorinator              | Chlorinator                                                   | chlorinator    |
-| Colorlogic Light         | Colorlogic Light                                              | colorlogic     |
-| Filter                   | Filter control                                                | filter         |
-| Heater Equipment         | Actual heater (i.e. gas, solar, electric)                     | heater         |
-| Pump                     | Auxiliary pump control (i.e. spillover)                      | pump           |
-| Relay                    | Accessory relay control (deck jet sprinklers, lights, etc.)   | relay          |
+| Things                   | Description                                                                     | Thing Type    |
+| ------------------------ | ------------------------------------------------------------------------------- | ------------- |
+| Hayward OmniLogix Bridge | Connection to the local OmniLogic controller over UDP                           | bridge        |
+| Backyard                 | Backyard                                                                        | backyard      |
+| Body of Water            | Body of Water                                                                   | bow           |
+| Chlorinator              | Chlorinator                                                                     | chlorinator   |
+| Colorlogic Light         | Colorlogic Light                                                                | colorlogic    |
+| Filter                   | Filter control                                                                  | filter        |
+| Group                    | Group control                                                                   | group         |
+| Heater Equipment         | Actual heater (i.e. gas, solar, electric)                                       | heater        |
+| Pump                     | Auxiliary pump control (i.e. spillover)                                         | pump          |
+| Relay                    | Accessory relay control (deck jet sprinklers, lights, etc.)                     | relay         |
 | Virtual Heater           | A Virtual Heater that can control all of the heater equipment based on priority | virtualHeater |
-
 
 ## Discovery
 
@@ -39,53 +39,52 @@ things within openHAB.
 
 Hayward OmniLogic Controller Parameters:
 
-| Property             | Default          | Required | Description                                   |
-|----------------------|------------------|----------|-----------------------------------------------|
-| Host Name            | haywardomnilogic | Yes      | Host name or IP address of the controller     |
-| Telemetry Poll Delay | 3                | Yes      | Telemetry poll delay (2-60 seconds)           |
-| Alarm Poll Delay     | 10               | Yes      | Alarm poll delay (0-120 seconds, 0 disabled)  |
+| Property             | Default          | Required | Description                                  |
+| -------------------- | ---------------- | -------- | -------------------------------------------- |
+| Host Name            | haywardomnilogic | Yes      | Host name or IP address of the controller    |
+| Telemetry Poll Delay | 10               | Yes      | Telemetry poll delay (5-60 seconds)          |
+| Alarm Poll Delay     | 10               | Yes      | Alarm poll delay (0-120 seconds, 0 disabled) |
 
 ## Channels
 
 ### Backyard Channels
 
-| Channel Type ID | Item Type          | Description                      | Read Write |
-|-----------------|--------------------|----------------------------------|:----------:|
-| backyardAirTemp | Number:Temperature | Backyard air temp sensor reading |      R     |
-| backyardStatus  | String             | Backyard status                  |      R     |
-| backyardState   | String             | Backyard state                   |      R     |
-| backyardAlarm1  | String             | Backyard alarm #1                |      R     |
-| backyardAlarm2  | String             | Backyard alarm #2                |      R     |
-| backyardAlarm3  | String             | Backyard alarm #3                |      R     |
-| backyardAlarm4  | String             | Backyard alarm #4                |      R     |
-| backyardAlarm5  | String             | Backyard alarm #5                |      R     |
+| Channel Type ID      | Item Type          | Description                      | Read Write |
+| -------------------- | ------------------ | -------------------------------- | :--------: |
+| backyardAirTemp      | Number:Temperature | Backyard air temp sensor reading |     R      |
+| backyardState        | String             | Backyard state                   |     R      |
+| backyardConfigChksum | String             | Config Checksum                  |     R      |
+| backyardMspVersion   | String             | MSP Version                      |     R      |
 
 ### Body of Water Channels
 
 | Channel Type ID | Item Type          | Description                        | Read Write |
-|-----------------|--------------------|------------------------------------|:----------:|
-| bowFlow         | Switch             | Body of Water flow sensor feedback |      R     |
-| bowWaterTemp    | Number:Temperature | Body of Water temperature          |      R     |
+| --------------- | ------------------ | ---------------------------------- | :--------: |
+| bowFlow         | Switch             | Body of Water flow sensor feedback |     R      |
+| bowWaterTemp    | Number:Temperature | Body of Water temperature          |     R      |
 
 ### Chlorinator Channels
 
 | Channel Type ID       | Item Type            | Description                                              | Read Write |
-|-----------------------|----------------------|----------------------------------------------------------|:----------:|
+| --------------------- | -------------------- | -------------------------------------------------------- | :--------: |
 | chlorEnable           | Switch               | Chlorinator enable                                       |    R/W     |
 | chlorOperatingMode    | String               | Chlorinator operating mode                               |     R      |
 | chlorTimedPercent     | Number:Dimensionless | Chlorinator salt output (%)                              |    R/W     |
 | chlorOperatingState   | Number               | Chlorinator operating state                              |     R      |
+| chlorScEnable         | Switch               | Chlorinator super chlorinate enable                      |     R      |
+| chlorScDuration       | Number:Time          | Chlorinator super chlorinate duration                    |     R      |
+| chlorScRemaining      | Number:Time          | Chlorinator super chlorinate time remaining              |     R      |
 | chlorScMode           | String               | Chlorinator super chlorinate mode                        |     R      |
 | chlorError            | String               | Chlorinator error bit array                              |     R      |
 | chlorAlert            | String               | Chlorinator alert bit array                              |     R      |
-| chlorAvgSaltLevel     | Number:Dimensionless | Chlorinator average salt level in Part per Million (ppm) |     R      |
-| chlorInstantSaltLevel | Number:Dimensionless | Chlorinator instant salt level in Part per Million (ppm) |     R      |
+| chlorSaltAvgLevel     | Number:Dimensionless | Chlorinator average salt level in Part per Million (ppm) |     R      |
+| chlorSaltInstantLevel | Number:Dimensionless | Chlorinator instant salt level in Part per Million (ppm) |     R      |
 | chlorStatus           | String               | Chlorinator status bit array                             |     R      |
 
 ### Chlorinator Error Bit Array
 
 | Bits  | Value                                                   | Description        |
-|-------|---------------------------------------------------------|--------------------|
+| ----- | ------------------------------------------------------- | ------------------ |
 | 1:0   | 00 = OK, 01 = Short, 10 = Open                          | Current Sensor     |
 | 3:2   | 00 = OK, 01 = Short, 10 = Open                          | Voltage Sensor     |
 | 5:4   | 00 = OK, 01 = Short, 10 = Open                          | Cell Temp Sensor   |
@@ -98,7 +97,7 @@ Hayward OmniLogic Controller Parameters:
 ### Chlorinator Alert Bit Array
 
 | Bits  | Value                                        | Description           |
-|-------|----------------------------------------------|-----------------------|
+| ----- | -------------------------------------------- | --------------------- |
 | 1:0   | 00 = OK, 01 = Salt Low, 10 = Salt too Low    | Low salt              |
 | 2     | 0 = OK, 1 = High                             | High Current          |
 | 3     | 0 = OK, 1 = Low                              | Low Voltage           |
@@ -110,76 +109,92 @@ Hayward OmniLogic Controller Parameters:
 
 ### Chlorinator Status Bit Array
 
-|Bits  |Value                                                         |Description                    |
-|------|--------------------------------------------------------------|-------------------------------|
-|0     |0 = OK, 1 = Error Present                                     |Error Present                  |
-|1     |0 = OK, 1 = Alert Present                                     |Alert Present                  |
-|2     |0 = Standy, 1 = Generating                                    |Generating                     |
-|3     |0 = Not Paused, 1 = Paused                                    |Paused                         |
-|4     |0 = Local Not Paused, 1 = Local Paused                        |Local Pause                    |
-|5     |0 = Not Authenticated, 1 = Authenticated                      |T-Cell Authenticated           |
-|6     |0 = K1 Relay Off, 1 = K1 Relay On                             |K1 Relay Active                |
-|7     |0 = K2 Relay Off, 1 = K2 Relay On                             |K2 Relay Active                |
+| Bits | Value                                    | Description          |
+| ---- | ---------------------------------------- | -------------------- |
+| 0    | 0 = OK, 1 = Error Present                | Error Present        |
+| 1    | 0 = OK, 1 = Alert Present                | Alert Present        |
+| 2    | 0 = Standy, 1 = Generating               | Generating           |
+| 3    | 0 = Not Paused, 1 = Paused               | Paused               |
+| 4    | 0 = Local Not Paused, 1 = Local Paused   | Local Pause          |
+| 5    | 0 = Not Authenticated, 1 = Authenticated | T-Cell Authenticated |
+| 6    | 0 = K1 Relay Off, 1 = K1 Relay On        | K1 Relay Active      |
+| 7    | 0 = K2 Relay Off, 1 = K2 Relay On        | K2 Relay Active      |
 
 ### Colorlogic Light Channels
 
 | Channel Type ID            | Item Type | Description                   | Read Write |
-|----------------------------|-----------|-------------------------------|:----------:|
-| colorLogicLightEnable      | Switch    | Colorlogic Light enable       |     R/W    |
-| colorLogicLightState       | String    | Colorlogic Light state        |      R     |
-| colorLogicLightCurrentShow | String    | Colorlogic Light current show |     R/W    |
-| colorLogicLightBrightness  | String    | Colorlogic Light brightness   |     R/W    |
-| colorLogicLightSpeed       | String    | Colorlogic Light speed        |     R/W    |
+| -------------------------- | --------- | ----------------------------- | :--------: |
+| colorLogicLightEnable      | Switch    | Colorlogic Light enable       |    R/W     |
+| colorLogicLightState       | String    | Colorlogic Light state        |     R      |
+| colorLogicLightCurrentShow | String    | Colorlogic Light current show |    R/W     |
+| colorLogicLightBrightness  | String    | Colorlogic Light brightness   |    R/W     |
+| colorLogicLightSpeed       | String    | Colorlogic Light speed        |    R/W     |
+| colorLogicSpecialEffect    | String    | Colorlogic Special Effect     |    R/W     |
 
-**Note:** Brightness and speed channels only available on Hayward V2 lights
+**Note:** Brightness, speed and special effect channels only available on Hayward V2 lights
 
 ### Filter Channels
 
-| Channel Type ID     | Item Type            | Description            | Read Write |
-|---------------------|----------------------|------------------------|:----------:|
-| filterEnable        | Switch               | Filter enable          |     R/W    |
-| filterValvePosition | String               | Filter valve position  |      R     |
-| filterSpeedPercent  | Number:Dimensionless | Filter speed (%)       |     R/W    |
-| filterSpeedRpm      | Number:Frequency     | Filter speed (rpm)     |     R/W    |
-| filterSpeedSelect   | String               | Filter speed presets   |     R/W    |
-| filterState         | String               | Filter state           |      R     |
-| filterLastSpeed     | Number:Dimensionless | Filter last speed (%)  |      R     |
+| Channel Type ID     | Item Type            | Description           | Read Write |
+| ------------------- | -------------------- | --------------------- | :--------: |
+| filterEnable        | Switch               | Filter enable         |    R/W     |
+| filterValvePosition | String               | Filter valve position |     R      |
+| filterSpeed         | Number:Dimensionless | Filter speed (%)      |    R/W     |
+| filterSpeedRpm      | Number:Frequency     | Filter speed (rpm)    |    R/W     |
+| filterSpeedPreset   | String               | Filter speed presets  |    R/W     |
+| filterState         | String               | Filter state          |     R      |
+| filterLastSpeed     | Number:Dimensionless | Filter last speed (%) |     R      |
+| filterWhyFilterIsOn | String               | Filter why on         |     R      |
+| filterFpOverride    | String               | Filter FP Override    |     R      |
+| filterReportedSpeed | Number:Dimensionless | Filter reported speed |     R      |
+| filterPower         | Number:Power         | Filter why on         |     R      |
 
 ### Heater Channels
 
-| Channel Type ID | Item Type | Description   | Read Write |
-|-----------------|-----------|---------------|:----------:|
-| heaterState     | String    | Heater state  |      R     |
-| heaterEnable    | Switch    | Heater enable |      R     |
+| Channel Type ID   | Item Type          | Description         | Read Write |
+| ----------------- | ------------------ | ------------------- | :--------: |
+| heaterState       | String             | Heater state        |     R      |
+| heaterTemp        | Number:Temperature | Heater temp         |     R      |
+| heaterState       | String             | Heater state        |     R      |
+| heaterEnable      | Switch             | Heater enable       |     R      |
+| heaterPriority    | Switch             | Heater priority     |     R      |
+| heaterMaintainFor | String             | Heater maintain for |     R      |
 
 ### Pump Channels
 
-| Channel Type ID  | Item Type            | Description          | Read Write |
-|------------------|----------------------|----------------------|:----------:|
-| pumpEnable       | Switch               | Pump enable          |     R/W    |
-| pumpSpeedPercent | Number:Dimensionless | Pump speed (%)       |     R/W    |
-| pumpSpeedRpm     | Number: Frequency    | Pump speed in rpm    |     R/W    |
-| pumpSpeedSelect  | String               | Pump speed presets   |     R/W    |
-| pumpState        | String               | Pump state           |      R     |
-| pumpLastSpeed    | Number:Dimensionless | Pump last speed (%)  |      R     |
+| Channel Type ID | Item Type            | Description         | Read Write |
+| --------------- | -------------------- | ------------------- | :--------: |
+| pumpEnable      | Switch               | Pump enable         |    R/W     |
+| pumpSpeed       | Number:Dimensionless | Pump speed (%)      |    R/W     |
+| pumpSpeedSelect | String               | Pump speed presets  |    R/W     |
+| pumpState       | String               | Pump state          |     R      |
+| pumpLastSpeed   | Number:Dimensionless | Pump last speed (%) |     R      |
+| pumpLastWhyOn   | String               | Pump why on         |     R      |
 
 ### Relay Channels
 
-| Channel Type ID | Item Type | Description | Read Write |
-|-----------------|-----------|-------------|:----------:|
-| relayState      | Switch    | Relay state |     R/W    |
+| Channel Type ID | Item Type | Description  | Read Write |
+| --------------- | --------- | ------------ | :--------: |
+| relayState      | Switch    | Relay state  |    R/W     |
+| relayWhyOn      | String    | Relay why on |     R      |
 
 ### Virtual Heater Channels
 
-| Channel Type ID       | Item Type          | Description             | Read Write |
-|-----------------------|--------------------|-------------------------|:----------:|
-| heaterEnable          | Switch             | Heater enable           |      R     |
-| heaterCurrentSetpoint | Number:Temperature | Heater Current Setpoint |     R/W    |
+| Channel Type ID            | Item Type          | Description             | Read Write |
+| -------------------------- | ------------------ | ----------------------- | :--------: |
+| heaterEnable               | Switch             | Heater enable           |     R      |
+| heaterCurrentSetpoint      | Number:Temperature | Heater current Setpoint |    R/W     |
+| virtualHeaterSolarSetpoint | Number:Temperature | Heater solar Setpoint   |    R/W     |
+| virtualHeaterMode          | String             | Heater mode             |    R/W     |
+| virtualHeaterSilentMode    | String             | Heater silent mode      |     R      |
+| virtualHeaterWhyOn         | String             | Heater why on           |     R      |
 
-**Item Types Number:Dimensionless should have the units (i.e. %, ppm) defined in the Unit metadata
+Item Types Number:Dimensionless should have the units (i.e. %, ppm) defined in the Unit metadata
 
-## Full Example
+## Notes
 
 After installing the binding, you will need to manually add the Hayward Connection thing.
 All pool items can be automatically discovered by scanning the bridge.
 Goto the inbox and add the things.
+
+Suggestion: Set "Default List Item Widget" to "Slider List Item" for chlorTimedPercent, filterSpeed and pumpSpeed channels.

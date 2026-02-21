@@ -40,6 +40,9 @@ public class Status {
     @XStreamImplicit(itemFieldName = "Filter")
     private final List<Filter> filters = new ArrayList<>();
 
+    @XStreamImplicit(itemFieldName = "Group")
+    private final List<Group> groups = new ArrayList<>();
+
     @XStreamImplicit(itemFieldName = "VirtualHeater")
     private final List<VirtualHeater> virtualHeaters = new ArrayList<>();
 
@@ -72,6 +75,10 @@ public class Status {
 
     public List<Filter> getFilters() {
         return filters;
+    }
+
+    public List<Group> getGroups() {
+        return groups;
     }
 
     public List<VirtualHeater> getVirtualHeaters() {

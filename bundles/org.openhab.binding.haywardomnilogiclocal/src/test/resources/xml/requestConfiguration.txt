@@ -1,0 +1,1572 @@
+2026-02-18 07:03:40.077 [TRACE] [local.internal.handler.BridgeHandler] - Hayward Connection thing:  requestConfiguration Hayward UDP command Response:
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--Settings for MSP-->
+<MSPConfig>
+    <System>
+        <Msp-Vsp-Speed-Format>RPM</Msp-Vsp-Speed-Format>
+        <Msp-Time-Format>12 Hour Format</Msp-Time-Format>
+        <TimeZone>-360</TimeZone>
+        <DST>yes</DST>
+        <InternetTime>on</InternetTime>
+        <Units>Standard</Units>
+        <Msp-Chlor-Display>Salt</Msp-Chlor-Display>
+        <Msp-Language>English</Msp-Language>
+        <UI-Display-Mode>standard</UI-Display-Mode>
+        <UI-MoodColor-Enabled>Yes</UI-MoodColor-Enabled>
+        <UI-Heater-SimpleMode>Yes</UI-Heater-SimpleMode>
+        <UI-Filter-SimpleMode>Yes</UI-Filter-SimpleMode>
+        <UI-Lights-SimpleMode>Yes</UI-Lights-SimpleMode>
+    </System>
+    <Backyard>
+        MSP Configuration
+        <System-Id>0</System-Id>
+        <Name>Backyard</Name>
+        <Service-Mode-Timeout>0</Service-Mode-Timeout>
+        <Sensor>
+            <System-Id>17</System-Id>
+            <Name>AirSensor</Name>
+            <Type>SENSOR_AIR_TEMP</Type>
+            <Units>UNITS_FAHRENHEIT</Units>
+            <Operation>
+                PEO_GET_VALUE
+                <Action>
+                    <Action-Function>ACT_FNC_GET_AIR_TEMP</Action-Function>
+                    <Action-Data1>19</Action-Data1>
+                    <Action-Data2>4</Action-Data2>
+                    <Action-Data3>0</Action-Data3>
+                </Action>
+            </Operation>
+        </Sensor>
+        <Body-of-water>
+            01
+            <System-Id>1</System-Id>
+            <Name>Pool</Name>
+            <Type>BOW_POOL</Type>
+            <Shared-Type>BOW_SHARED_EQUIPMENT</Shared-Type>
+            <Shared-Priority>SHARED_EQUIPMENT_LOW_PRIORITY</Shared-Priority>
+            <Shared-Equipment-System-ID>2</Shared-Equipment-System-ID>
+            <Supports-Spillover>no</Supports-Spillover>
+            <Use-Spillover-For-Filter-Operations>no</Use-Spillover-For-Filter-Operations>
+            <Size-In-Gallons>0</Size-In-Gallons>
+            <Filter>
+                <System-Id>3</System-Id>
+                <Name>Filter Pump</Name>
+                <Shared-Type>BOW_SHARED_EQUIPMENT</Shared-Type>
+                <Filter-Type>FMT_VARIABLE_SPEED_PUMP</Filter-Type>
+                <Max-Pump-Speed>100</Max-Pump-Speed>
+                <Min-Pump-Speed>50</Min-Pump-Speed>
+                <Max-Pump-RPM>3450</Max-Pump-RPM>
+                <Min-Pump-RPM>1725</Min-Pump-RPM>
+                <Min-Priming-Interval>30</Min-Priming-Interval>
+                <Priming-Enabled>no</Priming-Enabled>
+                <Priming-Duration>180</Priming-Duration>
+                <Cooldown-Duration>300</Cooldown-Duration>
+                <Shutdown-Request-Timeout>300</Shutdown-Request-Timeout>
+                <No-Water-Flow-Timeout-Enable>no</No-Water-Flow-Timeout-Enable>
+                <No-Water-Flow-Timeout-Timeout>900</No-Water-Flow-Timeout-Timeout>
+                <Valve-Change-Off-Enable>no</Valve-Change-Off-Enable>
+                <Valve-Change-Off-Duration>35</Valve-Change-Off-Duration>
+                <Freeze-Protect-Enable>yes</Freeze-Protect-Enable>
+                <Freeze-Protect-Temp>38</Freeze-Protect-Temp>
+                <Freeze-Protect-Speed>50</Freeze-Protect-Speed>
+                <Shared-Filter-Timeout>1800</Shared-Filter-Timeout>
+                <Filter-Valve-Position>FLT_DONT_CHANGE_VALVES</Filter-Valve-Position>
+                <Vsp-Low-Pump-Speed>50</Vsp-Low-Pump-Speed>
+                <Vsp-Medium-Pump-Speed>75</Vsp-Medium-Pump-Speed>
+                <Vsp-High-Pump-Speed>100</Vsp-High-Pump-Speed>
+                <Vsp-Custom-Pump-Speed>50</Vsp-Custom-Pump-Speed>
+                <Freeze-Protect-Override-Interval>7200</Freeze-Protect-Override-Interval>
+                <Operation>
+                    PEO_VSP_SET_SPEED
+                    <Action>
+                        <Action-Function>ACT_FNC_VSP_SET_SPEED</Action-Function>
+                        <Action-Data1>25</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_INIT
+                    <Action>
+                        <Action-Function>ACT_FNC_FLT_STARTUP</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_TEAR_DOWN
+                    <Action>
+                        <Action-Function>ACT_FNC_FLT_TEARDOWN</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_SET_VALVES_FOR_SPILLOVER
+                    <Action>
+                        <Action-Function>ACT_FNC_HW_ACTIVATE_VALVE</Action-Function>
+                        <Action-Data1>13</Action-Data1>
+                        <Action-Data2>2</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                    <Action>
+                        <Action-Function>ACT_FNC_HW_ACTIVATE_VALVE</Action-Function>
+                        <Action-Data1>12</Action-Data1>
+                        <Action-Data2>1</Action-Data2>
+                        <Action-Data3>1</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_SET_VALVES_FOR_FILTER
+                    <Action>
+                        <Action-Function>ACT_FNC_HW_ACTIVATE_VALVE</Action-Function>
+                        <Action-Data1>13</Action-Data1>
+                        <Action-Data2>2</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                    <Action>
+                        <Action-Function>ACT_FNC_HW_ACTIVATE_VALVE</Action-Function>
+                        <Action-Data1>12</Action-Data1>
+                        <Action-Data2>1</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_GET_TIME_VALVE_LAST_TURNED
+                    <Action>
+                        <Action-Function>ACT_FNC_HW_SEC_SINCE_VALVES_LAST_TURNED</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+            </Filter>
+            <Heater>
+                <System-Id>4</System-Id>
+                <Shared-Type>BOW_SHARED_EQUIPMENT</Shared-Type>
+                <Enabled>no</Enabled>
+                <Current-Set-Point>80</Current-Set-Point>
+                <SolarSetPoint>88</SolarSetPoint>
+                <Max-Water-Temp>104</Max-Water-Temp>
+                <Min-Settable-Water-Temp>55</Min-Settable-Water-Temp>
+                <Max-Settable-Water-Temp>104</Max-Settable-Water-Temp>
+                <Cooldown-Enabled>no</Cooldown-Enabled>
+                <Extend-Enabled>no</Extend-Enabled>
+                <Boost-Time-Interval>300</Boost-Time-Interval>
+                <Heater-Become-Valid-Timeout>900</Heater-Become-Valid-Timeout>
+                <Operation>
+                    PEO_INIT
+                    <Action>
+                        <Action-Function>ACT_FNC_HEATER_STARTUP</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_TEAR_DOWN
+                    <Action>
+                        <Action-Function>ACT_FNC_HEATER_TEARDOWN</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_HEATER_EQUIPMENT
+                    <Heater-Equipment>
+                        <System-Id>5</System-Id>
+                        <Name>HEATER</Name>
+                        <Type>PET_HEATER</Type>
+                        <Heater-Type>HTR_GAS</Heater-Type>
+                        <Enabled>yes</Enabled>
+                        <Priority>HTR_PRIORITY_1</Priority>
+                        <Run-For-Priority>HTR_MAINTAINS_PRIORITY_FOR_AS_LONG_AS_VALID</Run-For-Priority>
+                        <Allow-Low-Speed-Operation>yes</Allow-Low-Speed-Operation>
+                        <Min-Speed-For-Operation>90</Min-Speed-For-Operation>
+                        <Requires-Priming>no</Requires-Priming>
+                        <Min-Priming-Interval>180</Min-Priming-Interval>
+                        <Temp-Difference-Initial>8</Temp-Difference-Initial>
+                        <Temp-Difference-Running>2</Temp-Difference-Running>
+                        <Sensor-System-Id>-1</Sensor-System-Id>
+                        <Shared-Equipment-System-ID>13</Shared-Equipment-System-ID>
+                        <Operation>
+                            PEO_TURN_ON
+                            <Action>
+                                <Action-Function>ACT_FNC_TURN_ON_LV_RELAY</Action-Function>
+                                <Action-Data1>2</Action-Data1>
+                                <Action-Data2>1</Action-Data2>
+                                <Action-Data3>1</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_TURN_OFF
+                            <Action>
+                                <Action-Function>ACT_FNC_TURN_ON_LV_RELAY</Action-Function>
+                                <Action-Data1>2</Action-Data1>
+                                <Action-Data2>1</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                    </Heater-Equipment>
+                </Operation>
+            </Heater>
+            <Chlorinator>
+                <System-Id>6</System-Id>
+                <Name>Chlorinator</Name>
+                <Shared-Type>BOW_SHARED_EQUIPMENT</Shared-Type>
+                <Enabled>no</Enabled>
+                <Mode>CHLOR_OP_MODE_TIMED</Mode>
+                <Timed-Percent>70</Timed-Percent>
+                <SuperChlor-Timeout>24</SuperChlor-Timeout>
+                <Cell-Type>CELL_TYPE_TCELLS340</Cell-Type>
+                <Dispenser-Type>SALT_DISPENSING</Dispenser-Type>
+                <ORP-Timeout>86400</ORP-Timeout>
+                <ORP-Sensor-ID>-1</ORP-Sensor-ID>
+                <Operation>
+                    PEO_INIT
+                    <Action>
+                        <Action-Function>ACT_FNC_CHL_STARTUP</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_TEAR_DOWN
+                    <Action>
+                        <Action-Function>ACT_FNC_CHL_TEARDOWN</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_CHLORINATOR_EQUIPMENT
+                    <Chlorinator-Equipment>
+                        <System-Id>7</System-Id>
+                        <Name>Chlorinator1</Name>
+                        <Type>PET_CHLORINATOR</Type>
+                        <Chlorinator-Type>CHLOR_TYPE_MAIN_PANEL</Chlorinator-Type>
+                        <Enabled>yes</Enabled>
+                        <Operation>
+                            PEO_STATUS_GET
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_STATUS_GET</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_PARAMS_SET
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_PARAMS_SET</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_PAUSE
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_PAUSE_CONTINUE</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>1</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_CONTINUE
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_PAUSE_CONTINUE</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>2</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_ERRORS_GET
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_ERRORS_GET</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_ALERTS_GET
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_ALERTS_GET</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_SUPER_CHLOR_ON
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_SUPER_CHLOR_SET</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>1</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_SUPER_CHLOR_OFF
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_SUPER_CHLOR_SET</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_SALT_CALC_RESTART
+                            <Action>
+                                <Action-Function>ACT_FNC_SALT_CALC_RESTART</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_POLARITY_REVERSE
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_RELAY_POLARITY_REVERSE</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_CELL_RUNTIME_RESTART
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_CELL_RUNTIME_RESTART</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                    </Chlorinator-Equipment>
+                </Operation>
+            </Chlorinator>
+            <ColorLogic-Light>
+                <System-Id>8</System-Id>
+                <Name>LIGHTS</Name>
+                <Type>COLOR_LOGIC_UCL</Type>
+                <Node-Id>0</Node-Id>
+                <Networked>no</Networked>
+                <V2-Active>yes</V2-Active>
+                <Operation>
+                    PEO_TURN_ON
+                    <Action>
+                        <Action-Function>ACT_FNC_HW_FILTER_TURN_ON</Action-Function>
+                        <Action-Data1>9</Action-Data1>
+                        <Action-Data2>8</Action-Data2>
+                        <Action-Data3>1</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_TURN_OFF
+                    <Action>
+                        <Action-Function>ACT_FNC_HW_FILTER_TURN_ON</Action-Function>
+                        <Action-Data1>9</Action-Data1>
+                        <Action-Data2>8</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_GET_VALUE
+                    <Action>
+                        <Action-Function>ACT_FNC_GET_HV_RELAY</Action-Function>
+                        <Action-Data1>9</Action-Data1>
+                        <Action-Data2>8</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_INIT
+                    <Action>
+                        <Action-Function>ACT_FNC_CLL_STARTUP</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_TEAR_DOWN
+                    <Action>
+                        <Action-Function>ACT_FNC_CLL_TEARDOWN</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_GET_TIME_LIGHT_HAS_BEEN_ON
+                    <Action>
+                        <Action-Function>ACT_FNC_HW_SEC_LIGHTS_HAVE_BEEN_ON</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_V2_TOGGLE
+                    <Action>
+                        <Action-Function>ACT_FNC_V2_TOGGLE_RELAY</Action-Function>
+                        <Action-Data1>9</Action-Data1>
+                        <Action-Data2>8</Action-Data2>
+                        <Action-Data3>1</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_V2_TOGGLE
+                    <Action>
+                        <Action-Function>ACT_FNC_V2_TOGGLE_RELAY</Action-Function>
+                        <Action-Data1>9</Action-Data1>
+                        <Action-Data2>8</Action-Data2>
+                        <Action-Data3>1</Action-Data3>
+                    </Action>
+                </Operation>
+            </ColorLogic-Light>
+            <Pump>
+                <System-Id>9</System-Id>
+                <Name>FOUNTAINS</Name>
+                <Type>PMP_VARIABLE_SPEED_PUMP</Type>
+                <Function>PMP_LAMINARS</Function>
+                <Freeze-Protect-Enable>no</Freeze-Protect-Enable>
+                <Freeze-Protect-Speed>75</Freeze-Protect-Speed>
+                <Valve-Cycle-Enable>no</Valve-Cycle-Enable>
+                <Valve-Cycle-Time>1800</Valve-Cycle-Time>
+                <Priming-Enabled>no</Priming-Enabled>
+                <Priming-Duration>180</Priming-Duration>
+                <Max-Pump-RPM>2500</Max-Pump-RPM>
+                <Min-Pump-RPM>1200</Min-Pump-RPM>
+                <Min-Pump-Speed>48</Min-Pump-Speed>
+                <Max-Pump-Speed>75</Max-Pump-Speed>
+                <Vsp-Medium-Pump-Speed>50</Vsp-Medium-Pump-Speed>
+                <Vsp-Custom-Pump-Speed>0</Vsp-Custom-Pump-Speed>
+                <Vsp-High-Pump-Speed>75</Vsp-High-Pump-Speed>
+                <Vsp-Low-Pump-Speed>48</Vsp-Low-Pump-Speed>
+                <Operation>
+                    PEO_VSP_SET_SPEED
+                    <Action>
+                        <Action-Function>ACT_FNC_VSP_SET_SPEED</Action-Function>
+                        <Action-Data1>24</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_INIT
+                    <Action>
+                        <Action-Function>ACT_FNC_PUMP_STARTUP</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_TEAR_DOWN
+                    <Action>
+                        <Action-Function>ACT_FNC_PUMP_TEARDOWN</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+            </Pump>
+            <Sensor>
+                <System-Id>18</System-Id>
+                <Name>WaterSensor</Name>
+                <Type>SENSOR_WATER_TEMP</Type>
+                <Units>UNITS_FAHRENHEIT</Units>
+                <Operation>
+                    PEO_GET_VALUE
+                    <Action>
+                        <Action-Function>ACT_FNC_GET_WATER_TEMP</Action-Function>
+                        <Action-Data1>18</Action-Data1>
+                        <Action-Data2>2</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+            </Sensor>
+            <Sensor>
+                <System-Id>20</System-Id>
+                <Name>FlowSensor</Name>
+                <Type>SENSOR_FLOW</Type>
+                <Units>UNITS_ACTIVE_INACTIVE</Units>
+                <Operation>
+                    PEO_GET_VALUE
+                    <Action>
+                        <Action-Function>ACT_FNC_GET_WATER_FLOW</Action-Function>
+                        <Action-Data1>16</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+            </Sensor>
+        </Body-of-water>
+        <Body-of-water>
+            02
+            <System-Id>2</System-Id>
+            <Name>Spa</Name>
+            <Type>BOW_SPA</Type>
+            <Shared-Type>BOW_SHARED_EQUIPMENT</Shared-Type>
+            <Shared-Priority>SHARED_EQUIPMENT_HIGH_PRIORITY</Shared-Priority>
+            <Shared-Equipment-System-ID>1</Shared-Equipment-System-ID>
+            <Supports-Spillover>no</Supports-Spillover>
+            <Use-Spillover-For-Filter-Operations>no</Use-Spillover-For-Filter-Operations>
+            <Size-In-Gallons>0</Size-In-Gallons>
+            <Filter>
+                <System-Id>11</System-Id>
+                <Name>Filter Pump</Name>
+                <Shared-Type>BOW_SHARED_EQUIPMENT</Shared-Type>
+                <Filter-Type>FMT_VARIABLE_SPEED_PUMP</Filter-Type>
+                <Max-Pump-Speed>100</Max-Pump-Speed>
+                <Min-Pump-Speed>50</Min-Pump-Speed>
+                <Max-Pump-RPM>3450</Max-Pump-RPM>
+                <Min-Pump-RPM>1725</Min-Pump-RPM>
+                <Min-Priming-Interval>30</Min-Priming-Interval>
+                <Priming-Enabled>no</Priming-Enabled>
+                <Priming-Duration>180</Priming-Duration>
+                <Cooldown-Duration>300</Cooldown-Duration>
+                <Shutdown-Request-Timeout>300</Shutdown-Request-Timeout>
+                <No-Water-Flow-Timeout-Enable>no</No-Water-Flow-Timeout-Enable>
+                <No-Water-Flow-Timeout-Timeout>900</No-Water-Flow-Timeout-Timeout>
+                <Valve-Change-Off-Enable>no</Valve-Change-Off-Enable>
+                <Valve-Change-Off-Duration>35</Valve-Change-Off-Duration>
+                <Freeze-Protect-Enable>yes</Freeze-Protect-Enable>
+                <Freeze-Protect-Temp>38</Freeze-Protect-Temp>
+                <Freeze-Protect-Speed>50</Freeze-Protect-Speed>
+                <Shared-Filter-Timeout>1800</Shared-Filter-Timeout>
+                <Filter-Valve-Position>FLT_DONT_CHANGE_VALVES</Filter-Valve-Position>
+                <Vsp-Low-Pump-Speed>50</Vsp-Low-Pump-Speed>
+                <Vsp-Medium-Pump-Speed>75</Vsp-Medium-Pump-Speed>
+                <Vsp-High-Pump-Speed>100</Vsp-High-Pump-Speed>
+                <Vsp-Custom-Pump-Speed>50</Vsp-Custom-Pump-Speed>
+                <Freeze-Protect-Override-Interval>7200</Freeze-Protect-Override-Interval>
+                <Operation>
+                    PEO_VSP_SET_SPEED
+                    <Action>
+                        <Action-Function>ACT_FNC_VSP_SET_SPEED</Action-Function>
+                        <Action-Data1>25</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_INIT
+                    <Action>
+                        <Action-Function>ACT_FNC_FLT_STARTUP</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_TEAR_DOWN
+                    <Action>
+                        <Action-Function>ACT_FNC_FLT_TEARDOWN</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_SET_VALVES_FOR_SPILLOVER
+                    <Action>
+                        <Action-Function>ACT_FNC_HW_ACTIVATE_VALVE</Action-Function>
+                        <Action-Data1>13</Action-Data1>
+                        <Action-Data2>2</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                    <Action>
+                        <Action-Function>ACT_FNC_HW_ACTIVATE_VALVE</Action-Function>
+                        <Action-Data1>12</Action-Data1>
+                        <Action-Data2>1</Action-Data2>
+                        <Action-Data3>1</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_SET_VALVES_FOR_FILTER
+                    <Action>
+                        <Action-Function>ACT_FNC_HW_ACTIVATE_VALVE</Action-Function>
+                        <Action-Data1>13</Action-Data1>
+                        <Action-Data2>2</Action-Data2>
+                        <Action-Data3>1</Action-Data3>
+                    </Action>
+                    <Action>
+                        <Action-Function>ACT_FNC_HW_ACTIVATE_VALVE</Action-Function>
+                        <Action-Data1>12</Action-Data1>
+                        <Action-Data2>1</Action-Data2>
+                        <Action-Data3>1</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_GET_TIME_VALVE_LAST_TURNED
+                    <Action>
+                        <Action-Function>ACT_FNC_HW_SEC_SINCE_VALVES_LAST_TURNED</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+            </Filter>
+            <Heater>
+                <System-Id>12</System-Id>
+                <Shared-Type>BOW_SHARED_EQUIPMENT</Shared-Type>
+                <Enabled>yes</Enabled>
+                <Current-Set-Point>98</Current-Set-Point>
+                <SolarSetPoint>103</SolarSetPoint>
+                <Max-Water-Temp>104</Max-Water-Temp>
+                <Min-Settable-Water-Temp>55</Min-Settable-Water-Temp>
+                <Max-Settable-Water-Temp>104</Max-Settable-Water-Temp>
+                <Cooldown-Enabled>no</Cooldown-Enabled>
+                <Extend-Enabled>no</Extend-Enabled>
+                <Boost-Time-Interval>300</Boost-Time-Interval>
+                <Heater-Become-Valid-Timeout>900</Heater-Become-Valid-Timeout>
+                <Operation>
+                    PEO_INIT
+                    <Action>
+                        <Action-Function>ACT_FNC_HEATER_STARTUP</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_TEAR_DOWN
+                    <Action>
+                        <Action-Function>ACT_FNC_HEATER_TEARDOWN</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_HEATER_EQUIPMENT
+                    <Heater-Equipment>
+                        <System-Id>13</System-Id>
+                        <Name>HEATER</Name>
+                        <Type>PET_HEATER</Type>
+                        <Heater-Type>HTR_GAS</Heater-Type>
+                        <Enabled>yes</Enabled>
+                        <Priority>HTR_PRIORITY_1</Priority>
+                        <Run-For-Priority>HTR_MAINTAINS_PRIORITY_FOR_AS_LONG_AS_VALID</Run-For-Priority>
+                        <Allow-Low-Speed-Operation>yes</Allow-Low-Speed-Operation>
+                        <Min-Speed-For-Operation>90</Min-Speed-For-Operation>
+                        <Requires-Priming>no</Requires-Priming>
+                        <Min-Priming-Interval>180</Min-Priming-Interval>
+                        <Temp-Difference-Initial>8</Temp-Difference-Initial>
+                        <Temp-Difference-Running>2</Temp-Difference-Running>
+                        <Sensor-System-Id>-1</Sensor-System-Id>
+                        <Shared-Equipment-System-ID>5</Shared-Equipment-System-ID>
+                        <Operation>
+                            PEO_TURN_ON
+                            <Action>
+                                <Action-Function>ACT_FNC_TURN_ON_LV_RELAY</Action-Function>
+                                <Action-Data1>2</Action-Data1>
+                                <Action-Data2>1</Action-Data2>
+                                <Action-Data3>1</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_TURN_OFF
+                            <Action>
+                                <Action-Function>ACT_FNC_TURN_ON_LV_RELAY</Action-Function>
+                                <Action-Data1>2</Action-Data1>
+                                <Action-Data2>1</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                    </Heater-Equipment>
+                </Operation>
+            </Heater>
+            <Chlorinator>
+                <System-Id>14</System-Id>
+                <Name>Chlorinator</Name>
+                <Shared-Type>BOW_SHARED_EQUIPMENT</Shared-Type>
+                <Enabled>no</Enabled>
+                <Mode>CHLOR_OP_MODE_TIMED</Mode>
+                <Timed-Percent>1</Timed-Percent>
+                <SuperChlor-Timeout>24</SuperChlor-Timeout>
+                <Cell-Type>CELL_TYPE_TCELLS340</Cell-Type>
+                <Dispenser-Type>SALT_DISPENSING</Dispenser-Type>
+                <ORP-Timeout>86400</ORP-Timeout>
+                <ORP-Sensor-ID>-1</ORP-Sensor-ID>
+                <Operation>
+                    PEO_INIT
+                    <Action>
+                        <Action-Function>ACT_FNC_CHL_STARTUP</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_TEAR_DOWN
+                    <Action>
+                        <Action-Function>ACT_FNC_CHL_TEARDOWN</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_CHLORINATOR_EQUIPMENT
+                    <Chlorinator-Equipment>
+                        <System-Id>15</System-Id>
+                        <Name>Chlorinator1</Name>
+                        <Type>PET_CHLORINATOR</Type>
+                        <Chlorinator-Type>CHLOR_TYPE_MAIN_PANEL</Chlorinator-Type>
+                        <Enabled>yes</Enabled>
+                        <Operation>
+                            PEO_STATUS_GET
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_STATUS_GET</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_PARAMS_SET
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_PARAMS_SET</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_PAUSE
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_PAUSE_CONTINUE</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>1</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_CONTINUE
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_PAUSE_CONTINUE</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>2</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_ERRORS_GET
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_ERRORS_GET</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_ALERTS_GET
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_ALERTS_GET</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_SUPER_CHLOR_ON
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_SUPER_CHLOR_SET</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>1</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_SUPER_CHLOR_OFF
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_SUPER_CHLOR_SET</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_SALT_CALC_RESTART
+                            <Action>
+                                <Action-Function>ACT_FNC_SALT_CALC_RESTART</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_POLARITY_REVERSE
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_RELAY_POLARITY_REVERSE</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                        <Operation>
+                            PEO_CELL_RUNTIME_RESTART
+                            <Action>
+                                <Action-Function>ACT_FNC_CHL_CELL_RUNTIME_RESTART</Action-Function>
+                                <Action-Data1>23</Action-Data1>
+                                <Action-Data2>0</Action-Data2>
+                                <Action-Data3>0</Action-Data3>
+                            </Action>
+                        </Operation>
+                    </Chlorinator-Equipment>
+                </Operation>
+            </Chlorinator>
+            <Pump>
+                <System-Id>16</System-Id>
+                <Name>SPA JETS</Name>
+                <Type>PMP_SINGLE_SPEED</Type>
+                <Function>PMP_LAMINARS</Function>
+                <Freeze-Protect-Enable>no</Freeze-Protect-Enable>
+                <Freeze-Protect-Speed>100</Freeze-Protect-Speed>
+                <Valve-Cycle-Enable>no</Valve-Cycle-Enable>
+                <Valve-Cycle-Time>1800</Valve-Cycle-Time>
+                <Priming-Enabled>no</Priming-Enabled>
+                <Priming-Duration>180</Priming-Duration>
+                <Max-Pump-RPM>3450</Max-Pump-RPM>
+                <Min-Pump-RPM>600</Min-Pump-RPM>
+                <Min-Pump-Speed>18</Min-Pump-Speed>
+                <Max-Pump-Speed>100</Max-Pump-Speed>
+                <Vsp-Medium-Pump-Speed>100</Vsp-Medium-Pump-Speed>
+                <Vsp-Custom-Pump-Speed>100</Vsp-Custom-Pump-Speed>
+                <Vsp-High-Pump-Speed>100</Vsp-High-Pump-Speed>
+                <Vsp-Low-Pump-Speed>100</Vsp-Low-Pump-Speed>
+                <Operation>
+                    PEO_TURN_ON
+                    <Action>
+                        <Action-Function>ACT_FNC_HW_FILTER_TURN_ON</Action-Function>
+                        <Action-Data1>7</Action-Data1>
+                        <Action-Data2>2</Action-Data2>
+                        <Action-Data3>1</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_TURN_OFF
+                    <Action>
+                        <Action-Function>ACT_FNC_HW_FILTER_TURN_ON</Action-Function>
+                        <Action-Data1>7</Action-Data1>
+                        <Action-Data2>2</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_INIT
+                    <Action>
+                        <Action-Function>ACT_FNC_PUMP_STARTUP</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+                <Operation>
+                    PEO_TEAR_DOWN
+                    <Action>
+                        <Action-Function>ACT_FNC_PUMP_TEARDOWN</Action-Function>
+                        <Action-Data1>0</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+            </Pump>
+            <Sensor>
+                <System-Id>19</System-Id>
+                <Name>WaterSensor</Name>
+                <Type>SENSOR_WATER_TEMP</Type>
+                <Units>UNITS_FAHRENHEIT</Units>
+                <Operation>
+                    PEO_GET_VALUE
+                    <Action>
+                        <Action-Function>ACT_FNC_GET_WATER_TEMP</Action-Function>
+                        <Action-Data1>18</Action-Data1>
+                        <Action-Data2>2</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+            </Sensor>
+            <Sensor>
+                <System-Id>21</System-Id>
+                <Name>FlowSensor</Name>
+                <Type>SENSOR_FLOW</Type>
+                <Units>UNITS_ACTIVE_INACTIVE</Units>
+                <Operation>
+                    PEO_GET_VALUE
+                    <Action>
+                        <Action-Function>ACT_FNC_GET_WATER_FLOW</Action-Function>
+                        <Action-Data1>16</Action-Data1>
+                        <Action-Data2>0</Action-Data2>
+                        <Action-Data3>0</Action-Data3>
+                    </Action>
+                </Operation>
+            </Sensor>
+        </Body-of-water>
+    </Backyard>
+    <Schedules>
+        <sche>
+            <bow-system-id>1</bow-system-id>
+            <equipment-id>3</equipment-id>
+            <schedule-system-id>40</schedule-system-id>
+            <event>164</event>
+            <data>50</data>
+            <enabled>1</enabled>
+            <start-minute>31</start-minute>
+            <start-hour>22</start-hour>
+            <end-minute>59</end-minute>
+            <end-hour>8</end-hour>
+            <days-active>127</days-active>
+            <recurring>1</recurring>
+        </sche>
+        <sche>
+            <bow-system-id>1</bow-system-id>
+            <equipment-id>3</equipment-id>
+            <schedule-system-id>41</schedule-system-id>
+            <event>164</event>
+            <data>100</data>
+            <enabled>1</enabled>
+            <start-minute>1</start-minute>
+            <start-hour>9</start-hour>
+            <end-minute>29</end-minute>
+            <end-hour>22</end-hour>
+            <days-active>127</days-active>
+            <recurring>1</recurring>
+        </sche>
+        <sche>
+            <bow-system-id>1</bow-system-id>
+            <equipment-id>6</equipment-id>
+            <schedule-system-id>42</schedule-system-id>
+            <event>164</event>
+            <data>50</data>
+            <enabled>0</enabled>
+            <start-minute>0</start-minute>
+            <start-hour>9</start-hour>
+            <end-minute>0</end-minute>
+            <end-hour>17</end-hour>
+            <days-active>127</days-active>
+            <recurring>1</recurring>
+        </sche>
+    </Schedules>
+    <Favorites>
+        <Favorite>
+            <System-Id>28</System-Id>
+            <Index-Id>1</Index-Id>
+            <EquipmentID-Or-ThemeID>9</EquipmentID-Or-ThemeID>
+            <Sequence>0</Sequence>
+            <Data>0</Data>
+            <SimpleModeEnabled>1</SimpleModeEnabled>
+        </Favorite>
+        <Favorite>
+            <System-Id>33</System-Id>
+            <Index-Id>2</Index-Id>
+            <EquipmentID-Or-ThemeID>11</EquipmentID-Or-ThemeID>
+            <Sequence>1</Sequence>
+            <Data>268435440</Data>
+            <SimpleModeEnabled>1</SimpleModeEnabled>
+        </Favorite>
+        <Favorite>
+            <System-Id>35</System-Id>
+            <Index-Id>3</Index-Id>
+            <EquipmentID-Or-ThemeID>34</EquipmentID-Or-ThemeID>
+            <Sequence>2</Sequence>
+            <Data>268435455</Data>
+            <SimpleModeEnabled>1</SimpleModeEnabled>
+        </Favorite>
+        <Favorite>
+            <System-Id>37</System-Id>
+            <Index-Id>4</Index-Id>
+            <EquipmentID-Or-ThemeID>36</EquipmentID-Or-ThemeID>
+            <Sequence>3</Sequence>
+            <Data>268435455</Data>
+            <SimpleModeEnabled>1</SimpleModeEnabled>
+        </Favorite>
+    </Favorites>
+    <Groups>
+        <Group>
+            <System-Id>34</System-Id>
+            <Name>Pool, Low</Name>
+            <Icon-Id>0</Icon-Id>
+            <Request>
+                <Name>TurnOnOffForGroup</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="EquipmentID" dataType="int">3</Parameter>
+                    <Parameter name="Data" dataType="int">50</Parameter>
+                    <Parameter name="LightState" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetHeaterScheduleCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="HeaterID" dataType="int">4</Parameter>
+                    <Parameter name="Temp" dataType="int">80</Parameter>
+                    <Parameter name="IsCountDownTimer" dataType="bool">0</Parameter>
+                    <Parameter name="StartTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="StartTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="DaysActive" dataType="int">0</Parameter>
+                    <Parameter name="Recurring" dataType="bool">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterPriorityCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="HeaterID1" dataType="int">5</Parameter>
+                    <Parameter name="HeaterID2" dataType="int">-1</Parameter>
+                    <Parameter name="HeaterID3" dataType="int">-1</Parameter>
+                    <Parameter name="HeaterID4" dataType="int">-1</Parameter>
+                    <Parameter name="HeaterID5" dataType="int">-1</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterMaintainPriorityCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="HeaterID" dataType="int">4</Parameter>
+                    <Parameter name="Priority1MaintainFor" dataType="byte">24</Parameter>
+                    <Parameter name="Priority2MaintainFor" dataType="byte">255</Parameter>
+                    <Parameter name="Priority3MaintainFor" dataType="byte">255</Parameter>
+                    <Parameter name="Priority4MaintainFor" dataType="byte">255</Parameter>
+                    <Parameter name="Priority5MaintainFor" dataType="byte">255</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterEnable</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="HeaterID" dataType="int">4</Parameter>
+                    <Parameter name="Enabled" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterEnable</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="HeaterID" dataType="int">5</Parameter>
+                    <Parameter name="Enabled" dataType="int">1</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetSolarScheduleCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="HeaterID" dataType="int">4</Parameter>
+                    <Parameter name="Temp" dataType="int">81</Parameter>
+                    <Parameter name="IsCountDownTimer" dataType="bool">0</Parameter>
+                    <Parameter name="StartTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="StartTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="DaysActive" dataType="int">0</Parameter>
+                    <Parameter name="Recurring" dataType="bool">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUISuperCHLORCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="EquipmentID" dataType="int">6</Parameter>
+                    <Parameter name="IsOn" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>TurnOnOffForGroup</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="EquipmentID" dataType="int">8</Parameter>
+                    <Parameter name="Data" dataType="int">263171</Parameter>
+                    <Parameter name="LightState" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>TurnOnOffForGroup</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="EquipmentID" dataType="int">9</Parameter>
+                    <Parameter name="Data" dataType="int">0</Parameter>
+                    <Parameter name="LightState" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>TurnOnOffForGroup</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="EquipmentID" dataType="int">11</Parameter>
+                    <Parameter name="Data" dataType="int">0</Parameter>
+                    <Parameter name="LightState" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetHeaterScheduleCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="HeaterID" dataType="int">12</Parameter>
+                    <Parameter name="Temp" dataType="int">75</Parameter>
+                    <Parameter name="IsCountDownTimer" dataType="bool">0</Parameter>
+                    <Parameter name="StartTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="StartTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="DaysActive" dataType="int">0</Parameter>
+                    <Parameter name="Recurring" dataType="bool">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterPriorityCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="HeaterID1" dataType="int">13</Parameter>
+                    <Parameter name="HeaterID2" dataType="int">-1</Parameter>
+                    <Parameter name="HeaterID3" dataType="int">-1</Parameter>
+                    <Parameter name="HeaterID4" dataType="int">-1</Parameter>
+                    <Parameter name="HeaterID5" dataType="int">-1</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterMaintainPriorityCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="HeaterID" dataType="int">12</Parameter>
+                    <Parameter name="Priority1MaintainFor" dataType="byte">24</Parameter>
+                    <Parameter name="Priority2MaintainFor" dataType="byte">255</Parameter>
+                    <Parameter name="Priority3MaintainFor" dataType="byte">255</Parameter>
+                    <Parameter name="Priority4MaintainFor" dataType="byte">255</Parameter>
+                    <Parameter name="Priority5MaintainFor" dataType="byte">255</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterEnable</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="HeaterID" dataType="int">12</Parameter>
+                    <Parameter name="Enabled" dataType="int">1</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterEnable</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="HeaterID" dataType="int">13</Parameter>
+                    <Parameter name="Enabled" dataType="int">1</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetSolarScheduleCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="HeaterID" dataType="int">12</Parameter>
+                    <Parameter name="Temp" dataType="int">100</Parameter>
+                    <Parameter name="IsCountDownTimer" dataType="bool">0</Parameter>
+                    <Parameter name="StartTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="StartTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="DaysActive" dataType="int">0</Parameter>
+                    <Parameter name="Recurring" dataType="bool">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUISuperCHLORCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="EquipmentID" dataType="int">14</Parameter>
+                    <Parameter name="IsOn" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>TurnOnOffForGroup</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="EquipmentID" dataType="int">16</Parameter>
+                    <Parameter name="Data" dataType="int">0</Parameter>
+                    <Parameter name="LightState" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+        </Group>
+        <Group>
+            <System-Id>36</System-Id>
+            <Name>Pool, Med</Name>
+            <Icon-Id>0</Icon-Id>
+            <Request>
+                <Name>TurnOnOffForGroup</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="EquipmentID" dataType="int">3</Parameter>
+                    <Parameter name="Data" dataType="int">75</Parameter>
+                    <Parameter name="LightState" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetHeaterScheduleCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="HeaterID" dataType="int">4</Parameter>
+                    <Parameter name="Temp" dataType="int">80</Parameter>
+                    <Parameter name="IsCountDownTimer" dataType="bool">0</Parameter>
+                    <Parameter name="StartTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="StartTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="DaysActive" dataType="int">0</Parameter>
+                    <Parameter name="Recurring" dataType="bool">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterPriorityCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="HeaterID1" dataType="int">5</Parameter>
+                    <Parameter name="HeaterID2" dataType="int">-1</Parameter>
+                    <Parameter name="HeaterID3" dataType="int">-1</Parameter>
+                    <Parameter name="HeaterID4" dataType="int">-1</Parameter>
+                    <Parameter name="HeaterID5" dataType="int">-1</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterMaintainPriorityCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="HeaterID" dataType="int">4</Parameter>
+                    <Parameter name="Priority1MaintainFor" dataType="byte">24</Parameter>
+                    <Parameter name="Priority2MaintainFor" dataType="byte">255</Parameter>
+                    <Parameter name="Priority3MaintainFor" dataType="byte">255</Parameter>
+                    <Parameter name="Priority4MaintainFor" dataType="byte">255</Parameter>
+                    <Parameter name="Priority5MaintainFor" dataType="byte">255</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterEnable</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="HeaterID" dataType="int">4</Parameter>
+                    <Parameter name="Enabled" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterEnable</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="HeaterID" dataType="int">5</Parameter>
+                    <Parameter name="Enabled" dataType="int">1</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetSolarScheduleCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="HeaterID" dataType="int">4</Parameter>
+                    <Parameter name="Temp" dataType="int">81</Parameter>
+                    <Parameter name="IsCountDownTimer" dataType="bool">0</Parameter>
+                    <Parameter name="StartTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="StartTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="DaysActive" dataType="int">0</Parameter>
+                    <Parameter name="Recurring" dataType="bool">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUISuperCHLORCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="EquipmentID" dataType="int">6</Parameter>
+                    <Parameter name="IsOn" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>TurnOnOffForGroup</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="EquipmentID" dataType="int">8</Parameter>
+                    <Parameter name="Data" dataType="int">263171</Parameter>
+                    <Parameter name="LightState" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>TurnOnOffForGroup</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">1</Parameter>
+                    <Parameter name="EquipmentID" dataType="int">9</Parameter>
+                    <Parameter name="Data" dataType="int">0</Parameter>
+                    <Parameter name="LightState" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>TurnOnOffForGroup</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="EquipmentID" dataType="int">11</Parameter>
+                    <Parameter name="Data" dataType="int">0</Parameter>
+                    <Parameter name="LightState" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetHeaterScheduleCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="HeaterID" dataType="int">12</Parameter>
+                    <Parameter name="Temp" dataType="int">75</Parameter>
+                    <Parameter name="IsCountDownTimer" dataType="bool">0</Parameter>
+                    <Parameter name="StartTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="StartTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="DaysActive" dataType="int">0</Parameter>
+                    <Parameter name="Recurring" dataType="bool">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterPriorityCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="HeaterID1" dataType="int">13</Parameter>
+                    <Parameter name="HeaterID2" dataType="int">-1</Parameter>
+                    <Parameter name="HeaterID3" dataType="int">-1</Parameter>
+                    <Parameter name="HeaterID4" dataType="int">-1</Parameter>
+                    <Parameter name="HeaterID5" dataType="int">-1</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterMaintainPriorityCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="HeaterID" dataType="int">12</Parameter>
+                    <Parameter name="Priority1MaintainFor" dataType="byte">24</Parameter>
+                    <Parameter name="Priority2MaintainFor" dataType="byte">255</Parameter>
+                    <Parameter name="Priority3MaintainFor" dataType="byte">255</Parameter>
+                    <Parameter name="Priority4MaintainFor" dataType="byte">255</Parameter>
+                    <Parameter name="Priority5MaintainFor" dataType="byte">255</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterEnable</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="HeaterID" dataType="int">12</Parameter>
+                    <Parameter name="Enabled" dataType="int">1</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUITemporaryHeaterEnable</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="HeaterID" dataType="int">13</Parameter>
+                    <Parameter name="Enabled" dataType="int">1</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetSolarScheduleCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="HeaterID" dataType="int">12</Parameter>
+                    <Parameter name="Temp" dataType="int">100</Parameter>
+                    <Parameter name="IsCountDownTimer" dataType="bool">0</Parameter>
+                    <Parameter name="StartTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="StartTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeHours" dataType="int">0</Parameter>
+                    <Parameter name="EndTimeMinutes" dataType="int">0</Parameter>
+                    <Parameter name="DaysActive" dataType="int">0</Parameter>
+                    <Parameter name="Recurring" dataType="bool">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>SetUISuperCHLORCmd</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="EquipmentID" dataType="int">14</Parameter>
+                    <Parameter name="IsOn" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+            <Request>
+                <Name>TurnOnOffForGroup</Name>
+                <Parameters>
+                    <Parameter name="PoolID" dataType="int">2</Parameter>
+                    <Parameter name="EquipmentID" dataType="int">16</Parameter>
+                    <Parameter name="Data" dataType="int">0</Parameter>
+                    <Parameter name="LightState" dataType="int">0</Parameter>
+                </Parameters>
+            </Request>
+        </Group>
+    </Groups>
+    <Terminals>
+        <Terminal>
+            <Node-Id>51</Node-Id>
+            <Name>Spa</Name>
+            <Type>TRM_SPA_SIDE_SIX_BUTTON</Type>
+            <Filter>
+                <System-Id>11</System-Id>
+            </Filter>
+            <Heater>
+                <System-Id>12</System-Id>
+            </Heater>
+            <Button>
+                <Button-Id>0</Button-Id>
+                <System-Id>16</System-Id>
+                <Button-CtrlType>CTRL_TYPE_EQUIP</Button-CtrlType>
+            </Button>
+            <Button>
+                <Button-Id>1</Button-Id>
+                <System-Id>28</System-Id>
+                <Button-CtrlType>CTRL_TYPE_FAVORITE</Button-CtrlType>
+            </Button>
+            <Button>
+                <Button-Id>2</Button-Id>
+                <System-Id>-1</System-Id>
+                <Button-CtrlType>CTRL_TYPE_UNCONFIGURED</Button-CtrlType>
+            </Button>
+        </Terminal>
+    </Terminals>
+    <DMT>
+        <Device>
+            <Device-Name>MP</Device-Name>
+            <Type>MP</Type>
+            <Node-ID>1</Node-ID>
+            <Devices>
+                <Device>
+                    <Device-Name>LVR1</Device-Name>
+                    <Type>RELAY</Type>
+                    <Node-ID>2</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>LVR2</Device-Name>
+                    <Type>RELAY</Type>
+                    <Node-ID>3</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>LVR3</Device-Name>
+                    <Type>RELAY</Type>
+                    <Node-ID>4</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>LVR4</Device-Name>
+                    <Type>RELAY</Type>
+                    <Node-ID>5</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>HVR1</Device-Name>
+                    <Type>RELAY</Type>
+                    <Node-ID>6</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>HVR2</Device-Name>
+                    <Type>RELAY</Type>
+                    <Node-ID>7</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>HVR3</Device-Name>
+                    <Type>RELAY</Type>
+                    <Node-ID>8</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>HVR4</Device-Name>
+                    <Type>RELAY</Type>
+                    <Node-ID>9</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>HVR5</Device-Name>
+                    <Type>RELAY</Type>
+                    <Node-ID>10</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>HVR6</Device-Name>
+                    <Type>RELAY</Type>
+                    <Node-ID>11</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>ACR1</Device-Name>
+                    <Type>RELAY</Type>
+                    <Node-ID>12</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>ACR2</Device-Name>
+                    <Type>RELAY</Type>
+                    <Node-ID>13</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>ACR3</Device-Name>
+                    <Type>RELAY</Type>
+                    <Node-ID>14</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>ACR4</Device-Name>
+                    <Type>RELAY</Type>
+                    <Node-ID>15</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>SNS1</Device-Name>
+                    <Type>SENSOR</Type>
+                    <Node-ID>16</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>SNS2</Device-Name>
+                    <Type>SENSOR</Type>
+                    <Node-ID>17</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>SNS3</Device-Name>
+                    <Type>SENSOR</Type>
+                    <Node-ID>18</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>SNS4</Device-Name>
+                    <Type>SENSOR</Type>
+                    <Node-ID>19</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>SNS5</Device-Name>
+                    <Type>SENSOR</Type>
+                    <Node-ID>20</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>SNS6</Device-Name>
+                    <Type>SENSOR</Type>
+                    <Node-ID>21</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>SNS7</Device-Name>
+                    <Type>SENSOR</Type>
+                    <Node-ID>22</Node-ID>
+                </Device>
+                <Device>
+                    <Device-Name>CHLR1</Device-Name>
+                    <Type>CHLORINATOR</Type>
+                    <Node-ID>23</Node-ID>
+                </Device>
+            </Devices>
+        </Device>
+        <Device>
+            <Device-Name>VSP</Device-Name>
+            <Type>EPNS</Type>
+            <Node-ID>24</Node-ID>
+            <Devices />
+        </Device>
+        <Device>
+            <Device-Name>VSP</Device-Name>
+            <Type>EPNS</Type>
+            <Node-ID>25</Node-ID>
+            <Devices />
+        </Device>
+        <Device>
+            <Device-Name>Spa Remote</Device-Name>
+            <Type>WSRT</Type>
+            <Node-ID>51</Node-ID>
+            <Devices />
+        </Device>
+    </DMT>
+    <CHECKSUM>4860233</CHECKSUM>
+</MSPConfig>

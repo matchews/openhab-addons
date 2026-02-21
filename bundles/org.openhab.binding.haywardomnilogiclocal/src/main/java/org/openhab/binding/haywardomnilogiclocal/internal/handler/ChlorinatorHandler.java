@@ -120,124 +120,126 @@ public class ChlorinatorHandler extends HaywardThingHandler {
         String sysId = getThing().getUID().getId();
 
         for (Chlorinator c : status.getChlorinators()) {
-            @Nullable
-            String statusVal = c.getStatus();
-            if (statusVal != null) {
-                updateData(BindingConstants.CHANNEL_CHLORINATOR_STATUS, statusVal);
-            } else {
-                logger.debug("Chlorinator status missing from Telemtry");
-            }
-
-            @Nullable
-            String instantSaltLevel = c.getInstantSaltLevel();
-            if (instantSaltLevel != null) {
-                updateData(BindingConstants.CHANNEL_CHLORINATOR_INSTANTSALTLEVEL, instantSaltLevel);
-            } else {
-                logger.debug("Chlorinator instant salt level missing from Telemtry");
-            }
-
-            @Nullable
-            String avgSaltLevel = c.getAvgSaltLevel();
-            if (avgSaltLevel != null) {
-                updateData(BindingConstants.CHANNEL_CHLORINATOR_AVGSALTLEVEL, avgSaltLevel);
-            } else {
-                logger.debug("Chlorinator avgerage salt level missing from Telemtry");
-            }
-
-            @Nullable
-            String alert = c.getChlorAlert();
-            if (alert != null) {
-                updateData(BindingConstants.CHANNEL_CHLORINATOR_ALERT, alert);
-            } else {
-                logger.debug("Chlorinator alert missing from Telemtry");
-            }
-
-            @Nullable
-            String error = c.getChlorError();
-            if (error != null) {
-                updateData(BindingConstants.CHANNEL_CHLORINATOR_ERROR, error);
-            } else {
-                logger.debug("Chlorinator error missing from Telemtry");
-            }
-
-            @Nullable
-            String scMode = c.getScMode();
-            if (scMode != null) {
-                updateData(BindingConstants.CHANNEL_CHLORINATOR_SC_MODE, scMode);
-            } else {
-                logger.debug("Chlorinator SC Mode missing from Telemtry");
-            }
-
-            @Nullable
-            String operatingState = c.getOperatingState();
-            if (operatingState != null) {
-                updateData(BindingConstants.CHANNEL_CHLORINATOR_OPERATINGSTATE, operatingState);
-            } else {
-                logger.debug("Chlorinator operating state missing from Telemtry");
-            }
-
-            @Nullable
-            String timedPercent = c.getTimedPercent();
-            if (timedPercent != null) {
-                updateData(BindingConstants.CHANNEL_CHLORINATOR_TIMEDPERCENT, timedPercent);
-            } else {
-                logger.debug("Chlorinator timed percent missing from Telemtry");
-            }
-
-            @Nullable
-            String operatingMode = c.getOperatingMode();
-            if (operatingMode != null) {
-                // cache latest operating mode
-                synchronized (aggLock) {
-                    agg.operatingMode = operatingMode;
+            if (sysId.equals(c.getSystemId())) {
+                @Nullable
+                String statusVal = c.getStatus();
+                if (statusVal != null) {
+                    updateData(BindingConstants.CHANNEL_CHLORINATOR_STATUS, statusVal);
+                } else {
+                    logger.debug("Chlorinator status missing from Telemtry");
                 }
-                updateData(BindingConstants.CHANNEL_CHLORINATOR_OPERATINGMODE, operatingMode);
-            } else {
-                logger.debug("Chlorinator operating mode missing from Telemtry");
-            }
 
-            @Nullable
-            String enable = c.getEnable();
-            if (enable != null) {
-                synchronized (aggLock) {
-                    agg.chlorEnable = enable;
+                @Nullable
+                String instantSaltLevel = c.getInstantSaltLevel();
+                if (instantSaltLevel != null) {
+                    updateData(BindingConstants.CHANNEL_CHLORINATOR_INSTANTSALTLEVEL, instantSaltLevel);
+                } else {
+                    logger.debug("Chlorinator instant salt level missing from Telemtry");
                 }
-                updateData(BindingConstants.CHANNEL_CHLORINATOR_ENABLE, enable);
-            } else {
-                logger.debug("Chlorinator enable missing from Telemtry");
-            }
 
-            if ("0".equals(scMode)) {
-                synchronized (aggLock) {
-                    agg.scEnable = "0";
+                @Nullable
+                String avgSaltLevel = c.getAvgSaltLevel();
+                if (avgSaltLevel != null) {
+                    updateData(BindingConstants.CHANNEL_CHLORINATOR_AVGSALTLEVEL, avgSaltLevel);
+                } else {
+                    logger.debug("Chlorinator avgerage salt level missing from Telemtry");
                 }
-                updateData(BindingConstants.CHANNEL_CHLORINATOR_SC_ENABLE, "0");
-                updateData(BindingConstants.CHANNEL_CHLORINATOR_SC_REMAINING, "0");
-            } else {
-                // Check to see if superchlorinate just started. If so, capture the duration
-                // String scEnable = thing.getChannel(BindingConstants.CHANNEL_CHLORINATOR_SC_ENABLE).get
-                // if ("0".equals(scEnable)) {
-                // updateData(BindingConstants.CHANNEL_CHLORINATOR_SC_DURATION, "0");
-                // }
 
-                synchronized (aggLock) {
-                    agg.scEnable = "1";
+                @Nullable
+                String alert = c.getChlorAlert();
+                if (alert != null) {
+                    updateData(BindingConstants.CHANNEL_CHLORINATOR_ALERT, alert);
+                } else {
+                    logger.debug("Chlorinator alert missing from Telemtry");
                 }
-                updateData(BindingConstants.CHANNEL_CHLORINATOR_SC_ENABLE, "1");
-                // SC Time Remaining only exists in the requestConfiguration xml
-                Bridge bridge = getBridge();
-                if (bridge != null) {
-                    BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
-                    if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
-                        // bridgeHandler.requestConfiguration();
-                        Object object = bridgeHandler.getMspConfig().getDevice(sysId);
-                        if (object instanceof ChlorinatorConfig) {
-                            ChlorinatorConfig chlorinator = (ChlorinatorConfig) object;
-                            String scRemaining = chlorinator.getSuperChlorTimeout();
-                            if (scRemaining != null) {
-                                updateData(BindingConstants.CHANNEL_CHLORINATOR_SC_REMAINING, scRemaining);
-                            } else {
-                                logger.debug("Chlorinator super chlorinate timeout missing from Configuration");
+
+                @Nullable
+                String error = c.getChlorError();
+                if (error != null) {
+                    updateData(BindingConstants.CHANNEL_CHLORINATOR_ERROR, error);
+                } else {
+                    logger.debug("Chlorinator error missing from Telemtry");
+                }
+
+                @Nullable
+                String scMode = c.getScMode();
+                if (scMode != null) {
+                    updateData(BindingConstants.CHANNEL_CHLORINATOR_SC_MODE, scMode);
+                } else {
+                    logger.debug("Chlorinator SC Mode missing from Telemtry");
+                }
+
+                @Nullable
+                String operatingState = c.getOperatingState();
+                if (operatingState != null) {
+                    updateData(BindingConstants.CHANNEL_CHLORINATOR_OPERATINGSTATE, operatingState);
+                } else {
+                    logger.debug("Chlorinator operating state missing from Telemtry");
+                }
+
+                @Nullable
+                String timedPercent = c.getTimedPercent();
+                if (timedPercent != null) {
+                    updateData(BindingConstants.CHANNEL_CHLORINATOR_TIMEDPERCENT, timedPercent);
+                } else {
+                    logger.debug("Chlorinator timed percent missing from Telemtry");
+                }
+
+                @Nullable
+                String operatingMode = c.getOperatingMode();
+                if (operatingMode != null) {
+                    // cache latest operating mode
+                    synchronized (aggLock) {
+                        agg.operatingMode = operatingMode;
+                    }
+                    updateData(BindingConstants.CHANNEL_CHLORINATOR_OPERATINGMODE, operatingMode);
+                } else {
+                    logger.debug("Chlorinator operating mode missing from Telemtry");
+                }
+
+                @Nullable
+                String enable = c.getEnable();
+                if (enable != null) {
+                    synchronized (aggLock) {
+                        agg.chlorEnable = enable;
+                    }
+                    updateData(BindingConstants.CHANNEL_CHLORINATOR_ENABLE, enable);
+                } else {
+                    logger.debug("Chlorinator enable missing from Telemtry");
+                }
+
+                if ("0".equals(scMode)) {
+                    synchronized (aggLock) {
+                        agg.scEnable = "0";
+                    }
+                    updateData(BindingConstants.CHANNEL_CHLORINATOR_SC_ENABLE, "0");
+                    updateData(BindingConstants.CHANNEL_CHLORINATOR_SC_REMAINING, "0");
+                } else {
+                    // Check to see if superchlorinate just started. If so, capture the duration
+                    // String scEnable = thing.getChannel(BindingConstants.CHANNEL_CHLORINATOR_SC_ENABLE).get
+                    // if ("0".equals(scEnable)) {
+                    // updateData(BindingConstants.CHANNEL_CHLORINATOR_SC_DURATION, "0");
+                    // }
+
+                    synchronized (aggLock) {
+                        agg.scEnable = "1";
+                    }
+                    updateData(BindingConstants.CHANNEL_CHLORINATOR_SC_ENABLE, "1");
+                    // SC Time Remaining only exists in the requestConfiguration xml
+                    Bridge bridge = getBridge();
+                    if (bridge != null) {
+                        BridgeHandler bridgeHandler = (BridgeHandler) bridge.getHandler();
+                        if (bridgeHandler != null && bridgeHandler.getMspConfig() != null) {
+                            // bridgeHandler.requestConfiguration();
+                            Object object = bridgeHandler.getMspConfig().getDevice(sysId);
+                            if (object instanceof ChlorinatorConfig) {
+                                ChlorinatorConfig chlorinator = (ChlorinatorConfig) object;
+                                String scRemaining = chlorinator.getSuperChlorTimeout();
+                                if (scRemaining != null) {
+                                    updateData(BindingConstants.CHANNEL_CHLORINATOR_SC_REMAINING, scRemaining);
+                                } else {
+                                    logger.debug("Chlorinator super chlorinate timeout missing from Configuration");
+                                }
                             }
                         }
                     }

@@ -15,6 +15,9 @@ package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -341,6 +344,32 @@ public class BridgeHandler extends BaseBridgeHandler {
     }
 
     public synchronized String sendRequest(String xmlRequest, MessageType msgType) throws HaywardException {
+        // TODO
+        // ---------- DEBUG XML OVERRIDE (MULTI-MESSAGE) ----------
+        boolean debug = false;
+        if (debug) {
+            @Nullable
+            String debugFile = null;
+            if (msgType == MessageType.REQUEST_CONFIGURATION) {
+                debugFile = "C:\\Users\\Controls\\Desktop\\Hayward\\Hayward Local User Data\\Phil\\requestConfiguration.txt";
+            } else if (msgType == MessageType.GET_TELEMETRY) {
+                debugFile = "C:\\Users\\Controls\\Desktop\\Hayward\\Hayward Local User Data\\Phil\\getTelemetry.txt";
+            } else if (msgType == MessageType.GET_ALARM_LIST) {
+                debugFile = "C:\\Users\\Controls\\Desktop\\Hayward\\Hayward Local User Data\\Phil\\getAlarms.txt";
+            }
+
+            if (debugFile != null) {
+                try {
+                    String xml = Files.readString(Path.of(debugFile), StandardCharsets.UTF_8);
+                    logger.warn("DEBUG: Returning XML from {} for {}", debugFile, msgType);
+                    return xml;
+                } catch (IOException e) {
+                    throw new HaywardException("Failed to read debug XML for " + msgType + ": " + e.getMessage());
+                }
+            }
+        }
+        // ---------- END DEBUG OVERRIDE ----------
+
         if (logger.isTraceEnabled()) {
             logger.trace("Hayward Connection thing:  {} Hayward UDP command:\r{}", getCallingMethod(), xmlRequest);
         } else if (logger.isDebugEnabled()) {

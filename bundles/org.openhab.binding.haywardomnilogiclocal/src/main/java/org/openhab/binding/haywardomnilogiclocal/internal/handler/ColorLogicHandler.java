@@ -103,6 +103,9 @@ public class ColorLogicHandler extends HaywardThingHandler {
                 if ("COLOR_LOGIC_UCL".equals(lightType) || "COLOR_LOGIC_UCL_V2".equals(lightType)) {
                     addV2Channels();
                 }
+                if (lightType.contains("BOWL")) {
+                    addSpecialEffectChannel();
+                }
             }
             updateStatus(ThingStatus.ONLINE);
         } catch (HaywardException e) {
@@ -137,7 +140,9 @@ public class ColorLogicHandler extends HaywardThingHandler {
             thingBuilder.withChannel(channel);
             updateThing(thingBuilder.build());
         }
+    }
 
+    protected void addSpecialEffectChannel() {
         if (thing.getChannel(BindingConstants.CHANNEL_COLORLOGIC_SPECIALEFFECT) == null) {
             ThingBuilder thingBuilder = editThing();
             ChannelUID uid = new ChannelUID(thing.getUID(), BindingConstants.CHANNEL_COLORLOGIC_SPECIALEFFECT);

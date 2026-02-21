@@ -35,6 +35,9 @@ public class MspConfig {
     @XStreamImplicit(itemFieldName = "Backyard")
     private final List<BackyardConfig> backyards = new ArrayList<>();
 
+    @XStreamImplicit(itemFieldName = "Groups")
+    private final List<GroupsConfig> groups = new ArrayList<>();
+
     @XStreamAlias("Schedules")
     private final SchedulesConfig schedules = new SchedulesConfig();
 
@@ -50,6 +53,10 @@ public class MspConfig {
 
     public List<BackyardConfig> getBackyards() {
         return backyards;
+    }
+
+    public List<GroupsConfig> getGroups() {
+        return groups;
     }
 
     public @Nullable Object getDevice(String sysId) {
@@ -91,6 +98,16 @@ public class MspConfig {
                             }
                         }
                     }
+
+                    List<PumpConfig> pumps = bow.getPumps();
+                    if (pumps != null) {
+                        for (PumpConfig pump : pumps) {
+                            if (pump.getSystemId().equals(sysId)) {
+                                return pump;
+                            }
+                        }
+                    }
+
                     List<RelayConfig> relays = bow.getRelays();
                     if (relays != null) {
                         for (RelayConfig relay : relays) {

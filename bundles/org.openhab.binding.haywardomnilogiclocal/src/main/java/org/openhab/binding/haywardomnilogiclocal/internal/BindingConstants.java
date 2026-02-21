@@ -35,6 +35,7 @@ public class BindingConstants {
     public static final ThingTypeUID THING_TYPE_CHLORINATOR = new ThingTypeUID(BINDING_ID, "chlorinator");
     public static final ThingTypeUID THING_TYPE_COLORLOGIC = new ThingTypeUID(BINDING_ID, "colorlogic");
     public static final ThingTypeUID THING_TYPE_FILTER = new ThingTypeUID(BINDING_ID, "filter");
+    public static final ThingTypeUID THING_TYPE_GROUP = new ThingTypeUID(BINDING_ID, "group");
     public static final ThingTypeUID THING_TYPE_HEATER = new ThingTypeUID(BINDING_ID, "heater");
     public static final ThingTypeUID THING_TYPE_PUMP = new ThingTypeUID(BINDING_ID, "pump");
     public static final ThingTypeUID THING_TYPE_RELAY = new ThingTypeUID(BINDING_ID, "relay");
@@ -45,8 +46,8 @@ public class BindingConstants {
     public static final Set<ThingTypeUID> THING_TYPES_UIDS = Set.of(BindingConstants.THING_TYPE_BACKYARD,
             BindingConstants.THING_TYPE_BOW, BindingConstants.THING_TYPE_BRIDGE,
             BindingConstants.THING_TYPE_CHLORINATOR, BindingConstants.THING_TYPE_COLORLOGIC,
-            BindingConstants.THING_TYPE_FILTER, BindingConstants.THING_TYPE_HEATER, BindingConstants.THING_TYPE_PUMP,
-            BindingConstants.THING_TYPE_RELAY, BindingConstants.THING_TYPE_SENSOR,
+            BindingConstants.THING_TYPE_FILTER, BindingConstants.THING_TYPE_GROUP, BindingConstants.THING_TYPE_HEATER,
+            BindingConstants.THING_TYPE_PUMP, BindingConstants.THING_TYPE_RELAY, BindingConstants.THING_TYPE_SENSOR,
             BindingConstants.THING_TYPE_VIRTUALHEATER);
 
     // Bridge
@@ -173,6 +174,12 @@ public class BindingConstants {
     public static final String PROPERTY_FILTER_CUSTOMSPEED = "Custom Speed %";
     public static final String PROPERTY_FILTER_FREEZEPROTECTOVERRIDEINTERVAL = "Freeze Protect Override Interval";
 
+    // Group
+    public static final String CHANNEL_GROUP_STATE = "groupState";
+
+    public static final String PROPERTY_GROUP_NAME = "Name";
+    public static final String PROPERTY_GROUP_ICON = "Icon ID";
+
     // Heater
     public static final String CHANNEL_HEATER_STATE = "heaterState";
     public static final String CHANNEL_HEATER_TEMP = "heaterTemp";
@@ -199,9 +206,17 @@ public class BindingConstants {
     public static final String CHANNEL_PUMP_SPEED = "pumpSpeed";
     public static final String CHANNEL_PUMP_SPEEDPRESET = "pumpSpeedPreset";
     public static final String CHANNEL_PUMP_STATE = "pumpState";
+    public static final String CHANNEL_PUMP_LASTSPEED = "pumpLastSpeed";
+    public static final String CHANNEL_PUMP_WHYPUMPISON = "pumpWhyOn";
 
     public static final String PROPERTY_PUMP_TYPE = "pumpType";
     public static final String PROPERTY_PUMP_FUNCTION = "pumpFunction";
+    public static final String PROPERTY_PUMP_FREEZEPROTECTENABLE = "Freeze Protect Enable";
+    public static final String PROPERTY_PUMP_FREEZEPROTECTSPEED = "Freeze Protect Speed";
+    public static final String PROPERTY_PUMP_VALVECYCLEENABLE = "Valve Cycle Enabled";
+    public static final String PROPERTY_PUMP_VALVECYCLETIME = "Valve Cycle Time";
+    public static final String PROPERTY_PUMP_PRIMINGENABLED = "Priming Enabled";
+    public static final String PROPERTY_PUMP_PRIMINGDURATION = "Priming Duration";
     public static final String PROPERTY_PUMP_MINSPEED = "minPumpPercent";
     public static final String PROPERTY_PUMP_MAXSPEED = "maxPumpPercent";
     public static final String PROPERTY_PUMP_MINRPM = "minPumpRPM";

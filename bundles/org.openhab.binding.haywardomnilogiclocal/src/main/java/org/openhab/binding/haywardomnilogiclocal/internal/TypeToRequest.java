@@ -27,6 +27,7 @@ public enum TypeToRequest {
     COLORLOGIC,
     CSAD,
     FILTER,
+    GROUP,
     HEATER,
     PUMP,
     RELAY,

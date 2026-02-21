@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<STATUS version="1.12">
+    <Backyard systemId="0" statusVersion="12" airTemp="60" state="1" ConfigChksum="4860233" mspVersion="R0501000" />
+    <BodyOfWater systemId="1" waterTemp="64" flow="1" />
+    <Filter systemId="3" filterState="1" filterSpeed="50" valvePosition="1" whyFilterIsOn="11" fpOverride="0" reportedFilterSpeed="50" power="284" lastSpeed="50" />
+    <VirtualHeater systemId="4" Current-Set-Point="80" enable="0" SolarSetPoint="88" Mode="0" SilentMode="0" whyHeaterIsOn="1" />
+    <Heater systemId="5" heaterState="0" temp="65535" enable="1" priority="0" maintainFor="24" />
+    <Chlorinator systemId="6" status="0" instantSaltLevel="0" avgSaltLevel="3000" chlrAlert="0" chlrError="0" scMode="0" operatingState="0" Timed-Percent="70" operatingMode="1" enable="0" />
+    <ColorLogic-Light systemId="8" lightState="0" currentShow="5" speed="4" brightness="3" specialEffect="0" />
+    <Pump systemId="9" pumpState="0" pumpSpeed="0" lastSpeed="48" whyOn="0" />
+    <BodyOfWater systemId="2" waterTemp="-1" flow="1" />
+    <Filter systemId="11" filterState="0" filterSpeed="0" valvePosition="1" whyFilterIsOn="0" fpOverride="0" reportedFilterSpeed="90" power="1492" lastSpeed="50" />
+    <VirtualHeater systemId="12" Current-Set-Point="98" enable="1" SolarSetPoint="103" Mode="0" SilentMode="0" whyHeaterIsOn="1" />
+    <Heater systemId="13" heaterState="0" temp="65535" enable="1" priority="0" maintainFor="24" />
+    <Chlorinator systemId="14" status="0" instantSaltLevel="0" avgSaltLevel="0" chlrAlert="0" chlrError="0" scMode="0" operatingState="0" Timed-Percent="1" operatingMode="1" enable="0" />
+    <Pump systemId="16" pumpState="0" pumpSpeed="0" lastSpeed="100" whyOn="0" />
+    <Group systemId="34" groupState="0" />
+    <Group systemId="36" groupState="0" />
+</STATUS>

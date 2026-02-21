@@ -134,6 +134,18 @@ public class PumpHandler extends HaywardThingHandler {
                             putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_TYPE, backyardPump.getType());
                             putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_FUNCTION,
                                     backyardPump.getFunction());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_FREEZEPROTECTENABLE,
+                                    backyardPump.getFreezeProtectEnable());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_FREEZEPROTECTSPEED,
+                                    backyardPump.getFreezeProtectSpeed());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_VALVECYCLEENABLE,
+                                    backyardPump.getValveCycleEnable());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_VALVECYCLETIME,
+                                    backyardPump.getValveCycleTime());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_PRIMINGENABLED,
+                                    backyardPump.getPrimingEnabled());
+                            putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_PRIMINGDURATION,
+                                    backyardPump.getPrimingDuration());
                             putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_MINSPEED,
                                     backyardPump.getMinPumpSpeed());
                             putStrStrIfNotNull(props, BindingConstants.PROPERTY_PUMP_MAXSPEED,
@@ -161,33 +173,46 @@ public class PumpHandler extends HaywardThingHandler {
     @Override
     public void getTelemetry(String xmlResponse) throws HaywardException {
         Status status = TelemetryParser.parse(xmlResponse);
-        String sysId = getThing().getProperties().get("systemID");
-        if (sysId == null) {
-            return;
-        }
+        String sysId = getThing().getUID().getId();
+
         for (Pump p : status.getPumps()) {
             if (sysId.equals(p.getSystemId())) {
                 @Nullable
-                String pumpSpeed = p.getPumpSpeed();
-                if (pumpSpeed != null) {
-                    updateData(BindingConstants.CHANNEL_PUMP_SPEED, pumpSpeed);
-
-                    if (Integer.parseInt(pumpSpeed) > 0) {
+                String state = p.getState();
+                if (state != null) {
+                    if (Integer.parseInt(state) > 0) {
                         updateData(BindingConstants.CHANNEL_PUMP_ENABLE, "1");
                     } else {
                         updateData(BindingConstants.CHANNEL_PUMP_ENABLE, "0");
                     }
+                    updateData(BindingConstants.CHANNEL_PUMP_STATE, state);
+                } else {
+                    logger.debug("Pump state missing from Telemtry");
+                }
 
+                @Nullable
+                String speed = p.getSpeed();
+                if (speed != null) {
+                    updateData(BindingConstants.CHANNEL_PUMP_SPEED, speed);
+                    updateData(BindingConstants.CHANNEL_PUMP_SPEEDPRESET, speed);
                 } else {
                     logger.debug("Pump speed missing from Telemtry");
                 }
 
                 @Nullable
-                String pumpState = p.getPumpState();
-                if (pumpState != null) {
-                    updateData(BindingConstants.CHANNEL_PUMP_STATE, pumpState);
+                String lastSpeed = p.getLastSpeed();
+                if (lastSpeed != null) {
+                    updateData(BindingConstants.CHANNEL_PUMP_LASTSPEED, lastSpeed);
                 } else {
-                    logger.debug("Pump state missing from Telemtry");
+                    logger.debug("Pump last speed missing from Telemtry");
+                }
+
+                @Nullable
+                String whyPumpIsOn = p.getWhyOn();
+                if (whyPumpIsOn != null) {
+                    updateData(BindingConstants.CHANNEL_PUMP_WHYPUMPISON, whyPumpIsOn);
+                } else {
+                    logger.debug("Pump why pump is on missing from Telemtry");
                 }
             }
         }

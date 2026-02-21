@@ -99,8 +99,10 @@
 		</tags>
 		<state readOnly="true">
 			<options>
-				<option value="1">??</option>
-				<option value="2">???</option>
+				<option value="0">Unconfigured</option>
+				<option value="1">Paused</option>
+				<option value="2">Running</option>
+				<option value="3">Halt</option>
 			</options>
 		</state>
 	</channel-type>

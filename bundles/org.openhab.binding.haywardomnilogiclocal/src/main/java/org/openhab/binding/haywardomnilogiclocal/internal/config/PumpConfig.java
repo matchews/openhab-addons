@@ -37,6 +37,24 @@ public class PumpConfig {
     @XStreamAlias("Function")
     private @Nullable String function;
 
+    @XStreamAlias("Freeze-Protect-Enable")
+    private @Nullable String freezeProtectEnable;
+
+    @XStreamAlias("Freeze-Protect-Speed")
+    private @Nullable String freezeProtectSpeed;
+
+    @XStreamAlias("Valve-Cycle-Enable")
+    private @Nullable String valveCycleEnable;
+
+    @XStreamAlias("Valve-Cycle-Time")
+    private @Nullable String valveCycleTime;
+
+    @XStreamAlias("Priming-Enabled")
+    private @Nullable String primingEnabled;
+
+    @XStreamAlias("Priming-Duration")
+    private @Nullable String primingDuration;
+
     @XStreamAlias("Max-Pump-RPM")
     private @Nullable String maxPumpRpm;
 
@@ -75,6 +93,30 @@ public class PumpConfig {
 
     public @Nullable String getFunction() {
         return function;
+    }
+
+    public @Nullable String getFreezeProtectEnable() {
+        return freezeProtectEnable;
+    }
+
+    public @Nullable String getFreezeProtectSpeed() {
+        return freezeProtectSpeed;
+    }
+
+    public @Nullable String getValveCycleEnable() {
+        return valveCycleEnable;
+    }
+
+    public @Nullable String getValveCycleTime() {
+        return valveCycleTime;
+    }
+
+    public @Nullable String getPrimingEnabled() {
+        return primingEnabled;
+    }
+
+    public @Nullable String getPrimingDuration() {
+        return primingDuration;
     }
 
     public @Nullable String getMaxPumpSpeed() {

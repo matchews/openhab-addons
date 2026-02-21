@@ -29,6 +29,8 @@ import org.openhab.binding.haywardomnilogiclocal.internal.config.ChlorinatorConf
 import org.openhab.binding.haywardomnilogiclocal.internal.config.ColorLogicLightConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.ConfigParser;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.FilterConfig;
+import org.openhab.binding.haywardomnilogiclocal.internal.config.GroupConfig;
+import org.openhab.binding.haywardomnilogiclocal.internal.config.GroupsConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.HeaterEquipConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.MspConfig;
 import org.openhab.binding.haywardomnilogiclocal.internal.config.PumpConfig;
@@ -161,6 +163,21 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                             }
                         }
 
+                        List<PumpConfig> bowPumps = bow.getPumps();
+                        if (bowPumps != null) {
+                            for (PumpConfig bowPump : bowPumps) {
+                                String pumpName = bowPump.getName();
+                                if (pumpName == null) {
+                                    pumpName = "Pump";
+                                }
+                                Map<String, Object> pumpProps = new HashMap<>();
+                                pumpProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.PUMP);
+                                putStrObjIfNotNull(pumpProps, BindingConstants.PROPERTY_SYSTEM_ID,
+                                        bowPump.getSystemId());
+                                onDeviceDiscovered(BindingConstants.THING_TYPE_PUMP, pumpName, pumpProps);
+                            }
+                        }
+
                         List<RelayConfig> relays = bow.getRelays();
                         if (relays != null) {
                             for (RelayConfig relay : relays) {
@@ -226,6 +243,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                             }
                         }
                     }
+
                     List<PumpConfig> backyardPumps = backyard.getPumps();
                     if (backyardPumps != null) {
                         for (PumpConfig backyardPump : backyardPumps) {
@@ -240,6 +258,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                             onDeviceDiscovered(BindingConstants.THING_TYPE_PUMP, pumpName, pumpProps);
                         }
                     }
+
                     List<RelayConfig> backyardRelays = backyard.getRelays();
                     if (backyardRelays != null) {
                         for (RelayConfig relay : backyardRelays) {
@@ -253,6 +272,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                             onDeviceDiscovered(BindingConstants.THING_TYPE_RELAY, relayName, relayProps);
                         }
                     }
+
                     List<SensorConfig> backyardSensors = backyard.getSensors();
                     if (backyardSensors != null) {
                         for (SensorConfig sensor : backyardSensors) {
@@ -269,6 +289,24 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                             onDeviceDiscovered(BindingConstants.THING_TYPE_SENSOR, sensorName, sensorProps);
                         }
                     }
+                }
+            }
+        }
+
+        List<GroupsConfig> groups = config.getGroups();
+        if (groups != null) {
+            for (GroupsConfig group : groups) {
+                List<GroupConfig> subGroups = group.getGroup();
+                for (GroupConfig subGroup : subGroups) {
+                    String groupName = subGroup.getName();
+                    if (groupName == null) {
+                        groupName = "Group";
+                    }
+                    Map<String, Object> groupProps = new HashMap<>();
+                    groupProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.GROUP);
+                    putStrObjIfNotNull(groupProps, BindingConstants.PROPERTY_SYSTEM_ID, subGroup.getSystemId());
+                    putStrObjIfNotNull(groupProps, BindingConstants.PROPERTY_GROUP_ICON, subGroup.getIconID());
+                    onDeviceDiscovered(BindingConstants.THING_TYPE_GROUP, groupName, groupProps);
                 }
             }
         }

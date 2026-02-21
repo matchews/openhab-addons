@@ -27,6 +27,7 @@ import org.openhab.binding.haywardomnilogiclocal.internal.handler.BridgeHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.ChlorinatorHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.ColorLogicHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.FilterHandler;
+import org.openhab.binding.haywardomnilogiclocal.internal.handler.GroupHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.HeaterHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.PumpHandler;
 import org.openhab.binding.haywardomnilogiclocal.internal.handler.RelayHandler;
@@ -90,6 +91,9 @@ public class HandlerFactory extends BaseThingHandlerFactory {
         }
         if (thingTypeUID.equals(BindingConstants.THING_TYPE_FILTER)) {
             return new FilterHandler(thing);
+        }
+        if (thingTypeUID.equals(BindingConstants.THING_TYPE_GROUP)) {
+            return new GroupHandler(thing);
         }
         if (thingTypeUID.equals(BindingConstants.THING_TYPE_HEATER)) {
             return new HeaterHandler(thing);

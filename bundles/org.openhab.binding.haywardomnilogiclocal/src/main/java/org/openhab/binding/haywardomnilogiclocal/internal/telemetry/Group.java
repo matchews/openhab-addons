@@ -19,50 +19,25 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
- * Representation of a Pump element.
+ * Representation of a Relay element.
  *
  * @author Matt Myers - Initial contribution
  */
 @NonNullByDefault
-@XStreamAlias("Pump")
-public class Pump {
+@XStreamAlias("Group")
+public class Group {
     @XStreamAsAttribute
     @XStreamAlias("systemId")
     private @Nullable String systemId;
 
     @XStreamAsAttribute
-    @XStreamAlias("pumpSpeed")
-    private @Nullable String pumpSpeed;
-
-    @XStreamAsAttribute
-    @XStreamAlias("pumpState")
-    private @Nullable String pumpState;
-
-    @XStreamAsAttribute
-    @XStreamAlias("lastSpeed")
-    private @Nullable String lastSpeed;
-
-    @XStreamAsAttribute
-    @XStreamAlias("whyOn")
-    private @Nullable String whyOn;
+    private @Nullable String groupState;
 
     public @Nullable String getSystemId() {
         return systemId;
     }
 
-    public @Nullable String getSpeed() {
-        return pumpSpeed;
-    }
-
-    public @Nullable String getState() {
-        return pumpState;
-    }
-
-    public @Nullable String getLastSpeed() {
-        return lastSpeed;
-    }
-
-    public @Nullable String getWhyOn() {
-        return whyOn;
+    public @Nullable String getGroupState() {
+        return groupState;
     }
 }
