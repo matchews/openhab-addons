@@ -283,12 +283,18 @@ public class PumpHandler extends HaywardThingHandler {
                 break;
 
             case BindingConstants.CHANNEL_PUMP_SPEED_RPM:
-                if (minSpeed != null && maxSpeed != null && maxRpmSpeed != null) {
-                    cmdString = Integer.toString((Integer.parseInt(cmdString) * 100 / Integer.parseInt(maxRpmSpeed)));
-                    if (Integer.parseInt(cmdString) > 0 && Integer.parseInt(cmdString) < Integer.parseInt(minSpeed)) {
-                        cmdString = minSpeed;
-                    } else if (Integer.parseInt(cmdString) > Integer.parseInt(maxSpeed)) {
-                        cmdString = maxSpeed;
+                if (command instanceof QuantityType quantityCommand) {
+                    if (minSpeed != null && maxSpeed != null && maxRpmSpeed != null) {
+
+                        int cmdSpeed = (quantityCommand.intValue() * 100 / Integer.parseInt(maxRpmSpeed));
+                        cmdString = Integer.toString(cmdSpeed);
+                        if (cmdSpeed < Integer.parseInt(minSpeed)) {
+                            cmdString = minSpeed;
+                        } else if (cmdSpeed > Integer.parseInt(maxSpeed)) {
+                            cmdString = maxSpeed;
+                        }
+                        cmdURL = CommandBuilder.buildSetEquipmentCmd(bowId, sysId, cmdString);
+                        sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);
                     }
                 }
                 break;

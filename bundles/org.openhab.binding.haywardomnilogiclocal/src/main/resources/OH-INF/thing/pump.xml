@@ -49,16 +49,16 @@
 		</tags>
 		<state readOnly="false"/>
 	</channel-type>
-	
-       <channel-type id="pumpSpeedRpm">
-        <item-type unitHint="rpm">Number:Frequency</item-type>
-        <label>Pump Speed</label>
-        <description>Pump speed</description>
-        <tags>
-            <tag>Control</tag>
-            <tag>Speed</tag>
-        </tags>
-    </channel-type>
+
+	<channel-type id="pumpSpeedRpm">
+		<item-type unitHint="rpm">Number:Frequency</item-type>
+		<label>Pump Speed</label>
+		<description>Pump speed</description>
+		<tags>
+			<tag>Control</tag>
+			<tag>Speed</tag>
+		</tags>
+	</channel-type>
 
 	<channel-type id="pumpSpeedPreset">
 		<item-type>String</item-type>

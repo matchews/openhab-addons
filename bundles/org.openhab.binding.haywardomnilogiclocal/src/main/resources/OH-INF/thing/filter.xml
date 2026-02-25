@@ -61,16 +61,16 @@
 			<tag>Speed</tag>
 		</tags>
 	</channel-type>
-	
+
 	<channel-type id="filterSpeedRpm">
-        <item-type unitHint="rpm">Number:Frequency</item-type>
-        <label>Filter Speed</label>
-        <description>Filter speed</description>
-        <tags>
-            <tag>Control</tag>
-            <tag>Speed</tag>
-        </tags>
-    </channel-type>
+		<item-type unitHint="rpm">Number:Frequency</item-type>
+		<label>Filter Speed</label>
+		<description>Filter speed</description>
+		<tags>
+			<tag>Control</tag>
+			<tag>Speed</tag>
+		</tags>
+	</channel-type>
 
 	<channel-type id="filterSpeedPreset">
 		<item-type>String</item-type>
