@@ -13,7 +13,8 @@
 		<semantic-equipment-tag>Pump</semantic-equipment-tag>
 		<channels>
 			<channel id="pumpEnable" typeId="system.power"/>
-			<channel id="pumpSpeed" typeId="speed"/>
+			<channel id="pumpSpeedPercent" typeId="pumpSpeedPercent"/>
+			<channel id="pumpSpeedRpm" typeId="pumpSpeedRpm"/>
 			<channel id="pumpSpeedPreset" typeId="pumpSpeedPreset"/>
 			<channel id="pumpState" typeId="pumpState"/>
 			<channel id="pumpLastSpeed" typeId="pumpLastSpeed"/>
@@ -38,7 +39,7 @@
 		</state>
 	</channel-type>
 
-	<channel-type id="speed">
+	<channel-type id="pumpSpeedPercent">
 		<item-type unitHint="%">Number:Dimensionless</item-type>
 		<label>Pump Speed</label>
 		<description>Dynamic units (% or rpm from config)</description>
@@ -48,6 +49,17 @@
 		</tags>
 		<state readOnly="false"/>
 	</channel-type>
+	
+       <channel-type id="pumpSpeedRpm">
+        <item-type unitHint="RPM">Number:Frequency</item-type>
+        <label>Pump Speed</label>
+        <description>Pump speed</description>
+        <tags>
+            <tag>Control</tag>
+            <tag>Speed</tag>
+        </tags>
+        <state min="0" max="3450" step="100" pattern="%d %%" readOnly="false"/>
+    </channel-type>
 
 	<channel-type id="pumpSpeedPreset">
 		<item-type>String</item-type>

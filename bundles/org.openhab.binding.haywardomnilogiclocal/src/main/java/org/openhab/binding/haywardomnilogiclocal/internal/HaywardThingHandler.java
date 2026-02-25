@@ -74,7 +74,6 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
     public State toState(String type, String channelID, String value) throws NumberFormatException {
         // ---- Read bridge properties once (safe defaults) ----
         String unitsPref = "Standard"; // Standard => °F
-        String vspFormat = "Percent"; // Percent => %
 
         Bridge bridge = getBridge();
         if (bridge != null && bridge.getHandler() instanceof BridgeHandler bridgeHandler) {
@@ -82,10 +81,6 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
             String u = bridgeProps.get(BindingConstants.PROPERTY_BRIDGE_UNITS);
             if (u != null) {
                 unitsPref = u;
-            }
-            String vs = bridgeProps.get(BindingConstants.PROPERTY_BRIDGE_VSPSPEEDFORMAT);
-            if (vs != null) {
-                vspFormat = vs;
             }
         }
 
@@ -131,17 +126,21 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
                     return new QuantityType<>(Integer.parseInt(value), Units.PERCENT);
                 }
 
-                // --- Speed channels: Percent vs RPM depending on PROPERTY_BRIDGE_VSPSPEEDFORMAT ---
-                if (BindingConstants.CHANNEL_FILTER_SPEED.equals(channelID)
+                // --- Speed channels: Percent
+                if (BindingConstants.CHANNEL_FILTER_SPEED_PERCENT.equals(channelID)
                         || BindingConstants.CHANNEL_FILTER_LASTSPEED.equals(channelID)
-                        || BindingConstants.CHANNEL_PUMP_SPEED.equals(channelID)) {
+                        || BindingConstants.CHANNEL_FILTER_REPORTEDSPEED.equals(channelID)
+                        || BindingConstants.CHANNEL_PUMP_SPEED_PERCENT.equals(channelID)
+                        || BindingConstants.CHANNEL_PUMP_LASTSPEED.equals(channelID)) {
                     int v = Integer.parseInt(value);
+                    return new QuantityType<>(v, Units.PERCENT);
+                }
 
-                    if ("RPM".equalsIgnoreCase(vspFormat)) {
-                        return new QuantityType<>(v, Units.RPM);
-                    } else {
-                        return new QuantityType<>(v, Units.PERCENT);
-                    }
+                // --- Speed channels: RPM
+                if (BindingConstants.CHANNEL_FILTER_SPEED_RPM.equals(channelID)
+                        || BindingConstants.CHANNEL_PUMP_SPEED_RPM.equals(channelID)) {
+                    int v = Integer.parseInt(value);
+                    return new QuantityType<>(v, Units.RPM);
                 }
 
                 // Default for other Number:Dimensionless channels: keep numeric

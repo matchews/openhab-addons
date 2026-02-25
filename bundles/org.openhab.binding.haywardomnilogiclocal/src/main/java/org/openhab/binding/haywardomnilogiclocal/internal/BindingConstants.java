@@ -140,7 +140,8 @@ public class BindingConstants {
     public static final String CHANNEL_FILTER_ENABLE = "filterEnable";
     public static final String CHANNEL_FILTER_STATE = "filterState";
     public static final String CHANNEL_FILTER_VALVEPOSITION = "filterValvePosition";
-    public static final String CHANNEL_FILTER_SPEED = "filterSpeed";
+    public static final String CHANNEL_FILTER_SPEED_PERCENT = "filterSpeedPercent";
+    public static final String CHANNEL_FILTER_SPEED_RPM = "filterSpeedRpm";
     public static final String CHANNEL_FILTER_SPEEDPRESET = "filterSpeedPreset";
     public static final String CHANNEL_FILTER_LASTSPEED = "filterLastSpeed";
     public static final String CHANNEL_FILTER_WHYFILTERISON = "filterWhyFilterIsOn";
@@ -203,7 +204,8 @@ public class BindingConstants {
 
     // Pump
     public static final String CHANNEL_PUMP_ENABLE = "pumpEnable";
-    public static final String CHANNEL_PUMP_SPEED = "pumpSpeed";
+    public static final String CHANNEL_PUMP_SPEED_PERCENT = "pumpSpeedPercent";
+    public static final String CHANNEL_PUMP_SPEED_RPM = "pumpSpeedRpm";
     public static final String CHANNEL_PUMP_SPEEDPRESET = "pumpSpeedPreset";
     public static final String CHANNEL_PUMP_STATE = "pumpState";
     public static final String CHANNEL_PUMP_LASTSPEED = "pumpLastSpeed";

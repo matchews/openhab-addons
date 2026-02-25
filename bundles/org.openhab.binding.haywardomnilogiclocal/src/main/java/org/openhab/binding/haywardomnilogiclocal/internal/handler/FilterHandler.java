@@ -72,53 +72,6 @@ public class FilterHandler extends HaywardThingHandler {
     }
 
     @Override
-    public void setStateDescriptions() throws HaywardException {
-        List<StateOption> options = new ArrayList<>();
-        String option;
-
-        Bridge bridge = getBridge();
-        if (bridge != null && bridge.getHandler() instanceof BridgeHandler bridgehandler) {
-            // Set minimum and maximum speeds
-            Channel ch = thing.getChannel(BindingConstants.CHANNEL_FILTER_SPEED);
-            if (ch != null) {
-                StateDescriptionFragment stateDescriptionFragment = StateDescriptionFragmentBuilder.create()
-                        .withMinimum(new BigDecimal(
-                                getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MINSPEED)))
-                        .withMaximum(new BigDecimal(
-                                getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MAXSPEED)))
-                        .withPattern("%d %%").withStep(new BigDecimal(5)).withReadOnly(false).build();
-                bridgehandler.updateChannelStateDescriptionFragment(ch, stateDescriptionFragment);
-            }
-
-            // Set Speed States
-            ch = thing.getChannel(BindingConstants.CHANNEL_FILTER_SPEEDPRESET);
-            if (ch != null) {
-                options.add(new StateOption("0", "Off"));
-                option = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_LOWSPEED);
-                if (option != null) {
-                    options.add(new StateOption(option, "Low"));
-                }
-                option = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MEDSPEED);
-                if (option != null) {
-                    options.add(new StateOption(option, "Medium"));
-                }
-                option = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_HIGHSPEED);
-                if (option != null) {
-                    options.add(new StateOption(option, "High"));
-                }
-                option = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_CUSTOMSPEED);
-                if (option != null) {
-                    options.add(new StateOption(option, "Custom"));
-                }
-
-                StateDescriptionFragment stateDescriptionFragment = StateDescriptionFragmentBuilder.create()
-                        .withOptions(options).build();
-                bridgehandler.updateChannelStateDescriptionFragment(ch, stateDescriptionFragment);
-            }
-        }
-    }
-
-    @Override
     public void getProperties() {
         Bridge bridge = getBridge();
         if (bridge != null) {
@@ -188,88 +141,156 @@ public class FilterHandler extends HaywardThingHandler {
     }
 
     @Override
+    public void setStateDescriptions() throws HaywardException {
+        List<StateOption> options = new ArrayList<>();
+        String option;
+
+        Bridge bridge = getBridge();
+        BridgeHandler bridgehandler = (BridgeHandler) bridge.getHandler();
+
+        if (bridge != null & bridgehandler != null) {
+            // Set minimum and maximum RPM speeds
+            Channel ch = thing.getChannel(BindingConstants.CHANNEL_FILTER_SPEED_RPM);
+            if (ch != null) {
+                StateDescriptionFragment stateDescriptionFragment = StateDescriptionFragmentBuilder.create()
+                        .withMinimum(
+                                new BigDecimal(getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MINRPM)))
+                        .withMaximum(
+                                new BigDecimal(getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MAXRPM)))
+                        .withPattern("%d %%").withStep(new BigDecimal(100)).withReadOnly(false).build();
+                bridgehandler.updateChannelStateDescriptionFragment(ch, stateDescriptionFragment);
+            }
+            // Set minimum and maximum percent speeds
+            ch = thing.getChannel(BindingConstants.CHANNEL_FILTER_SPEED_PERCENT);
+            if (ch != null) {
+                StateDescriptionFragment stateDescriptionFragment = StateDescriptionFragmentBuilder.create()
+                        .withMinimum(new BigDecimal(
+                                getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MINSPEED)))
+                        .withMaximum(new BigDecimal(
+                                getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MAXSPEED)))
+                        .withPattern("%d %%").withStep(new BigDecimal(5)).withReadOnly(false).build();
+                bridgehandler.updateChannelStateDescriptionFragment(ch, stateDescriptionFragment);
+            }
+        }
+
+        // Set Speed States
+        Channel ch = thing.getChannel(BindingConstants.CHANNEL_FILTER_SPEEDPRESET);
+        if (ch != null) {
+            options.add(new StateOption("0", "Off"));
+            option = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_LOWSPEED);
+            if (option != null) {
+                options.add(new StateOption(option, "Low"));
+            }
+            option = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MEDSPEED);
+            if (option != null) {
+                options.add(new StateOption(option, "Medium"));
+            }
+            option = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_HIGHSPEED);
+            if (option != null) {
+                options.add(new StateOption(option, "High"));
+            }
+            option = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_CUSTOMSPEED);
+            if (option != null) {
+                options.add(new StateOption(option, "Custom"));
+            }
+
+            StateDescriptionFragment stateDescriptionFragment = StateDescriptionFragmentBuilder.create()
+                    .withOptions(options).build();
+            bridgehandler.updateChannelStateDescriptionFragment(ch, stateDescriptionFragment);
+        }
+    }
+
+    @Override
     public void getTelemetry(String xmlResponse) throws HaywardException {
         Status status = TelemetryParser.parse(xmlResponse);
         String sysId = getThing().getUID().getId();
         String bowID = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
 
-        for (Filter f : status.getFilters()) {
-            if (sysId.equals(f.getSystemId())) {
-                @Nullable
-                String state = f.getState();
-                if (state != null) {
-                    if (Integer.parseInt(state) > 0) {
-                        updateData(BindingConstants.CHANNEL_FILTER_ENABLE, "1");
+        Bridge bridge = getBridge();
+        if (bridge != null && bridge.getHandler() instanceof BridgeHandler bridgehandler) {
+            for (Filter f : status.getFilters()) {
+                if (sysId.equals(f.getSystemId())) {
+                    @Nullable
+                    String state = f.getState();
+                    if (state != null) {
+                        if (Integer.parseInt(state) > 0) {
+                            updateData(BindingConstants.CHANNEL_FILTER_ENABLE, "1");
+                        } else {
+                            updateData(BindingConstants.CHANNEL_FILTER_ENABLE, "0");
+                        }
+                        updateData(BindingConstants.CHANNEL_FILTER_STATE, state);
                     } else {
-                        updateData(BindingConstants.CHANNEL_FILTER_ENABLE, "0");
+                        logger.debug("Filter state missing from Telemtry");
                     }
-                    updateData(BindingConstants.CHANNEL_FILTER_STATE, state);
-                } else {
-                    logger.debug("Filter state missing from Telemtry");
-                }
 
-                @Nullable
-                String speed = f.getSpeed();
-                if (speed != null) {
-                    updateData(BindingConstants.CHANNEL_FILTER_SPEED, speed);
-                    updateData(BindingConstants.CHANNEL_FILTER_SPEEDPRESET, speed);
-                } else {
-                    logger.debug("Filter speed missing from Telemtry");
-                }
+                    @Nullable
+                    String speed = f.getSpeed();
+                    if (speed != null) {
+                        updateData(BindingConstants.CHANNEL_FILTER_SPEED_PERCENT, speed);
+                        updateData(BindingConstants.CHANNEL_FILTER_SPEEDPRESET, speed);
+                        String maxRpm = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MAXRPM);
+                        if (maxRpm != null) {
+                            Integer rpmSpeed = (Integer.parseInt(speed) * (Integer.parseInt(maxRpm)) / 100);
+                            updateData(BindingConstants.CHANNEL_FILTER_SPEED_RPM, rpmSpeed.toString());
+                        }
+                    } else {
+                        logger.debug("Filter speed missing from Telemtry");
+                    }
 
-                @Nullable
-                String valvePosition = f.getValvePosition();
-                if (valvePosition != null && bowID != null) {
-                    updateData(BindingConstants.CHANNEL_FILTER_VALVEPOSITION, valvePosition);
-                    onFilterValvePositionUpdated(bowID, valvePosition);
-                } else {
-                    logger.debug("Filter valve position missing from Telemtry");
-                }
+                    @Nullable
+                    String valvePosition = f.getValvePosition();
+                    if (valvePosition != null && bowID != null) {
+                        updateData(BindingConstants.CHANNEL_FILTER_VALVEPOSITION, valvePosition);
+                        onFilterValvePositionUpdated(bowID, valvePosition);
+                    } else {
+                        logger.debug("Filter valve position missing from Telemtry");
+                    }
 
-                @Nullable
-                String whyFilterIsOn = f.getWhyFilterIsOn();
-                if (whyFilterIsOn != null) {
-                    updateData(BindingConstants.CHANNEL_FILTER_WHYFILTERISON, whyFilterIsOn);
-                } else {
-                    logger.debug("Filter why filter is on missing from Telemtry");
-                }
+                    @Nullable
+                    String whyFilterIsOn = f.getWhyFilterIsOn();
+                    if (whyFilterIsOn != null) {
+                        updateData(BindingConstants.CHANNEL_FILTER_WHYFILTERISON, whyFilterIsOn);
+                    } else {
+                        logger.debug("Filter why filter is on missing from Telemtry");
+                    }
 
-                @Nullable
-                String fpOverride = f.getFpOverride();
-                if (fpOverride != null) {
-                    updateData(BindingConstants.CHANNEL_FILTER_FPOVERRIDE, fpOverride);
-                } else {
-                    logger.debug("Filter fpOverride missing from Telemtry");
-                }
+                    @Nullable
+                    String fpOverride = f.getFpOverride();
+                    if (fpOverride != null) {
+                        updateData(BindingConstants.CHANNEL_FILTER_FPOVERRIDE, fpOverride);
+                    } else {
+                        logger.debug("Filter fpOverride missing from Telemtry");
+                    }
 
-                @Nullable
-                String reportedSpeed = f.getReportedSpeed();
-                if (reportedSpeed != null) {
-                    updateData(BindingConstants.CHANNEL_FILTER_REPORTEDSPEED, reportedSpeed);
-                } else {
-                    logger.debug("Filter reported speed missing from Telemtry");
-                }
+                    @Nullable
+                    String reportedSpeed = f.getReportedSpeed();
+                    if (reportedSpeed != null) {
+                        updateData(BindingConstants.CHANNEL_FILTER_REPORTEDSPEED, reportedSpeed);
+                    } else {
+                        logger.debug("Filter reported speed missing from Telemtry");
+                    }
 
-                @Nullable
-                String power = f.getPower();
-                if (power != null) {
-                    updateData(BindingConstants.CHANNEL_FILTER_POWER, power);
-                } else {
-                    logger.debug("Filter power missing from Telemtry");
-                }
+                    @Nullable
+                    String power = f.getPower();
+                    if (power != null) {
+                        updateData(BindingConstants.CHANNEL_FILTER_POWER, power);
+                    } else {
+                        logger.debug("Filter power missing from Telemtry");
+                    }
 
-                @Nullable
-                String lastSpeed = f.getLastSpeed();
-                if (lastSpeed != null) {
-                    updateData(BindingConstants.CHANNEL_FILTER_LASTSPEED, lastSpeed);
-                } else {
-                    logger.debug("Filter last speed missing from Telemtry");
-                }
+                    @Nullable
+                    String lastSpeed = f.getLastSpeed();
+                    if (lastSpeed != null) {
+                        updateData(BindingConstants.CHANNEL_FILTER_LASTSPEED, lastSpeed);
+                    } else {
+                        logger.debug("Filter last speed missing from Telemtry");
+                    }
 
-                // TODO Test/implement Filter Diagnostics
-                if (bowID != null) {
-                    String cmdURL = CommandBuilder.buildGetUIFilterDiagnosticInfo(bowID, sysId);
-                    // sendUdpCommand(cmdURL, MessageType.DEFAULT);
+                    // TODO Test/implement Filter Diagnostics
+                    if (bowID != null) {
+                        String cmdURL = CommandBuilder.buildGetUIFilterDiagnosticInfo(bowID, sysId);
+                        // sendUdpCommand(cmdURL, MessageType.DEFAULT);
+                    }
                 }
             }
         }
@@ -284,6 +305,8 @@ public class FilterHandler extends HaywardThingHandler {
         String bowId = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
         String minSpeed = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MINSPEED);
         String maxSpeed = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MAXSPEED);
+        String minRpmSpeed = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MINRPM);
+        String maxRpmSpeed = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MAXRPM);
 
         Bridge bridge = getBridge();
         if (sysId == null || bowId == null || bridge == null
@@ -304,7 +327,7 @@ public class FilterHandler extends HaywardThingHandler {
                 sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);
                 break;
 
-            case BindingConstants.CHANNEL_FILTER_SPEED:
+            case BindingConstants.CHANNEL_FILTER_SPEED_PERCENT:
                 if (command instanceof QuantityType quantityCommand) {
                     if (minSpeed != null && maxSpeed != null) {
                         if (quantityCommand.intValue() < Integer.parseInt(minSpeed)) {
@@ -313,13 +336,24 @@ public class FilterHandler extends HaywardThingHandler {
                             cmdString = maxSpeed;
                         } else {
                             cmdString = this.cmdToString(command);
-                            ;
                         }
+                        cmdURL = CommandBuilder.buildSetEquipmentCmd(bowId, sysId, cmdString);
+                        sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);
                     }
-                    cmdURL = CommandBuilder.buildSetEquipmentCmd(bowId, sysId, cmdString);
-                    sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);
                 }
                 break;
+
+            case BindingConstants.CHANNEL_FILTER_SPEED_RPM:
+                if (minSpeed != null && maxSpeed != null && maxRpmSpeed != null) {
+                    cmdString = Integer.toString((Integer.parseInt(cmdString) * 100 / Integer.parseInt(maxRpmSpeed)));
+                    if (Integer.parseInt(cmdString) > 0 && Integer.parseInt(cmdString) < Integer.parseInt(minSpeed)) {
+                        cmdString = minSpeed;
+                    } else if (Integer.parseInt(cmdString) > Integer.parseInt(maxSpeed)) {
+                        cmdString = maxSpeed;
+                    }
+                }
+                break;
+
             case BindingConstants.CHANNEL_FILTER_SPEEDPRESET:
                 cmdURL = CommandBuilder.buildSetEquipmentCmd(bowId, sysId, command.toString());
                 sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);

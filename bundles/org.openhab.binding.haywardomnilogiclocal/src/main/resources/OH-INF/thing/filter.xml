@@ -14,7 +14,8 @@
 		<channels>
 			<channel id="filterEnable" typeId="system.power"/>
 			<channel id="filterState" typeId="filterState"/>
-			<channel id="filterSpeed" typeId="filterSpeed"/>
+			<channel id="filterSpeedPercent" typeId="filterSpeedPercent"/>
+			<channel id="filterSpeedRpm" typeId="filterSpeedRpm"/>
 			<channel id="filterSpeedPreset" typeId="filterSpeedPreset"/>
 			<channel id="filterValvePosition" typeId="filterValvePosition"/>
 			<channel id="filterWhyFilterIsOn" typeId="filterWhyFilterIsOn"/>
@@ -51,7 +52,7 @@
 		</state>
 	</channel-type>
 
-	<channel-type id="filterSpeed">
+	<channel-type id="filterSpeedPercent">
 		<item-type unitHint="%">Number:Dimensionless</item-type>
 		<label>Filter Speed</label>
 		<description>Filter speed</description>
@@ -61,6 +62,17 @@
 		</tags>
 		<state min="0" max="100" step="5" pattern="%d %%" readOnly="false"/>
 	</channel-type>
+	
+	<channel-type id="filterSpeedRpm">
+        <item-type unitHint="RPM">Number:Frequency</item-type>
+        <label>Filter Speed</label>
+        <description>Filter speed</description>
+        <tags>
+            <tag>Control</tag>
+            <tag>Speed</tag>
+        </tags>
+        <state min="0" max="3450" step="100" pattern="%d %%" readOnly="false"/>
+    </channel-type>
 
 	<channel-type id="filterSpeedPreset">
 		<item-type>String</item-type>
