@@ -60,18 +60,16 @@
 			<tag>Control</tag>
 			<tag>Speed</tag>
 		</tags>
-		<state min="0" max="100" step="5" pattern="%d %%" readOnly="false"/>
 	</channel-type>
 	
 	<channel-type id="filterSpeedRpm">
-        <item-type unitHint="RPM">Number:Frequency</item-type>
+        <item-type unitHint="rpm">Number:Frequency</item-type>
         <label>Filter Speed</label>
         <description>Filter speed</description>
         <tags>
             <tag>Control</tag>
             <tag>Speed</tag>
         </tags>
-        <state min="0" max="3450" step="100" pattern="%d %%" readOnly="false"/>
     </channel-type>
 
 	<channel-type id="filterSpeedPreset">

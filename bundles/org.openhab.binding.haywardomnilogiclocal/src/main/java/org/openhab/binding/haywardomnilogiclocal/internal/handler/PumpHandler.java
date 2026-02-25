@@ -78,7 +78,7 @@ public class PumpHandler extends HaywardThingHandler {
 
         Bridge bridge = getBridge();
         if (bridge != null && bridge.getHandler() instanceof BridgeHandler bridgehandler) {
-            // Set minimum and maximum speeds
+            // Set minimum and maximum percent speeds
             Channel ch = thing.getChannel(BindingConstants.CHANNEL_PUMP_SPEED_PERCENT);
             if (ch != null) {
                 StateDescriptionFragment stateDescriptionFragment = StateDescriptionFragmentBuilder.create()
@@ -86,7 +86,18 @@ public class PumpHandler extends HaywardThingHandler {
                                 new BigDecimal(getThing().getProperties().get(BindingConstants.PROPERTY_PUMP_MINSPEED)))
                         .withMaximum(
                                 new BigDecimal(getThing().getProperties().get(BindingConstants.PROPERTY_PUMP_MAXSPEED)))
-                        .withPattern("%d %%").withStep(new BigDecimal(5)).withReadOnly(false).build();
+                        .withPattern("%d %unit%").withStep(new BigDecimal(5)).withReadOnly(false).build();
+                bridgehandler.updateChannelStateDescriptionFragment(ch, stateDescriptionFragment);
+            }
+            // Set minimum and maximum RPM speeds
+            ch = thing.getChannel(BindingConstants.CHANNEL_PUMP_SPEED_RPM);
+            if (ch != null) {
+                StateDescriptionFragment stateDescriptionFragment = StateDescriptionFragmentBuilder.create()
+                        .withMinimum(
+                                new BigDecimal(getThing().getProperties().get(BindingConstants.PROPERTY_PUMP_MINRPM)))
+                        .withMaximum(
+                                new BigDecimal(getThing().getProperties().get(BindingConstants.PROPERTY_PUMP_MAXRPM)))
+                        .withPattern("%d %unit%").withStep(new BigDecimal(10)).withReadOnly(false).build();
                 bridgehandler.updateChannelStateDescriptionFragment(ch, stateDescriptionFragment);
             }
 
@@ -198,7 +209,7 @@ public class PumpHandler extends HaywardThingHandler {
                     String maxRpmSpeed = getThing().getProperties().get(BindingConstants.PROPERTY_PUMP_MAXRPM);
                     if (maxRpmSpeed != null) {
                         Integer rpmSpeed = (Integer.parseInt(speed) * (Integer.parseInt(maxRpmSpeed)) / 100);
-                        updateData(BindingConstants.CHANNEL_FILTER_SPEED_RPM, rpmSpeed.toString());
+                        updateData(BindingConstants.CHANNEL_PUMP_SPEED_RPM, rpmSpeed.toString());
                     }
                 } else {
                     logger.debug("Pump speed missing from Telemtry");

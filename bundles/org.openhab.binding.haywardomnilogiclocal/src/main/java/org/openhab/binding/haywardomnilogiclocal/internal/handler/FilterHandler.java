@@ -147,28 +147,27 @@ public class FilterHandler extends HaywardThingHandler {
 
         Bridge bridge = getBridge();
         BridgeHandler bridgehandler = (BridgeHandler) bridge.getHandler();
-
         if (bridge != null & bridgehandler != null) {
-            // Set minimum and maximum RPM speeds
-            Channel ch = thing.getChannel(BindingConstants.CHANNEL_FILTER_SPEED_RPM);
-            if (ch != null) {
-                StateDescriptionFragment stateDescriptionFragment = StateDescriptionFragmentBuilder.create()
-                        .withMinimum(
-                                new BigDecimal(getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MINRPM)))
-                        .withMaximum(
-                                new BigDecimal(getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MAXRPM)))
-                        .withPattern("%d %%").withStep(new BigDecimal(100)).withReadOnly(false).build();
-                bridgehandler.updateChannelStateDescriptionFragment(ch, stateDescriptionFragment);
-            }
             // Set minimum and maximum percent speeds
-            ch = thing.getChannel(BindingConstants.CHANNEL_FILTER_SPEED_PERCENT);
+            Channel ch = thing.getChannel(BindingConstants.CHANNEL_FILTER_SPEED_PERCENT);
             if (ch != null) {
                 StateDescriptionFragment stateDescriptionFragment = StateDescriptionFragmentBuilder.create()
                         .withMinimum(new BigDecimal(
                                 getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MINSPEED)))
                         .withMaximum(new BigDecimal(
                                 getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MAXSPEED)))
-                        .withPattern("%d %%").withStep(new BigDecimal(5)).withReadOnly(false).build();
+                        .withPattern("%d %unit%").withStep(new BigDecimal(5)).withReadOnly(false).build();
+                bridgehandler.updateChannelStateDescriptionFragment(ch, stateDescriptionFragment);
+            }
+            // Set minimum and maximum RPM speeds
+            ch = thing.getChannel(BindingConstants.CHANNEL_FILTER_SPEED_RPM);
+            if (ch != null) {
+                StateDescriptionFragment stateDescriptionFragment = StateDescriptionFragmentBuilder.create()
+                        .withMinimum(
+                                new BigDecimal(getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MINRPM)))
+                        .withMaximum(
+                                new BigDecimal(getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MAXRPM)))
+                        .withPattern("%d %unit%").withStep(new BigDecimal(10)).withReadOnly(false).build();
                 bridgehandler.updateChannelStateDescriptionFragment(ch, stateDescriptionFragment);
             }
         }

@@ -89,24 +89,6 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
             case "Number":
                 return new DecimalType(value);
 
-            case "Switch":
-                return OnOffType.from(Integer.parseInt(value) > 0);
-
-            case "Number:Power":
-                if (BindingConstants.CHANNEL_FILTER_POWER.equals(channelID)) {
-                    return new QuantityType<>(Integer.parseInt(value), Units.WATT);
-                }
-                return new DecimalType(value);
-
-            case "Number:Temperature": {
-                int v = Integer.parseInt(value);
-                if ("Metric".equalsIgnoreCase(unitsPref)) {
-                    return new QuantityType<>(v, SIUnits.CELSIUS);
-                } else {
-                    // Default Standard
-                    return new QuantityType<>(v, ImperialUnits.FAHRENHEIT);
-                }
-            }
             case "Number:Dimensionless": {
                 // --- Chlorinator salt levels: ppm vs g/L ---
                 if (BindingConstants.CHANNEL_CHLORINATOR_AVGSALTLEVEL.equals(channelID)
@@ -146,6 +128,38 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
                 // Default for other Number:Dimensionless channels: keep numeric
                 return new DecimalType(value);
             }
+
+            case "Number:Frequency": {
+                // --- Speed channels: RPM
+                if (BindingConstants.CHANNEL_FILTER_SPEED_RPM.equals(channelID)
+                        || BindingConstants.CHANNEL_PUMP_SPEED_RPM.equals(channelID)) {
+                    int v = Integer.parseInt(value);
+                    return new QuantityType<>(v, Units.RPM);
+                }
+
+                // Default for other Number: Frequency channels: keep numeric
+                return new DecimalType(value);
+            }
+
+            case "Number:Power":
+                if (BindingConstants.CHANNEL_FILTER_POWER.equals(channelID)) {
+                    return new QuantityType<>(Integer.parseInt(value), Units.WATT);
+                }
+                return new DecimalType(value);
+
+            case "Number:Temperature": {
+                int v = Integer.parseInt(value);
+                if ("Metric".equalsIgnoreCase(unitsPref)) {
+                    return new QuantityType<>(v, SIUnits.CELSIUS);
+                } else {
+                    // Default Standard
+                    return new QuantityType<>(v, ImperialUnits.FAHRENHEIT);
+                }
+            }
+
+            case "Switch":
+                return OnOffType.from(Integer.parseInt(value) > 0);
+
             default:
                 return StringType.valueOf(value);
         }

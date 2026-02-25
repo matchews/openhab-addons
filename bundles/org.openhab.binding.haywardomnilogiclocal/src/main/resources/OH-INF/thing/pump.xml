@@ -42,7 +42,7 @@
 	<channel-type id="pumpSpeedPercent">
 		<item-type unitHint="%">Number:Dimensionless</item-type>
 		<label>Pump Speed</label>
-		<description>Dynamic units (% or rpm from config)</description>
+		<description>Pump Speed</description>
 		<tags>
 			<tag>Control</tag>
 			<tag>Speed</tag>
@@ -51,14 +51,13 @@
 	</channel-type>
 	
        <channel-type id="pumpSpeedRpm">
-        <item-type unitHint="RPM">Number:Frequency</item-type>
+        <item-type unitHint="rpm">Number:Frequency</item-type>
         <label>Pump Speed</label>
         <description>Pump speed</description>
         <tags>
             <tag>Control</tag>
             <tag>Speed</tag>
         </tags>
-        <state min="0" max="3450" step="100" pattern="%d %%" readOnly="false"/>
     </channel-type>
 
 	<channel-type id="pumpSpeedPreset">
