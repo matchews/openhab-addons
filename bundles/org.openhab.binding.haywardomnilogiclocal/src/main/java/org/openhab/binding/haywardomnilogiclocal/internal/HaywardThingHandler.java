@@ -128,7 +128,6 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
                 // Default for other Number:Dimensionless channels: keep numeric
                 return new DecimalType(value);
             }
-
             case "Number:Frequency": {
                 // --- Speed channels: RPM
                 if (BindingConstants.CHANNEL_FILTER_SPEED_RPM.equals(channelID)
@@ -140,7 +139,6 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
                 // Default for other Number: Frequency channels: keep numeric
                 return new DecimalType(value);
             }
-
             case "Number:Power":
                 if (BindingConstants.CHANNEL_FILTER_POWER.equals(channelID)) {
                     return new QuantityType<>(Integer.parseInt(value), Units.WATT);
@@ -156,7 +154,6 @@ public abstract class HaywardThingHandler extends BaseThingHandler {
                     return new QuantityType<>(v, ImperialUnits.FAHRENHEIT);
                 }
             }
-
             case "Switch":
                 return OnOffType.from(Integer.parseInt(value) > 0);
 

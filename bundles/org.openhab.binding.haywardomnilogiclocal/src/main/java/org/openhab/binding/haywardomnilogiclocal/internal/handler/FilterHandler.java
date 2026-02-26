@@ -304,12 +304,10 @@ public class FilterHandler extends HaywardThingHandler {
         String bowId = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
         String minSpeed = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MINSPEED);
         String maxSpeed = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MAXSPEED);
-        String minRpmSpeed = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MINRPM);
         String maxRpmSpeed = getThing().getProperties().get(BindingConstants.PROPERTY_FILTER_MAXRPM);
 
         Bridge bridge = getBridge();
-        if (sysId == null || bowId == null || bridge == null
-                || !(bridge.getHandler() instanceof BridgeHandler bridgehandler)) {
+        if (sysId == null || bowId == null || bridge == null) {
             return;
         }
         String cmdURL;

@@ -46,9 +46,6 @@ public class BackyardConfig {
     @XStreamImplicit(itemFieldName = "Body-of-water")
     private final List<BodyOfWaterConfig> bodiesOfWater = new ArrayList<>();
 
-    @XStreamImplicit(itemFieldName = "Pump")
-    private final List<PumpConfig> pumps = new ArrayList<>();
-
     @XStreamImplicit(itemFieldName = "Relay")
     private final List<RelayConfig> relays = new ArrayList<>();
 
@@ -79,10 +76,6 @@ public class BackyardConfig {
             }
         }
         return null;
-    }
-
-    public List<PumpConfig> getPumps() {
-        return pumps;
     }
 
     public List<RelayConfig> getRelays() {

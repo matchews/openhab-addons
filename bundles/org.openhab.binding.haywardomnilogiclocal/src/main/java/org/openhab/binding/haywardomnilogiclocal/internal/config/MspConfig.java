@@ -144,15 +144,6 @@ public class MspConfig {
                 }
             }
 
-            List<PumpConfig> backyardPumps = backyard.getPumps();
-            if (backyardPumps != null) {
-                for (PumpConfig backyardPump : backyardPumps) {
-                    if (backyardPump.getSystemId().equals(sysId)) {
-                        return backyardPump;
-                    }
-                }
-            }
-
             List<RelayConfig> backyardRelays = backyard.getRelays();
             if (backyardRelays != null) {
                 for (RelayConfig backyardRelay : backyardRelays) {

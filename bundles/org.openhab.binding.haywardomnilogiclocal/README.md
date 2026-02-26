@@ -139,7 +139,7 @@ Hayward OmniLogic Controller Parameters:
 | ------------------- | -------------------- | --------------------- | :--------: |
 | filterEnable        | Switch               | Filter enable         |    R/W     |
 | filterValvePosition | String               | Filter valve position |     R      |
-| filterSpeed         | Number:Dimensionless | Filter speed (%)      |    R/W     |
+| filterSpeedPercent  | Number:Dimensionless | Filter speed (%)      |    R/W     |
 | filterSpeedRpm      | Number:Frequency     | Filter speed (rpm)    |    R/W     |
 | filterSpeedPreset   | String               | Filter speed presets  |    R/W     |
 | filterState         | String               | Filter state          |     R      |
@@ -165,7 +165,8 @@ Hayward OmniLogic Controller Parameters:
 | Channel Type ID | Item Type            | Description         | Read Write |
 | --------------- | -------------------- | ------------------- | :--------: |
 | pumpEnable      | Switch               | Pump enable         |    R/W     |
-| pumpSpeed       | Number:Dimensionless | Pump speed (%)      |    R/W     |
+| pumpSpeedPercent| Number:Dimensionless | Pump speed (%)      |    R/W     |
+| pumpSpeedRpm    | Number:Frequency     | Pump speed (rpm)    |    R/W     |
 | pumpSpeedSelect | String               | Pump speed presets  |    R/W     |
 | pumpState       | String               | Pump state          |     R      |
 | pumpLastSpeed   | Number:Dimensionless | Pump last speed (%) |     R      |

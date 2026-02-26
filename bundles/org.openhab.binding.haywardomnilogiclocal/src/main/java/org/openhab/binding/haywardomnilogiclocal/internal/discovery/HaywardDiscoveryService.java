@@ -174,6 +174,7 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                                 pumpProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.PUMP);
                                 putStrObjIfNotNull(pumpProps, BindingConstants.PROPERTY_SYSTEM_ID,
                                         bowPump.getSystemId());
+                                addBowContext(pumpProps, bow);
                                 onDeviceDiscovered(BindingConstants.THING_TYPE_PUMP, pumpName, pumpProps);
                             }
                         }
@@ -241,21 +242,6 @@ public class HaywardDiscoveryService extends AbstractThingHandlerDiscoveryServic
                                             heaterProps);
                                 }
                             }
-                        }
-                    }
-
-                    List<PumpConfig> backyardPumps = backyard.getPumps();
-                    if (backyardPumps != null) {
-                        for (PumpConfig backyardPump : backyardPumps) {
-                            String pumpName = backyardPump.getName();
-                            if (pumpName == null) {
-                                pumpName = "Pump";
-                            }
-                            Map<String, Object> pumpProps = new HashMap<>();
-                            pumpProps.put(BindingConstants.PROPERTY_TYPE, TypeToRequest.PUMP);
-                            putStrObjIfNotNull(pumpProps, BindingConstants.PROPERTY_SYSTEM_ID,
-                                    backyardPump.getSystemId());
-                            onDeviceDiscovered(BindingConstants.THING_TYPE_PUMP, pumpName, pumpProps);
                         }
                     }
 
