@@ -346,7 +346,7 @@ public class BridgeHandler extends BaseBridgeHandler {
     public synchronized String sendRequest(String xmlRequest, MessageType msgType) throws HaywardException {
         // TODO
         // ---------- DEBUG XML OVERRIDE (MULTI-MESSAGE) ----------
-        boolean debug = true;
+        boolean debug = false;
         if (debug) {
             @Nullable
             String debugFile = null;
