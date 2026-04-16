@@ -23,8 +23,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @NonNullByDefault
 public class HaywardConfig {
     private String host = "";
-    private int alarmPollTime = 60;
-    private int telemetryPollTime = 10;
 
     public HaywardConfig() {
     }
@@ -35,21 +33,5 @@ public class HaywardConfig {
 
     public void setEndpointUrl(String host) {
         this.host = host;
-    }
-
-    public int getAlarmPollTime() {
-        return alarmPollTime;
-    }
-
-    public void setAlarmPollTime(int alarmPollTime) {
-        this.alarmPollTime = alarmPollTime;
-    }
-
-    public int getTelemetryPollTime() {
-        return telemetryPollTime;
-    }
-
-    public void setTelemetryPollTime(int telemetryPollTime) {
-        this.telemetryPollTime = telemetryPollTime;
     }
 }

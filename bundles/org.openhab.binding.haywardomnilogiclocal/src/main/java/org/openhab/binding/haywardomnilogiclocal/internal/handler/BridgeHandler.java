@@ -13,12 +13,10 @@
 package org.openhab.binding.haywardomnilogiclocal.internal.handler;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -27,11 +25,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -62,8 +55,6 @@ import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescriptionFragment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 /**
  * The {@link BridgeHandler} is responsible for handling commands, which are
@@ -80,6 +71,7 @@ public class BridgeHandler extends BaseBridgeHandler {
     private @Nullable UdpClient udpClient;
     private @Nullable ScheduledFuture<?> initializeFuture;
     private @Nullable ScheduledFuture<?> pollTelemetryFuture;
+    private @Nullable ScheduledFuture<?> pollTelemetryResume;
     private @Nullable ScheduledFuture<?> pollAlarmsFuture;
     private int commFailureCount;
     private HaywardConfig haywardConfig = getConfig().as(HaywardConfig.class);
@@ -87,6 +79,12 @@ public class BridgeHandler extends BaseBridgeHandler {
     private MspConfig mspConfig;
     public String units = "Standard";
     private final ConcurrentHashMap<String, String> filterValvePositionByBow = new ConcurrentHashMap<>();
+
+    private static final int ALARM_POLL_PERIOD = 0;
+    private static final int TELEMETRY_POLL_PERIOD = 60;
+    private static final int TELEMETRY_POLL_PERIOD_FAST = 3;
+    private static final int POST_COMMAND_DELAY_SECONDS = 3;
+    private static final int POST_COMMAND_DURATION_SECONDS = 30;
 
     public @Nullable String getFilterValvePositionForBow(String bowID) {
         return filterValvePositionByBow.get(bowID);
@@ -133,6 +131,7 @@ public class BridgeHandler extends BaseBridgeHandler {
         clearPolling(initializeFuture);
         clearPolling(pollTelemetryFuture);
         clearPolling(pollAlarmsFuture);
+        clearPolling(pollTelemetryResume);
         logger.trace("Hayward polling cancelled");
         super.dispose();
     }
@@ -151,7 +150,7 @@ public class BridgeHandler extends BaseBridgeHandler {
                 clearPolling(pollTelemetryFuture);
                 clearPolling(pollAlarmsFuture);
                 commFailureCount = 50;
-                initPolling(60);
+                initPolling(60, TELEMETRY_POLL_PERIOD);
                 return;
             }
             getProperties();
@@ -161,10 +160,10 @@ public class BridgeHandler extends BaseBridgeHandler {
 
             logger.debug("Successfully opened connection to Hayward controller: {}", haywardConfig.getEndpointUrl());
 
-            initPolling(0);
+            initPolling(0, TELEMETRY_POLL_PERIOD);
             logger.trace("Hayward Telemetry polling scheduled");
 
-            if (haywardConfig.getAlarmPollTime() > 0) {
+            if (ALARM_POLL_PERIOD > 0) {
                 initAlarmPolling(1);
             }
         } catch (HaywardException e) {
@@ -173,11 +172,11 @@ public class BridgeHandler extends BaseBridgeHandler {
             clearPolling(pollTelemetryFuture);
             clearPolling(pollAlarmsFuture);
             commFailureCount = 50;
-            initPolling(60);
+            initPolling(60, TELEMETRY_POLL_PERIOD);
         }
     }
 
-    private synchronized void initPolling(int initalDelay) {
+    private synchronized void initPolling(int initalDelay, int pollFrequency) {
         pollTelemetryFuture = scheduler.scheduleWithFixedDelay(() -> {
             try {
                 if (commFailureCount >= 5) {
@@ -195,7 +194,7 @@ public class BridgeHandler extends BaseBridgeHandler {
             } catch (HaywardException e) {
                 logger.debug("Hayward Connection thing: Exception during poll: {}", e.getMessage());
             }
-        }, initalDelay, haywardConfig.getTelemetryPollTime(), TimeUnit.SECONDS);
+        }, initalDelay, pollFrequency, TimeUnit.SECONDS);
     }
 
     private synchronized void initAlarmPolling(int initalDelay) {
@@ -205,13 +204,40 @@ public class BridgeHandler extends BaseBridgeHandler {
             } catch (HaywardException e) {
                 logger.debug("Hayward Connection thing: Exception during getAlarmList: {}", e.getMessage());
             }
-        }, initalDelay, haywardConfig.getAlarmPollTime(), TimeUnit.SECONDS);
+        }, initalDelay, ALARM_POLL_PERIOD, TimeUnit.SECONDS);
     }
 
     private void clearPolling(@Nullable ScheduledFuture<?> pollJob) {
         if (pollJob != null) {
             pollJob.cancel(false);
         }
+    }
+
+    /**
+     * Resets telemetry polling after a command is sent.
+     * Fast polling starts 3s after command, lasts 30s, then reverts to 60s polling.
+     */
+    private synchronized void bumpPollingAfterCommand() {
+        clearPolling(pollTelemetryFuture);
+        clearPolling(pollTelemetryResume);
+
+        // Start fast polling
+        pollTelemetryFuture = scheduler.scheduleWithFixedDelay(() -> {
+            try {
+                requestTelemetryData();
+            } catch (HaywardException e) {
+                logger.debug("Exception during post-command telemetry poll: {}", e.getMessage());
+            }
+        }, POST_COMMAND_DELAY_SECONDS, TELEMETRY_POLL_PERIOD_FAST, TimeUnit.SECONDS);
+
+        // Schedule revert back to normal polling
+        pollTelemetryResume = scheduler.schedule(() -> {
+            synchronized (BridgeHandler.this) {
+                clearPolling(pollTelemetryFuture);
+                initPolling(0, TELEMETRY_POLL_PERIOD);
+                logger.trace("Telemetry polling reverted to normal rate");
+            }
+        }, POST_COMMAND_DURATION_SECONDS, TimeUnit.SECONDS);
     }
 
     public synchronized String requestConfiguration() throws HaywardException {
@@ -327,23 +353,13 @@ public class BridgeHandler extends BaseBridgeHandler {
         }
     }
 
-    public List<String> evaluateXPath(String xpathExp, String xmlResponse) {
-        List<String> values = new ArrayList<>();
-        try {
-            InputSource inputXML = new InputSource(new StringReader(xmlResponse));
-            XPath xPath = XPathFactory.newInstance().newXPath();
-            NodeList nodes = (NodeList) xPath.evaluate(xpathExp, inputXML, XPathConstants.NODESET);
-
-            for (int i = 0; i < nodes.getLength(); i++) {
-                values.add(nodes.item(i).getNodeValue());
-            }
-        } catch (XPathExpressionException e) {
-            logger.warn("XPathExpression exception: {}", e.getMessage());
-        }
-        return values;
-    }
-
     public synchronized String sendRequest(String xmlRequest, MessageType msgType) throws HaywardException {
+        // Any non-polling request is treated as a command and bumps polling
+        if (msgType != MessageType.GET_TELEMETRY && msgType != MessageType.GET_ALARM_LIST
+                && msgType != MessageType.REQUEST_CONFIGURATION) {
+            bumpPollingAfterCommand();
+        }
+
         // TODO
         // ---------- DEBUG XML OVERRIDE (MULTI-MESSAGE) ----------
         boolean debug = false;
@@ -371,9 +387,9 @@ public class BridgeHandler extends BaseBridgeHandler {
         // ---------- END DEBUG OVERRIDE ----------
 
         if (logger.isTraceEnabled()) {
-            logger.trace("Hayward Connection thing:  {} Hayward UDP command:\r{}", getCallingMethod(), xmlRequest);
+            logger.trace("Hayward Connection thing: {} Hayward UDP command:\r{}", getCallingMethod(), xmlRequest);
         } else if (logger.isDebugEnabled()) {
-            logger.debug("Hayward Connection thing:  {}", getCallingMethod());
+            logger.debug("Hayward Connection thing: {}", getCallingMethod());
         }
 
         if (udpClient == null) {
@@ -384,11 +400,9 @@ public class BridgeHandler extends BaseBridgeHandler {
             UdpMessage response = udpClient.send(msgType, xmlRequest);
             if (logger.isTraceEnabled()) {
                 if (!response.getXml().isEmpty()) {
-                    logger.trace("Hayward Connection thing:  {} Hayward UDP command Response:\r{}", getCallingMethod(),
+                    logger.trace("Hayward Connection thing: {} Hayward UDP command Response:\r{}", getCallingMethod(),
                             response.getXml());
                 }
-            } else if (logger.isDebugEnabled()) {
-                logger.debug("Hayward Connection thing:  {}", getCallingMethod());
             }
             return response.getXml();
         } catch (IOException e) {

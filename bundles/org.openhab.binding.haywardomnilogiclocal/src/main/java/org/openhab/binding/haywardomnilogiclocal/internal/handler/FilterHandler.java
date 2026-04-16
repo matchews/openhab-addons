@@ -343,7 +343,6 @@ public class FilterHandler extends HaywardThingHandler {
             case BindingConstants.CHANNEL_FILTER_SPEED_RPM:
                 if (command instanceof QuantityType quantityCommand) {
                     if (minSpeed != null && maxSpeed != null && maxRpmSpeed != null) {
-
                         int cmdSpeed = (quantityCommand.intValue() * 100 / Integer.parseInt(maxRpmSpeed));
                         cmdString = Integer.toString(cmdSpeed);
                         if (cmdSpeed < Integer.parseInt(minSpeed)) {

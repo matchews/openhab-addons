@@ -83,7 +83,7 @@ public class UdpClient {
                         UdpHeader hdr = UdpHeader.fromBytes(data);
                         int receivingMsgId = hdr.getMessageId();
                         MessageType msgType = hdr.getMessageType();
-                        logger.debug("Received UDP packet with message type {} and messageID = {}", msgType,
+                        logger.trace("Received UDP packet with message type {} and messageID = {}", msgType,
                                 receivingMsgId);
                         if (msgType != MessageType.ACK) {
                             ackHandler.sendAck(socket, receivingMsgId);
