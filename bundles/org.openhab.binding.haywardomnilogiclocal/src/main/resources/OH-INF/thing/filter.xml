@@ -131,6 +131,11 @@
 				<option value="13">Timed Spill Over</option>
 				<option value="14">Timed On</option>
 				<option value="15">Freeze Protect</option>
+				<option value="16">Pool Spa Spill Over</option>
+				<option value="17">Spill Over Coundown Timer</option>
+				<option value="18">Group Command</option>
+				<option value="19">Spill Over Interlock</option>
+				<option value="20">Max Value</option>
 			</options>
 		</state>
 	</channel-type>

@@ -262,7 +262,41 @@ public class ChlorinatorHandler extends HaywardThingHandler {
 
         String sysID = getThing().getProperties().get(BindingConstants.PROPERTY_SYSTEM_ID);
         String bowID = getThing().getProperties().get(BindingConstants.PROPERTY_BOWID);
-        String cellType = getThing().getProperties().get(BindingConstants.PROPERTY_CHLORINATOR_CELLTYPE);
+        String cellTypeRaw = getThing().getProperties().get(BindingConstants.PROPERTY_CHLORINATOR_CELLTYPE);
+        String cellType = "1";
+
+        switch (cellTypeRaw) {
+            case "CELL_TYPE_T3":
+                cellType = "1";
+                break;
+            case "CELL_TYPE_T5":
+                cellType = "2";
+                break;
+            case "CELL_TYPE_T9":
+                cellType = "3";
+                break;
+            case "CELL_TYPE_T15":
+                cellType = "4";
+                break;
+            case "CELL_TYPE_T15_LS":
+                cellType = "5";
+                break;
+            case "CELL_TYPE_TCELLS315":
+                cellType = "6";
+                break;
+            case "CELL_TYPE_TCELLS325":
+                cellType = "7";
+                break;
+            case "CELL_TYPE_TCELLS340":
+                cellType = "8";
+                break;
+            case "CELL_TYPE_LIQUID":
+                cellType = "9";
+                break;
+            case "CELL_TYPE_TABLET":
+                cellType = "10";
+                break;
+        }
 
         Bridge bridge = getBridge();
         if (sysID == null || bowID == null || cellType == null || bridge == null
@@ -283,8 +317,6 @@ public class ChlorinatorHandler extends HaywardThingHandler {
                 sendUdpCommand(cmdURL, MessageType.SET_CHLOR_ENABLED);
                 break;
 
-            // TODO somewhat working - need to run pump to change timed percent OR have t-cell plugged in. it won't
-            // change on the app either
             case BindingConstants.CHANNEL_CHLORINATOR_TIMEDPERCENT:
                 String cholorEnabled = orDefault(snap.chlorEnable, DEFAULT_CHLOR_ENABLE);
                 String scEnabled = orDefault(snap.scEnable, DEFAULT_SC_ENABLE);
@@ -294,22 +326,26 @@ public class ChlorinatorHandler extends HaywardThingHandler {
                     String valvePos = bridgeHandler.getFilterValvePositionForBow(bowID);
 
                     // Set bowType based on filter valvePosition
+                    // 0 = Pool, 1 = Spa
                     String bowType = "2".equals(valvePos) ? "1" : "0";
 
                     // cfgState 3 enables/2 disables the chlorinator. Used stored value.
                     String cfgState = "1".equals(cholorEnabled) ? "3" : "2";
 
+                    // Operating Mode: 0 = Not Configured, 1 = Timed, 2 = ORP Autosense
                     String opMode = orDefault(snap.operatingMode, DEFAULT_OPERATINGMODE);
-                    String scTimeout = "0";
-                    String orpTimeout = "0";
+
+                    String scTimeout = "24";
+                    String orpTimeout = "24";
                     cmdURL = CommandBuilder.buildSetChlorParamsCmd(bowID, sysID, cfgState, opMode, bowType, cellType,
                             this.cmdToString(command), scTimeout, orpTimeout);
                     sendUdpCommand(cmdURL, MessageType.SET_EQUIPMENT_CMD);
                 }
                 break;
 
-            // TODO not working likely because the tcell is not plugged in
-            // I think this was working before. need to verify.
+            // TODO SC enable/disable works
+            // Need channel for duration.
+            // Need hayward to return countdown in case another client issued the SC command
             case BindingConstants.CHANNEL_CHLORINATOR_SC_ENABLE:
                 if (command == OnOffType.ON) {
                     cmdString = "1";
